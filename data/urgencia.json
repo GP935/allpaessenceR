@@ -1,0 +1,13 @@
+{
+  "_nota": "DATOS DE URGENCIA. Mientras 'placeholder' sea true son CIFRAS DE MUESTRA para visualizar el sitio: se marcan con data-placeholder-cifra y NO deben publicarse. Para pasar a datos reales: pon placeholder en false y escribe el stock real por SKU (unidades disponibles). 'viewers' es el rango de 'personas viendo'; con datos reales hay que sustituirlo por un contador real (backend) o quitarlo.",
+  "placeholder": true,
+  "umbralVisible": 10,
+  "umbralUltimas": 5,
+  "viewers": { "min": 4, "max": 14 },
+  "stock": {
+    "ae-01": 4, "ae-02": 7, "ae-03": 3, "ae-04": 9, "ae-05": 12,
+    "ae-06": 5, "ae-07": 8, "ae-08": 2, "ae-09": 6, "ae-10": 11,
+    "ae-11": 3, "ae-12": 9, "ae-13": 5, "ae-14": 14, "ae-15": 4,
+    "ae-16": 7, "ae-17": 10, "ae-18": 3, "ae-19": 6, "ae-20": 8
+  }
+}

@@ -1,0 +1,1632 @@
+/* ==========================================================================
+   ALLPA ESSENCE — style.css (AE-C1)
+   Perfumería de nicho. Identidad propia — NO reusa el sistema de AP Beauty/
+   Makeup Andrea (Playfair+rojo), aunque comparte el mismo esqueleto técnico
+   (grid maestro --container-max/--gutter, ritmo --section-pad-y, patrón de
+   menú móvil + carrito con backdrop, mismo espíritu BEM). Ver contrato de
+   clases dejado por front en inbox/css.md.
+
+   Paleta jerárquica estricta (brief allpaessence.txt):
+     Cuerpo 1 (~45%) blanco hielo · Cuerpo 2 (~25%) plata satinada (gradiente,
+     material reflectante) · Cuerpo 3 (~20%) carbón grafito · Acento (~10%)
+     naranja quirúrgico.
+
+   DECISIÓN DE DISCIPLINA (documentar en log): el naranja de acento vive
+   EXCLUSIVAMENTE en `.btn--primary` (el único CTA de conversión por vista:
+   hero, "Añadir al carrito" en ficha de producto, checkout). Badges
+   (bestseller/trending), pills activas y acentos tipográficos NO usan
+   naranja — de lo contrario se repite más de una vez por vista (catálogo
+   real tiene 4 productos "trending" a la vez) y deja de ser accent, pasa a
+   ser cuerpo. Bestseller = ink sólido. Trending = plata (material, no color
+   plano). Mantiene la regla de disciplina del brief.
+
+   EXCEPCIÓN AE-C4 (2026-08-19) RETIRADA (AE-F18/AE-C18, 2026-08-21): existía
+   para `.favoritos` (rail "Favoritos del live"), que repetía `.btn--primary`
+   naranja 3 veces en la misma vista por pedido explícito de Paul. La sección
+   se eliminó del sitio — la regla general de arriba (naranja solo en
+   `.btn--primary`, un único punto de atención por vista) vuelve a regir sin
+   excepciones activas. `.trending` usa `.btn--outline`, no repite el acento.
+
+   Tipografía elegida por CSS (front dejó el hueco, ver AE00 en pipeline):
+   — Display: Bodoni Moda (Didone de alto contraste, filo/precisión — evita
+     a propósito el serif "editorial suave" tipo Playfair Display que usan
+     AP Beauty/Makeup Andrea, descartado explícitamente en el brief).
+   — Cuerpo: Inter (sans neutra, alto contraste AA, distinta a Montserrat de
+     las hermanas para que Allpa Essence no se lea como el mismo sistema).
+   PENDIENTE DE FRONT (no es dominio CSS tocar <head>): añadir a las 8
+   páginas —
+     <link rel="preconnect" href="https://fonts.googleapis.com">
+     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+     <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+   Mensaje dejado en inbox/front.md. Mientras tanto cae a fallback serif/sans
+   del sistema — visualmente correcto en jerarquía, solo cambia el glifo.
+
+   AE-C25 (2026-08-23): `.reveal`/`[data-animate="stagger"]` dejaron de ser
+   hooks inertes — js activó `initScrollReveals()` (AE-J3, `main.js`), que
+   observa cada `.reveal` con IntersectionObserver y aplica `transitionDelay`
+   escalonado a los hijos directos de `[data-animate="stagger"]`, togglando
+   `.is-visible` una sola vez. El CSS del efecto vive en `.reveal`/
+   `.reveal.is-visible` más abajo (mismo patrón que `.why-stat`/`.revealed`
+   de AP Beauty). Respeta `prefers-reduced-motion` tanto en JS como en CSS.
+
+   Sin assets reales todavía (fotografía pendiente de Paul) — los contenedores
+   de imagen llevan de fondo `--color-bg` + borde `--color-border` como
+   placeholder intencional, no un hueco roto (desde AE-C16 ese fondo es
+   blanco puro, igual al resto del sitio — el borde es lo único que distingue
+   el placeholder).
+
+   AJUSTE 2026-08-19 (pedido directo de Paul): la plata dejó de usarse como
+   FONDO de placeholder de imagen — el brief la define como Cuerpo 2 (~25%)
+   pero en la práctica competía con el blanco en demasiadas secciones. Ahora
+   el cuerpo del sitio es solo blanco (ver AE-C16) + carbón grafito; plata y
+   naranja quedan como acento puro (plata: badge trending, íconos, líneas
+   divisorias — nunca relleno de área grande; naranja: solo `.btn--primary`,
+   sin cambios respecto a la regla original).
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1 · Design tokens
+   -------------------------------------------------------------------------- */
+:root {
+  /* AE-C16 (pedido directo de Paul, 2026-08-21): paleta del sitio pasa a ser
+     un único blanco, el mismo del header (`--color-bg-alt`) — se retira la
+     banda "blanco hielo" (#F5F5F4) que antes alternaba con el blanco puro
+     para dar ritmo entre secciones. `--color-bg` queda igualado a
+     `--color-bg-alt` en vez de borrar el token: evita tener que tocar cada
+     regla que ya lo usa (fondo base del body, placeholders de imagen,
+     hovers de menú) — todas heredan el blanco nuevo automáticamente. */
+  /* Cuerpo 1 — blanco (dominante ~45%) */
+  --color-bg:         #FFFFFF;
+  --color-bg-alt:      #FFFFFF;
+  --color-white:       #FFFFFF;
+
+  /* Cuerpo 3 — carbón grafito (peso ~20%) */
+  --color-ink:         #242422;
+  --color-ink-soft:    #34342F;   /* hover sobre superficies ink */
+
+  /* Cuerpo 2 — plata satinada (contraste ~25%, material reflectante) */
+  --color-silver-a:    #B8B8B8;
+  --color-silver-b:    #E8E8E8;
+  --color-silver:      linear-gradient(135deg, var(--color-silver-a) 0%, var(--color-silver-b) 55%, var(--color-silver-a) 100%);
+  --color-silver-text: #CFCFCB;   /* variante plata para texto sobre fondo oscuro */
+
+  /* AE-C32 (pedido directo de Paul): acento pasa de naranja quirúrgico a
+     rosa salmón — mismo rol en el sistema (~10%, solo .btn--primary, ver
+     nota arriba), mismo token, solo cambia el hex. El glow tenue nuevo del
+     CTA vive en `.btn--primary` (más abajo), no acá. */
+  --color-accent:       #F4978E;
+  --color-accent-hover: #E8776C;
+
+  /* AE-C20 (pedido directo de Paul, especificación con hex exacto): azul
+     marino — no es un 4º color del sistema de 3 cuerpos + acento, uso
+     deliberadamente acotado. Nació exclusivo de los 3 íconos de `.valores`
+     (no tocar ningún otro ícono del sitio: header, carrito, flechas de
+     carrusel siguen en su color actual); AE-C21 lo extendió también al
+     fondo de `.site-footer` (pedido directo de Paul) — esos 2 usos son los
+     únicos permitidos, no generalizar a más bloques sin que Paul lo pida. */
+  --color-navy:    #1D3557;
+
+  /* Neutros funcionales derivados de la paleta (sin colores sueltos) */
+  --color-border:      #DDDDDA;
+  --color-text-muted:  #6B6B67;
+  --text-on-dark:      rgba(255,255,255,.82);
+  --text-on-dark-dim:  rgba(255,255,255,.58);
+
+  /* Tipografía */
+  --font-display: 'Bodoni Moda', Georgia, 'Times New Roman', serif;
+  --font-body:    'Inter', system-ui, -apple-system, sans-serif;
+
+  /* Ritmo vertical + grid maestro */
+  --section-pad-y: clamp(48px, 6vw, 100px);
+  --container-max: 1400px;
+  --gutter: clamp(20px, 4vw, 48px);
+
+  /* Filo — "afilado" es identidad, no adorno: radios mínimos en todo el sitio */
+  --radius-card: 2px;
+  --radius-pill: 2px;
+  --radius-soft: 2px;
+
+  --shadow-card:  0 8px 28px rgba(36,36,34,.08);
+  --shadow-hover: 0 16px 40px rgba(36,36,34,.14);
+}
+
+/* --------------------------------------------------------------------------
+   2 · Reset & base
+   -------------------------------------------------------------------------- */
+*, *::before, *::after { box-sizing: border-box; max-width: 100%; }
+html, body { margin: 0; padding: 0; overflow-x: clip; }
+body {
+  font-family: var(--font-body);
+  color: var(--color-ink);
+  background: var(--color-bg);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+img, svg { display: block; max-width: 100%; height: auto; }
+a { color: inherit; }
+ul, ol { list-style: none; margin: 0; padding: 0; }
+dl, dd { margin: 0; }
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+h1, h2, h3 { margin: 0; font-family: var(--font-display); font-weight: 700; color: var(--color-ink); }
+
+/* Compensa el header sticky al saltar a un anchor */
+[id] { scroll-margin-top: 96px; }
+
+.container { width: 100%; max-width: var(--container-max); margin-inline: auto; padding-inline: var(--gutter); }
+section { padding-block: var(--section-pad-y); }
+
+/* Toggle de visibilidad nativo — sin overrides de display en las clases de
+   abajo cuando el elemento puede llevar [hidden] (ver nota de fase MOCKUP y
+   la memoria del bug AP Beauty: `.clase[hidden]{display:none}` obligatorio
+   si la clase define su propio `display`). `.cart-page__layout` es el único
+   caso real del sitio que necesita `display:grid`, por eso lleva su propio
+   override compound más abajo. */
+
+/* --------------------------------------------------------------------------
+   3 · Utilidades
+   -------------------------------------------------------------------------- */
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+}
+.skip-link {
+  position: absolute; top: -48px; left: 12px; z-index: 2000;
+  background: var(--color-ink); color: var(--color-white);
+  padding: 12px 18px; font: 600 .85rem/1 var(--font-body);
+  border-radius: var(--radius-soft); text-decoration: none;
+  transition: top .2s ease;
+}
+.skip-link:focus { top: 12px; }
+
+.eyebrow {
+  display: inline-block;
+  font: 600 .72rem/1 var(--font-body);
+  letter-spacing: .18em; text-transform: uppercase;
+  color: var(--color-text-muted); margin: 0 0 14px;
+}
+section.principio .eyebrow,
+.muestras-promo .eyebrow { color: var(--text-on-dark-dim); }
+
+/* AE-C25 (handoff js AE-J3, ver inbox/css.md): mínimo funcional para el
+   IntersectionObserver que ya activó js — mismo patrón que `.why-stat`/
+   `.revealed` de AP Beauty (andreaapbeauty/style.css:627-639). El stagger
+   entre hermanos de `[data-animate="stagger"]` lo resuelve js con
+   `transitionDelay` inline por elemento, no hace falta CSS extra acá. */
+.reveal { opacity: 0; transform: translateY(16px); transition: opacity .5s ease-out, transform .5s ease-out; }
+.reveal.is-visible { opacity: 1; transform: none; }
+/* Red de seguridad: sin JS el contenido NO debe quedar invisible (SEO, lectores,
+   navegadores sin IntersectionObserver). Con JS activo, el efecto sigue igual. */
+@media (scripting: none) { .reveal { opacity: 1; transform: none; } }
+/* `.product-item`/`.product-card` (más abajo, ~L509) ya declaran su propio
+   `transition` (box-shadow+transform, para el hover) — mismo selector de 1
+   clase que `.reveal`, y por venir después en el archivo GANABA por cascada
+   y pisaba `transition` completo de `.reveal`, dejando la opacidad sin
+   animar (verificado con clic real: `transitionProperty` computado daba
+   "box-shadow, transform", sin "opacity"). Selector de 2 clases (más
+   específico, gana sin importar el orden) que fusiona ambas listas —
+   afecta a las tarjetas de trending/skincare que llevan ambas clases. */
+.reveal.product-item, .reveal.product-card {
+  transition: opacity .5s ease-out, transform .5s ease-out, box-shadow .25s ease;
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; transition: none; }
+}
+
+/* --------------------------------------------------------------------------
+   4 · Botonería — sistema propio Allpa Essence (NO .btn-editorial)
+   -------------------------------------------------------------------------- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: 8px;
+  padding: 13px 30px;
+  font: 600 .78rem/1 var(--font-body);
+  letter-spacing: .12em; text-transform: uppercase;
+  border-radius: var(--radius-soft);
+  border: 1.5px solid transparent;
+  cursor: pointer; text-decoration: none;
+  transition: background .2s ease, color .2s ease, border-color .2s ease;
+  white-space: nowrap;
+}
+.btn--lg { padding: 17px 40px; font-size: .85rem; }
+.btn--sm { padding: 9px 20px; font-size: .68rem; letter-spacing: .1em; }
+/* Mismo patrón AE-C5 (.nav-dropdown__menu): `.btn` define su propio `display`,
+   así que gana por origen sobre el `[hidden]{display:none}` del user-agent —
+   sin este override un `.btn` oculto por JS (ej. #link-muestra) queda visible. */
+.btn[hidden] { display: none; }
+
+/* Único CTA con color de marca — ver nota de disciplina al inicio del archivo */
+/* AE-C32 (pedido directo de Paul): brillo tenue alrededor del CTA para que
+   llame más la atención — glow estático (no el anillo pulsante que usa
+   `.hero__cta`, ver AE-C14: acá aparecen muchas instancias `.btn--primary` a
+   la vez -catálogo, carrito-, un pulso animado en cada una sería ruido, no
+   foco). Sombra coloreada (rgba del propio --color-accent), no gris — un
+   box-shadow neutro no se nota sobre los fondos claros del sitio. */
+.btn--primary {
+  background: var(--color-accent); color: var(--color-ink); border-color: var(--color-accent);
+  box-shadow: 0 0 14px 1px rgba(244,151,142,.5), 0 0 30px 6px rgba(244,151,142,.22);
+}
+.btn--primary:hover {
+  background: var(--color-accent-hover); border-color: var(--color-accent-hover);
+  box-shadow: 0 0 18px 2px rgba(232,119,108,.55), 0 0 36px 8px rgba(232,119,108,.26);
+}
+
+.btn--outline { background: transparent; color: var(--color-ink); border-color: var(--color-ink); }
+.btn--outline:hover { background: var(--color-ink); color: var(--color-white); }
+
+.btn--ghost { background: transparent; color: var(--color-ink); border-color: var(--color-ink); }
+.btn--ghost:hover { background: var(--color-ink); color: var(--color-white); }
+/* Contexto oscuro (banner .muestras-promo) — mismo patrón de override
+   puntual que usan AP Beauty/Makeup Andrea para .btn-editorial--ghost */
+.muestras-promo .btn--ghost { color: var(--color-white); border-color: var(--color-white); }
+.muestras-promo .btn--ghost:hover { background: var(--color-white); color: var(--color-ink); }
+
+/* --------------------------------------------------------------------------
+   4b · Barra de utilidad (brief v2 §3, sobre el header) — señal de confianza
+   #2 del brief ("transparencia"): mensaje vivo + selector país/moneda real.
+   -------------------------------------------------------------------------- */
+/* AE-C24 (pedido directo de Paul): fondo pasa de --color-ink a --color-navy,
+   mismo criterio que footer/muestras-promo/íconos de valores (AE-C20/21/23).
+   .utility-bar__message ya usa --text-on-dark, sin cambios. */
+.utility-bar { background: var(--color-navy); }
+/* AE-F6: el selector país/moneda salió del brief maestro (solo Perú por
+   ahora) — .utility-bar__message queda como único hijo, ya no hay nada
+   contra qué repartir con space-between. Centrado real en todo el ancho. */
+.utility-bar__inner {
+  display: flex; align-items: center; justify-content: center; gap: 16px;
+  padding-block: 9px;
+}
+.utility-bar__message {
+  margin: 0; font: 500 .74rem/1.3 var(--font-body); letter-spacing: .02em;
+  color: var(--text-on-dark);
+}
+/* AE-F7 #5: 3 mensajes ahora conviven como hermanos — sin esto se ven los 3
+   apilados. Estado visual base + fade; la rotación real (ciclar .is-active)
+   es dominio js. */
+.utility-bar__msg { margin: 0; display: none; animation: utility-msg-in .3s ease; }
+.utility-bar__msg.is-active { display: block; }
+@keyframes utility-msg-in { from { opacity: 0; } to { opacity: 1; } }
+@media (max-width: 600px) {
+  .utility-bar__inner { flex-direction: column; gap: 6px; text-align: center; padding-block: 8px; }
+}
+
+/* --------------------------------------------------------------------------
+   4c · AE-R1 Banner de campaña con cuenta atrás — REDISEÑO 2026-11-15 al formato
+   de https://elexirium.com/ (banda negra, marco de línea fina, eyebrow con
+   rombos, titular grande + divisor vertical + cuenta atrás con unidades
+   pequeñas + botón blanco). Escrito por front en esta copia por autorización
+   de Paul; css lo afina (kerning, alturas, móvil). `[hidden]` lo pone js al
+   llegar a 0.
+   -------------------------------------------------------------------------- */
+.promo-banner { background: #000; color: var(--color-white); padding-block: 8px 10px; }
+.promo-banner[hidden] { display: none; }
+.promo-banner__frame { border: 1px solid rgba(255,255,255,.28); padding: 8px clamp(14px, 3vw, 36px) 12px; text-align: center; }
+.promo-banner__eyebrow {
+  margin: 0 0 6px; font: 700 .7rem/1 var(--font-body);
+  letter-spacing: .32em; text-transform: uppercase; color: var(--color-white);
+}
+.promo-banner__eyebrow span { margin-inline: 10px; font-size: .62rem; }
+.promo-banner__row { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 8px clamp(16px, 2.6vw, 34px); }
+.promo-banner__offer { margin: 0; display: flex; align-items: baseline; flex-wrap: wrap; justify-content: center; gap: 2px 12px; }
+.promo-banner__headline { font: 700 clamp(1.6rem, 3vw, 2.3rem)/1 var(--font-body); letter-spacing: -.01em; }
+.promo-banner__size { font: 600 clamp(.82rem, 1.5vw, 1.05rem)/1 var(--font-body); text-transform: uppercase; letter-spacing: .02em; }
+.promo-banner__was { font: 500 .8rem/1 var(--font-body); color: var(--text-on-dark-dim); }
+.promo-banner__divider { align-self: stretch; width: 1px; min-height: 30px; background: rgba(255,255,255,.28); }
+.promo-banner__timer { margin: 0; display: flex; align-items: baseline; gap: 10px; }
+.promo-banner__timer-label { font: 500 .78rem/1 var(--font-body); color: var(--text-on-dark-dim); }
+.promo-banner__countdown { display: inline-flex; align-items: baseline; gap: 10px; }
+.promo-banner__unit { display: inline-flex; align-items: baseline; gap: 2px; font: 700 clamp(1.05rem, 2vw, 1.35rem)/1 var(--font-body); font-variant-numeric: tabular-nums; }
+.promo-banner__unit small { font: 500 .68rem/1 var(--font-body); color: var(--text-on-dark-dim); text-transform: lowercase; }
+.promo-banner__cta {
+  display: inline-flex; align-items: center; padding: 12px 26px; background: var(--color-white); color: #000;
+  font: 700 .74rem/1 var(--font-body); letter-spacing: .08em; text-transform: uppercase; text-decoration: none;
+  border: 1px solid var(--color-white); border-radius: 0;
+}
+.promo-banner__cta:hover { background: transparent; color: var(--color-white); }
+.promo-banner__cta:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 3px; }
+@media (max-width: 700px) {
+  .promo-banner { padding-block: 6px 8px; }
+  .promo-banner__frame { padding: 10px 14px 12px; }
+  .promo-banner__eyebrow { margin-bottom: 8px; font-size: .62rem; letter-spacing: .2em; }
+  .promo-banner__eyebrow span { margin-inline: 6px; }
+  .promo-banner__divider { display: none; }
+  .promo-banner__row { flex-direction: column; gap: 10px; }
+  .promo-banner__offer { gap: 4px 10px; }
+  .promo-banner__headline { font-size: 1.7rem; }
+  .promo-banner__size { font-size: .78rem; }
+  .promo-banner__timer { justify-content: center; flex-wrap: wrap; gap: 6px 10px; }
+  .promo-banner__countdown { gap: 8px; }
+  .promo-banner__cta { width: 100%; justify-content: center; padding: 13px 16px; }
+}
+@media (max-width: 360px) {
+  .promo-banner__frame { padding-inline: 10px; }
+  .promo-banner__eyebrow { letter-spacing: .14em; }
+  .promo-banner__headline { font-size: 1.5rem; }
+  .promo-banner__unit { font-size: 1rem; }
+}
+/* --------------------------------------------------------------------------
+   4d · AE-R3 Drawer del carrito enriquecido: oferta + progreso + upsell +
+   filas de ahorro/total. Escrito por front en esta copia por autorización de
+   Paul (2026-11-15). Todo bloque con [hidden] necesita su override porque
+   define `display` propio. Sin transiciones para el estado visible.
+   -------------------------------------------------------------------------- */
+.cart-drawer__offer, .cart-progress, .cart-upsell { flex: none; }
+.cart-drawer__offer { margin: 0 clamp(20px, 4vw, 28px) 12px; padding: 12px 14px; background: var(--color-ink); color: var(--color-white); border-radius: var(--radius-soft); }
+.cart-drawer__offer[hidden] { display: none; }
+.cart-drawer__offer-title { margin: 0 0 4px; font: 500 .85rem/1.3 var(--font-body); }
+.cart-drawer__offer-title strong { font: 600 1.15rem/1 var(--font-display); }
+.cart-drawer__offer-title s { color: var(--text-on-dark-dim); }
+.cart-drawer__offer-timer { margin: 0; font: 500 .72rem/1.3 var(--font-body); letter-spacing: .06em; text-transform: uppercase; color: var(--text-on-dark); font-variant-numeric: tabular-nums; }
+
+.cart-progress { margin: 0 clamp(20px, 4vw, 28px) 12px; }
+.cart-progress[hidden] { display: none; }
+.cart-progress__msg { margin: 0 0 8px; font: 600 .8rem/1.35 var(--font-body); color: var(--color-ink); }
+.cart-progress__track { height: 6px; background: var(--color-border); border-radius: 999px; overflow: hidden; }
+.cart-progress__fill { display: block; height: 100%; width: 0; background: var(--color-accent); }
+.cart-progress__steps { list-style: none; margin: 6px 0 0; padding: 0; display: flex; justify-content: space-between; font: 600 .66rem/1 var(--font-body); letter-spacing: .06em; color: var(--color-text-muted); }
+
+.cart-upsell { margin: 0 clamp(20px, 4vw, 28px) 12px; padding-top: 12px; border-top: 1px solid var(--color-border); }
+.cart-upsell[hidden] { display: none; }
+.cart-upsell__title { margin: 0 0 8px; font: 600 .66rem/1 var(--font-body); letter-spacing: .12em; text-transform: uppercase; color: var(--color-text-muted); }
+.cart-upsell__list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.cart-upsell__item { display: flex; align-items: center; gap: 10px; }
+.cart-upsell__img { flex: none; width: 48px; height: 60px; object-fit: cover; border: 1px solid var(--color-border); background: var(--color-bg); }
+.cart-upsell__info { flex: 1; min-width: 0; }
+.cart-upsell__name { margin: 0; font: 600 .85rem/1.25 var(--font-body); }
+.cart-upsell__price { margin: 2px 0 0; font: 500 .78rem/1 var(--font-body); color: var(--color-text-muted); }
+
+.cart-drawer__summary--saving { color: var(--color-ink); }
+.cart-drawer__summary--saving[hidden] { display: none; }
+.cart-drawer__summary--saving span:last-child { font-weight: 700; }
+.cart-drawer__summary--total { font-weight: 700; }
+.cart-summary__row--saving[hidden] { display: none; }
+.cart-summary__row--saving span:last-child { font-weight: 700; }
+.cart-summary__row--total { margin-top: 4px; padding-top: 10px; border-top: 1px solid var(--color-border); font-size: 1.05rem; }
+
+/* --------------------------------------------------------------------------
+   5 · Header
+   -------------------------------------------------------------------------- */
+.site-header {
+  position: sticky; top: 0; z-index: 1000;
+  background: var(--color-bg-alt);
+  border-bottom: 1px solid var(--color-border);
+}
+.site-header__inner {
+  display: grid; grid-template-columns: auto 1fr auto;
+  align-items: center; gap: clamp(16px, 2vw, 40px);
+  padding-block: clamp(14px, 1.8vw, 22px);
+}
+.header-logo { display: flex; align-items: center; text-decoration: none; }
+/* Logo real (PNG recortado, fondo transparente) — sustituye el wordmark
+   tipográfico. `.header-logo__img` se reutiliza en 3 contextos (header,
+   menú móvil, footer) con la MISMA imagen; cada contexto ajusta solo la
+   altura mostrada, nunca el archivo. */
+.header-logo__img { height: clamp(34px, 3.4vw, 42px); width: auto; display: block; }
+/* AE-C31 (handoff front AE-F28/AE-F29, ver inbox/css.md): Paul pidió
+   agrandar SOLO el logo del header (lo veía chico) — `.header-logo__img` es
+   compartida con menú móvil y footer (misma clase, 3 contextos, ver nota de
+   arriba), así que un selector scoped a `.site-header` sube el tamaño acá
+   sin tocar los otros 2.
+   Primer intento (subir `height` tal cual) no se notó casi nada — analicé el
+   PNG nuevo con un canvas (getImageData) y el wordmark "Allpa" real solo
+   ocupa ~37% del alto del lienzo cuadrado 1408×1408 (mucho blanco arriba/
+   abajo, invisible sobre el header blanco). Fix real: `aspect-ratio`
+   distinto al del archivo (1408/518, el alto real del wordmark) fuerza una
+   caja rectangular angosta; `object-fit:cover` escala la imagen para llenar
+   esa caja y recorta el sobrante — el wordmark pasa a ocupar ~100% del alto
+   visible en vez de ~37%. `object-position` vertical ajustado al centro real
+   del wordmark (45%, no 50%, por la asimetría del padding original). */
+.site-header .header-logo__img {
+  height: clamp(46px, 4.6vw, 58px);
+  aspect-ratio: 1408 / 518;
+  object-fit: cover;
+  object-position: center 45%;
+}
+
+.nav-main { display: flex; justify-content: center; gap: clamp(18px, 2vw, 32px); }
+/* brief v2 §3: nav-main pasa a ser SOLO el grupo izquierdo (Catálogo-Muestras-
+   Historia-Contacto), logo centrado en columna propia, actions a la derecha —
+   ver la regla :has() más abajo. La base `justify-content:center` sin
+   modificador se conserva porque `confirmacion.html` sigue usando `.nav-main`
+   sin `--left` (header simplificado de 2 columnas, sin actions, ver AE-C2). */
+.nav-main--left { justify-content: flex-start; }
+.nav-main__link {
+  font: 500 .78rem/1 var(--font-body); letter-spacing: .1em; text-transform: uppercase;
+  color: var(--color-ink); text-decoration: none; position: relative; padding-bottom: 4px;
+  background: none; border: 0;
+}
+.nav-main__link::after {
+  content: ""; position: absolute; left: 0; right: 100%; bottom: 0; height: 1.5px;
+  background: var(--color-ink); transition: right .2s ease;
+}
+.nav-main__link:hover::after,
+.nav-main__link[aria-current="page"]::after { right: 0; }
+
+/* Layout de 3 zonas simétrico (logo matemáticamente centrado sin importar que
+   nav-main--left y site-header__actions tengan anchos de contenido distintos):
+   columnas 1fr/auto/1fr en vez de auto/1fr/auto. Acotado a los headers reales
+   con dropdown (`:has(.nav-main--left)`) para no afectar confirmacion.html,
+   cuyo header de 2 columnas depende del `auto 1fr auto` original. Acotado
+   además a ≥769px: por debajo de eso nav-main se oculta (menú hamburguesa) y
+   el media query de abajo ya fuerza `auto 1fr auto` con más especificidad. */
+@media (min-width: 769px) {
+  .site-header__inner:has(.nav-main--left) { grid-template-columns: 1fr auto 1fr; }
+}
+
+/* Dropdown "Catálogo" — botón reutiliza .nav-main__link, solo suma la flecha.
+   Sin agente JS todavía (AE-J1 sin registrar): fallback hover/focus-within
+   para que el menú sea alcanzable sin depender de que exista main.js —
+   compatible con el toggle real por aria-expanded/[hidden] cuando JS exista. */
+/* `font-size:0` — `.nav-dropdown` hereda el font/line-height del body (más
+   grande que el del nav) y ese "strut" tipográfico invisible del block fija
+   la altura de línea a ese tamaño mayor, empujando el botón hacia abajo
+   dentro de la celda (los `<a>` hermanos no sufren esto porque su propio
+   font YA ES el `.nav-main__link` pequeño — no hay strut más grande de por
+   medio). El botón no se ve afectado: su tamaño de fuente lo fija su propia
+   regla `.nav-main__link` en `rem` (relativo a la raíz, no al padre). */
+.nav-dropdown { position: relative; font-size: 0; line-height: 0; }
+.nav-dropdown__toggle {
+  display: inline-flex; align-items: center; gap: 6px; cursor: pointer;
+  padding: 0 0 4px; /* pisa el padding por defecto del <button> del UA */
+}
+.nav-dropdown__toggle::before {
+  content: ""; width: 0; height: 0; margin-top: 2px;
+  border-left: 4px solid transparent; border-right: 4px solid transparent;
+  border-top: 5px solid currentColor; transition: transform .2s ease;
+}
+.nav-dropdown__toggle[aria-expanded="true"]::before { transform: rotate(180deg); }
+.nav-dropdown__menu {
+  position: absolute; top: calc(100% + 16px); left: 0; z-index: 1050;
+  min-width: 230px; flex-direction: column; gap: 2px;
+  background: var(--color-bg-alt); border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-card); padding: 10px;
+}
+/* [hidden] debe seguir ocultando el menú por defecto — si `.nav-dropdown__menu`
+   definiera su propio `display` sin este override, ganaría por especificidad
+   sobre el `[hidden]{display:none}` del user-agent y el menú quedaría visible
+   siempre (mismo bug ya documentado: AP Beauty catálogo, `[hidden]` + display
+   propio). El estado abierto (hover/focus-within) apunta al mismo selector
+   `[hidden]` para tener especificidad suficiente y ganarle a esta regla. */
+.nav-dropdown__menu[hidden] { display: none; }
+.nav-dropdown__menu a {
+  display: block; padding: 10px 12px; border-radius: var(--radius-soft);
+  font: 500 .82rem/1 var(--font-body); color: var(--color-ink); text-decoration: none;
+  transition: background .15s ease;
+}
+.nav-dropdown__menu a:hover { background: var(--color-bg); }
+@media (hover: hover) {
+  .nav-dropdown:hover .nav-dropdown__menu[hidden],
+  .nav-dropdown:focus-within .nav-dropdown__menu[hidden] { display: flex; }
+}
+
+/* AE-F6 §3: separación EXTRA entre nav-main--right y site-header__icons —
+   antes 24px, menor que el gap interno de los links (32px), así que los 2
+   grupos se leían como una sola fila continua en vez de "nav + acciones". */
+.site-header__actions { display: flex; align-items: center; justify-content: flex-end; gap: clamp(32px, 3.6vw, 56px); }
+.site-header__icons { display: flex; align-items: center; gap: 6px; }
+.header-icon { display: inline-flex; padding: 4px; color: var(--color-ink); text-decoration: none; transition: color .15s ease; }
+.header-icon:hover { color: var(--color-accent-hover); }
+.header-cart { position: relative; }
+.cart-count {
+  position: absolute; top: -6px; right: -8px;
+  background: var(--color-ink); color: var(--color-white);
+  font: 700 10px/1 var(--font-body);
+  min-width: 16px; height: 16px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; padding: 0 3px;
+}
+.menu-toggle { display: none; padding: 4px; color: var(--color-ink); }
+
+@media (max-width: 768px) {
+  /* Header móvil = 3 elementos, petición directa de Paul: hamburguesa
+     (izq) · logo (centro) · carrito (der) — sin cuenta, sin nav de texto.
+     Mismo truco de columnas simétricas `1fr auto 1fr` que ya usa desktop
+     para centrar el logo "matemáticamente" (ver nota de arriba, ≥769px).
+     `.site-header__actions`/`.site-header__icons` no aportan nada visual
+     propio [ni fondo ni borde], así que pasarlos a `display:contents` deja
+     a sus hijos [nav-main--right, cuenta, carrito, hamburguesa] competir
+     como grid items directos de `.site-header__inner` y así poder ubicar
+     cada uno por línea de grid, sin depender del orden del DOM. */
+  .site-header__inner {
+    grid-template-columns: 1fr auto 1fr;
+    /* `dense`: sin esto la hamburguesa [col1] cae a una 2da fila — el
+       algoritmo `sparse` (default) no rellena columnas ya "atrás" del
+       cursor una vez que logo [col2] y carrito [col3] lo adelantaron. */
+    grid-auto-flow: dense;
+  }
+  .nav-main { display: none; }
+  .site-header__actions,
+  .site-header__icons { display: contents; }
+  .header-icon--account { display: none; }
+  .menu-toggle { display: inline-flex; grid-column: 1; justify-self: start; }
+  .header-logo { grid-column: 2; justify-self: center; }
+  .header-cart { grid-column: 3; justify-self: end; }
+}
+
+/* --------------------------------------------------------------------------
+   6 · Menú móvil — panel + backdrop
+   -------------------------------------------------------------------------- */
+.menu-backdrop {
+  position: fixed; inset: 0; z-index: 1090;
+  background: rgba(36,36,34,.5);
+  opacity: 0; visibility: hidden; transition: opacity .3s ease, visibility .3s ease;
+}
+.menu-backdrop.is-open { opacity: 1; visibility: visible; }
+
+.menu-panel {
+  position: fixed; top: 0; right: 0; bottom: 0; z-index: 1100;
+  width: min(86vw, 380px);
+  background: var(--color-bg-alt);
+  display: flex; flex-direction: column;
+  padding: clamp(20px, 4vw, 32px);
+  transform: translateX(100%);
+  transition: transform .35s cubic-bezier(.4,0,.2,1);
+  overflow-y: auto;
+}
+.menu-panel.is-open { transform: translateX(0); }
+.menu-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: clamp(28px, 5vw, 44px); }
+.menu-close {
+  width: 38px; height: 38px; border-radius: 50%;
+  background: var(--color-ink); color: var(--color-white); font-size: 15px; line-height: 1;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.menu-primary { display: flex; flex-direction: column; }
+.menu-primary a {
+  display: flex; align-items: center; justify-content: space-between;
+  font-family: var(--font-display); font-size: 1.35rem; font-weight: 700;
+  color: var(--color-ink); text-decoration: none;
+  padding: clamp(12px, 2.2vw, 16px) 0; border-bottom: 1px solid var(--color-border);
+}
+.menu-primary a::after { content: "\203A"; color: var(--color-text-muted); font-weight: 400; }
+.menu-primary a[aria-current="page"] { color: var(--color-accent-hover); }
+
+/* --------------------------------------------------------------------------
+   7 · Carrito — drawer + backdrop
+   -------------------------------------------------------------------------- */
+.cart-backdrop {
+  position: fixed; inset: 0; z-index: 1090;
+  background: rgba(36,36,34,.5);
+  opacity: 0; visibility: hidden; transition: opacity .3s ease, visibility .3s ease;
+}
+.cart-backdrop.is-open { opacity: 1; visibility: visible; }
+
+.cart-drawer {
+  position: fixed; top: 0; right: 0; bottom: 0; z-index: 1100;
+  width: min(94vw, 420px);
+  background: var(--color-bg-alt);
+  display: flex; flex-direction: column;
+  transform: translateX(100%);
+  transition: transform .35s cubic-bezier(.4,0,.2,1);
+}
+.cart-drawer.is-open { transform: translateX(0); }
+
+.cart-drawer__top {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: clamp(20px, 3vw, 26px) clamp(20px, 4vw, 28px);
+  border-bottom: 1px solid var(--color-border);
+}
+.cart-drawer__title { font-size: 1.3rem; margin: 0; }
+.cart-close {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: var(--color-bg); color: var(--color-ink); font-size: 14px;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+
+.cart-drawer__empty { padding: clamp(48px, 8vw, 72px) clamp(20px, 4vw, 28px); text-align: center; }
+.cart-empty__icon { margin: 0 auto 18px; color: var(--color-silver-a); }
+.cart-empty__title { font-family: var(--font-display); font-weight: 700; font-size: 1.15rem; margin: 0 0 8px; }
+.cart-empty__text { color: var(--color-text-muted); font-size: .92rem; margin: 0 0 22px; }
+
+/* AE-R: con oferta+progreso+upsell la lista se comprimía a 1px en alturas <600px.
+   Mínimo propio + el drawer entero hace scroll cuando no cabe. */
+.cart-drawer { overflow-y: auto; overscroll-behavior: contain; }
+.cart-drawer__items { padding: 0 clamp(20px, 4vw, 28px); flex: 1 0 auto; min-height: 132px; overflow-y: visible; }
+
+.cart-drawer__foot { padding: clamp(20px, 3vw, 26px) clamp(20px, 4vw, 28px); border-top: 1px solid var(--color-border); position: sticky; bottom: 0; background: var(--color-bg-alt); }
+.cart-drawer__summary {
+  display: flex; justify-content: space-between; align-items: baseline;
+  font: 600 .95rem/1 var(--font-body); margin-bottom: 6px;
+}
+.cart-drawer__note { font-size: .78rem; color: var(--color-text-muted); margin: 0 0 16px; }
+.cart-drawer__checkout { display: flex; width: 100%; }
+
+@media (max-width: 600px) { .cart-drawer { width: 100vw; } }
+
+/* --------------------------------------------------------------------------
+   8 · Línea de carrito — componente compartido (drawer + página carrito)
+   -------------------------------------------------------------------------- */
+.cart-line {
+  display: flex; gap: 14px; align-items: flex-start;
+  padding-block: 18px; border-bottom: 1px solid var(--color-border);
+}
+.cart-line__img { width: 64px; height: 64px; object-fit: cover; border-radius: var(--radius-soft); background: var(--color-bg); border: 1px solid var(--color-border); flex: none; }
+.cart-line__info { flex: 1; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.cart-line__name { font: 600 .92rem/1.3 var(--font-body); margin: 0; }
+.cart-line__price { font: 500 .85rem/1 var(--font-body); color: var(--color-text-muted); margin: 0; }
+.cart-line__qty { display: inline-flex; align-items: center; gap: 12px; border: 1px solid var(--color-border); border-radius: var(--radius-soft); padding: 4px 10px; width: fit-content; }
+.cart-line__qty .qty-btn { font-size: 15px; line-height: 1; color: var(--color-ink); }
+.cart-line__qty .qty-btn:hover { color: var(--color-accent-hover); }
+.cart-line__qval { min-width: 18px; text-align: center; font: 600 .82rem/1 var(--font-body); }
+.cart-line__remove { color: var(--color-text-muted); font-size: 13px; padding: 4px; }
+.cart-line__remove:hover { color: var(--color-ink); }
+
+/* --------------------------------------------------------------------------
+   9 · Sistema de tarjeta de producto — compartido en home/catálogo/muestras
+   -------------------------------------------------------------------------- */
+.product-item, .product-card {
+  position: relative;
+  display: flex; flex-direction: column;
+  background: var(--color-bg-alt);
+  border: 1px solid var(--color-border);
+  transition: box-shadow .25s ease, transform .25s ease;
+}
+.product-item:hover, .product-card:hover { box-shadow: var(--shadow-hover); transform: translateY(-3px); }
+/* Mismo patrón AE-C5/AE-J1: display propio le gana en cascada al [hidden] del
+   user-agent — sin esto, el filtro de catálogo oculta por JS pero el item
+   sigue ocupando su lugar en el grid con display:flex. */
+.product-item[hidden] { display: none; }
+
+/* El <a> envuelve casi todo el contenido en .product-item (contrato de
+   front) — `display:contents` deja pasar sus hijos como flex items directos
+   de la tarjeta, sin introducir una caja extra que rompa el layout. */
+.product-item__link { display: contents; color: inherit; text-decoration: none; }
+
+.product-item__media, .product-card__media {
+  position: relative; aspect-ratio: 4 / 5; overflow: hidden;
+  background: var(--color-bg);
+}
+.product-item__media img, .product-card__media img {
+  width: 100%; height: 100%; object-fit: cover;
+  position: relative; z-index: 1;
+}
+
+/* Bestseller = ink sólido (autoridad). Trending = plata (material, no color
+   plano) — ninguno usa el naranja de acento, ver nota de disciplina arriba. */
+.product-item__badge, .product-card__badge {
+  position: absolute; top: 12px; left: 12px; z-index: 2;
+  background: var(--color-ink); color: var(--color-white);
+  font: 700 .6875rem/1 var(--font-body); letter-spacing: .08em; text-transform: uppercase;
+  padding: 6px 10px; border-radius: var(--radius-pill);
+}
+.product-item__badge--trending, .product-card__badge--trending {
+  background: var(--color-silver); color: var(--color-ink);
+  border: 1px solid var(--color-ink);
+  box-shadow: var(--shadow-card);
+}
+
+.product-item__familia, .product-card__familia {
+  font: 600 .68rem/1 var(--font-body); letter-spacing: .1em; text-transform: uppercase;
+  color: var(--color-text-muted); margin: 16px 16px 6px;
+}
+.product-item__name, .product-card__name {
+  font-family: var(--font-display); font-weight: 700; font-size: 1.05rem; line-height: 1.25;
+  margin: 0 16px 6px;
+}
+.product-item__desc {
+  font-size: .85rem; color: var(--color-text-muted); line-height: 1.5;
+  margin: 0 16px 10px;
+}
+.product-item__price, .product-card__price {
+  font-family: var(--font-display); font-weight: 700; font-size: 1.05rem;
+  margin: 0 16px 16px auto;
+  font-variant-numeric: tabular-nums;
+}
+.product-item__name, .product-item__price,
+.product-card__name, .product-card__price { order: 0; }
+
+.add-to-cart { margin: 0 16px 16px; align-self: stretch; }
+/* En .product-item el botón vive fuera del <a> (hijo directo del <li>) —
+   necesita su propio margen horizontal para alinear con el resto del texto. */
+
+/* --------------------------------------------------------------------------
+   10a · AE-R4 Hero blanco (reestructuración, decisión de Paul 2026-11-15) —
+   composición de https://elexirium.com/ : titular, subtítulo, grupo "Para él"
+   | pieza central | grupo "Para ella", microbeneficios. Escrito por front en
+   esta copia por autorización de Paul; css puede reabsorberlo. Las reglas
+   El `.hero*` antiguo (§10) fue borrado por css (2026-11-15).
+   Las fotos son TEMPORALES (con fondo) hasta tener recortes sin fondo.
+   -------------------------------------------------------------------------- */
+.hero-split { background: var(--color-white); padding-block: clamp(28px, 4vw, 56px) clamp(32px, 4.5vw, 64px); }
+.hero-split__inner { text-align: center; }
+.hero-split__title {
+  margin: 0 0 10px; font: 700 clamp(1.7rem, 4.4vw, 3.1rem)/1.1 var(--font-display);
+  letter-spacing: .02em; text-transform: uppercase; color: var(--color-ink);
+}
+.hero-split__subtitle {
+  display: inline-block; margin: 0 0 clamp(22px, 3vw, 40px); padding-bottom: 12px;
+  font: 500 clamp(.78rem, 1.5vw, 1rem)/1 var(--font-body); letter-spacing: .2em; text-transform: uppercase; color: var(--color-text-muted);
+  background: linear-gradient(90deg, transparent, var(--color-silver-a), transparent) center bottom / 100% 1px no-repeat;
+  min-width: min(520px, 90%);
+}
+.hero-split__grid { display: grid; grid-template-columns: 1fr; gap: clamp(24px, 3vw, 40px); align-items: end; }
+@media (min-width: 900px) { .hero-split__grid { grid-template-columns: 1fr minmax(240px, .78fr) 1fr; } }
+.hero-split__group, .hero-split__center { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: var(--color-ink); }
+.hero-split__group--him { order: 1; } .hero-split__group--her { order: 2; } .hero-split__center { order: 3; }
+@media (min-width: 900px) { .hero-split__group--him { order: 1; } .hero-split__center { order: 2; } .hero-split__group--her { order: 3; } }
+
+.hero-split__bottles { display: flex; justify-content: center; width: 100%; max-width: 460px; }
+.hero-split__bottles img {
+  width: 36%; aspect-ratio: 4 / 5; object-fit: cover; height: auto;
+  border: 1px solid var(--color-border); background: var(--color-bg);
+  box-shadow: 0 10px 26px rgba(36,36,34,.14);
+}
+.hero-split__bottles img + img { margin-left: -4%; }
+.hero-split__bottles img:nth-child(2) { position: relative; z-index: 1; transform: translateY(-14px); }
+
+.hero-split__rule {
+  position: relative; display: block; width: 100%; max-width: 420px; height: 14px; margin: 22px 0 12px;
+  background:
+    linear-gradient(var(--color-silver-a), var(--color-silver-a)) left center / calc(50% - 14px) 1px no-repeat,
+    linear-gradient(var(--color-silver-a), var(--color-silver-a)) right center / calc(50% - 14px) 1px no-repeat;
+}
+.hero-split__rule::after {
+  content: ""; position: absolute; left: 50%; top: 50%; width: 8px; height: 8px;
+  border: 1px solid var(--color-silver-a); background: var(--color-white); transform: translate(-50%, -50%) rotate(45deg);
+}
+.hero-split__label { font: 500 clamp(1.1rem, 2vw, 1.5rem)/1 var(--font-display); letter-spacing: .08em; text-transform: uppercase; }
+.hero-split__group:hover .hero-split__label { text-decoration: underline; text-underline-offset: 6px; }
+
+.hero-split__feature { width: min(100%, clamp(200px, 56vw, 300px)); height: auto; aspect-ratio: 1 / 1; object-fit: cover; border: 1px solid var(--color-border); box-shadow: 0 14px 34px rgba(36,36,34,.16); }
+.hero-split__feature-caption { margin-top: 16px; font: 600 .8rem/1.2 var(--font-body); letter-spacing: .16em; text-transform: uppercase; }
+.hero-split__feature-sub { margin-top: 6px; font: 500 .84rem/1.3 var(--font-body); color: var(--color-text-muted); }
+.hero-split__center:hover .hero-split__feature-caption { text-decoration: underline; text-underline-offset: 5px; }
+
+.hero-split__benefits {
+  list-style: none; margin: clamp(26px, 3.4vw, 44px) 0 22px; padding: 14px 0 0;
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 22px;
+  font: 600 clamp(.7rem, 1.3vw, .84rem)/1.3 var(--font-body); letter-spacing: .1em; text-transform: uppercase; color: var(--color-ink);
+  background: linear-gradient(90deg, transparent, var(--color-silver-a), transparent) center top / min(520px, 90%) 1px no-repeat;
+}
+.hero-split__benefits li + li::before { content: "·"; margin-right: 22px; color: var(--color-text-muted); }
+@media (max-width: 600px) { .hero-split__benefits li + li::before { display: none; } }
+.hero-split__trust { margin: 22px 0 0; font: 500 .84rem/1.4 var(--font-body); color: var(--color-text-muted); }
+.hero-split__trust[hidden] { display: none; }
+
+/* --------------------------------------------------------------------------
+   10b · AE-R4 Home reestructurado (escrito por front en esta copia por
+   autorización de Paul 2026-11-15; css puede reabsorberlo). Bloques nuevos
+   inspirados en https://elexirium.com/ : franja de valoración, buscador,
+   marquee, pestañas, recién llegados, "del live a tu casa", reseñas, franja
+   de confianza, "por qué Allpa", aviso legal y botón flotante de WhatsApp.
+   Los nuevos bloques NO usan `.reveal` (no dependen de IntersectionObserver).
+   -------------------------------------------------------------------------- */
+.rating-bar {
+  display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 4px 12px;
+  margin: 0; padding: 9px var(--gutter); background: var(--color-bg); border-bottom: 1px solid var(--color-border);
+  font: 500 .8rem/1.3 var(--font-body); color: var(--color-ink);
+}
+.rating-bar[hidden] { display: none; }
+.rating-bar__stars { letter-spacing: .1em; }
+.rating-bar__link { color: var(--color-text-muted); text-decoration: underline; }
+
+.home-search { background: linear-gradient(180deg, var(--color-white), var(--color-bg)); padding-block: clamp(32px, 4vw, 56px); }
+.home-search__inner { text-align: center; }
+.home-search__title { margin: 0 0 8px; font-size: clamp(1.4rem, 2.6vw, 2rem); text-transform: uppercase; letter-spacing: .04em; }
+.home-search__sub { margin: 0 auto 20px; max-width: 54ch; color: var(--color-text-muted); font-size: .95rem; }
+.home-search__form { display: flex; gap: 10px; max-width: 560px; margin-inline: auto; }
+.home-search__input { flex: 1; min-width: 0; padding: 14px 16px; font: 500 .95rem/1 var(--font-body); color: var(--color-ink); background: var(--color-white); border: 1.5px solid var(--color-ink); border-radius: var(--radius-soft); }
+.home-search__input:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+@media (max-width: 480px) { .home-search__form { flex-direction: column; } }
+
+.marquee { overflow: hidden; background: var(--color-ink); color: var(--color-white); border-block: 1px solid var(--color-ink-soft); }
+.marquee__track { display: flex; width: max-content; animation: marquee-scroll 34s linear infinite; }
+.marquee__group { display: flex; flex: none; gap: 0; margin: 0; padding: 0; list-style: none; }
+.marquee__group li { padding: 12px 28px; white-space: nowrap; font: 600 .74rem/1 var(--font-body); letter-spacing: .16em; text-transform: uppercase; }
+.marquee__group li::after { content: "✦"; margin-left: 56px; color: var(--color-silver-text); }
+.marquee__group li[hidden] { display: none; }
+@keyframes marquee-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+.marquee:hover .marquee__track { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) { .marquee { overflow-x: auto; } .marquee__track { animation: none; } .marquee__group[aria-hidden="true"] { display: none; } }
+
+.tabs { display: flex; flex-wrap: wrap; gap: 10px; margin: 0 0 24px; }
+.tabs__tab {
+  padding: 10px 20px; font: 600 .74rem/1 var(--font-body); letter-spacing: .08em; text-transform: uppercase;
+  color: var(--color-ink); background: transparent; border: 1.5px solid var(--color-ink); border-radius: var(--radius-pill); cursor: pointer;
+}
+.tabs__tab:hover { background: var(--color-bg); }
+.tabs__tab.is-active { background: var(--color-ink); color: var(--color-white); }
+.tabs__tab:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+.section-more { margin: 28px 0 0; text-align: center; }
+
+.nuevos { background: var(--color-bg); }
+.nuevos[hidden] { display: none; }
+.nuevos__grid { list-style: none; margin: 24px 0 0; padding: 0; display: grid; gap: 16px; grid-template-columns: repeat(2, 1fr); }
+@media (min-width: 900px) { .nuevos__grid { grid-template-columns: repeat(4, 1fr); } }
+.product-card__link { display: block; color: inherit; text-decoration: none; }
+.product-card__name a { color: inherit; text-decoration: none; }
+.product-card__name a:hover { text-decoration: underline; }
+.product-card__rating { margin: 0 0 4px; font: 500 .78rem/1 var(--font-body); color: var(--color-text-muted); }
+.product-card__rating[hidden], .product-card__badge[hidden] { display: none; }
+
+
+.home-reviews .reviews__list { margin-top: 28px; }
+.trust-strip { background: var(--color-bg); border-block: 1px solid var(--color-border); padding-block: clamp(22px, 3vw, 36px); }
+.trust-strip__grid { list-style: none; margin: 0; padding: 0; display: grid; gap: 20px; grid-template-columns: repeat(2, 1fr); text-align: center; }
+@media (min-width: 900px) { .trust-strip__grid { grid-template-columns: repeat(4, 1fr); } }
+.trust-strip__item { display: flex; flex-direction: column; align-items: center; gap: 8px; color: var(--color-ink); }
+.trust-strip__title { margin: 0; font: 600 .84rem/1.2 var(--font-body); letter-spacing: .06em; text-transform: uppercase; }
+.trust-strip__sub { margin: 0; font-size: .82rem; line-height: 1.4; color: var(--color-text-muted); }
+
+.porque__title { text-align: center; margin: 0 0 8px; }
+.porque .eyebrow { text-align: center; }
+.porque__grid { list-style: none; margin: 32px 0 0; padding: 0; display: grid; gap: 14px; grid-template-columns: 1fr; }
+@media (min-width: 640px) { .porque__grid { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1024px) { .porque__grid { grid-template-columns: repeat(3, 1fr); } }
+.porque__grid .valor { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 26px 20px; text-align: center; background: var(--color-white); border: 1px solid var(--color-border); border-radius: var(--radius-card); }
+
+.legal-note { margin: 0 auto; padding-block: 22px 34px; font-size: .72rem; line-height: 1.55; color: var(--color-text-muted); text-align: center; max-width: 900px; }
+
+.whatsapp-float {
+  position: fixed; right: 18px; bottom: 18px; z-index: 850;
+  display: inline-flex; align-items: center; justify-content: center; width: 54px; height: 54px;
+  background: #25D366; color: #fff; border-radius: 50%; box-shadow: 0 8px 22px rgba(0,0,0,.25);
+}
+.whatsapp-float:hover { filter: brightness(.94); }
+.whatsapp-float:focus-visible { outline: 3px solid var(--color-ink); outline-offset: 3px; }
+body.has-buy-bar .whatsapp-float { bottom: 98px; }
+/* --------------------------------------------------------------------------
+   10c · AE-R4 (ronda 2) — banner "Nuevos ingresos", "Hablan por nosotros",
+   trust grid y "Del laboratorio a tu casa" con reels. Escrito por front en esta
+   copia por autorización de Paul 2026-11-15. Cifras con data-placeholder-cifra.
+   -------------------------------------------------------------------------- */
+.rating-bar__score { font-weight: 600; }
+.rating-bar__stars { color: var(--color-ink); }
+
+.new-arrival { overflow: hidden; background: var(--color-navy); border-block: 1px solid var(--color-navy); }
+.new-arrival__track { display: flex; width: max-content; animation: marquee-scroll 60s linear infinite reverse; }
+.new-arrival__group { display: flex; flex: none; margin: 0; max-width: none; width: max-content; }
+.new-arrival__group span {
+  padding: 14px 34px; white-space: nowrap; font: 800 clamp(2.2rem, 6vw, 4.2rem)/1 var(--font-display);
+  letter-spacing: .04em; text-transform: uppercase; color: transparent; -webkit-text-stroke: 1.2px var(--color-white);
+}
+.new-arrival__group span:nth-child(even) { color: var(--color-white); -webkit-text-stroke: 0; }
+@media (prefers-reduced-motion: reduce) { .new-arrival__track { animation: none; } .new-arrival__group + .new-arrival__group { display: none; } }
+
+.reviews__score { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 14px; margin: 6px 0 4px; }
+.reviews__score-num { font: 700 clamp(2.4rem, 5vw, 3.4rem)/1 var(--font-display); }
+.reviews__score-stars { font-size: 1.5rem; letter-spacing: .12em; color: var(--color-ink); }
+.reviews__score .reviews__summary { margin: 0; }
+.reviews__score .reviews__summary[hidden] { display: none; }
+[data-placeholder-cifra] { outline: 0; }
+
+.lab { background: var(--color-white); }
+.lab__sub { margin: 0 0 clamp(20px, 3vw, 34px); font: 500 clamp(.9rem, 1.6vw, 1.1rem)/1.4 var(--font-body); letter-spacing: .12em; text-transform: uppercase; color: var(--color-text-muted); }
+/* Móvil: galería horizontal con scroll-snap (como Elexirium), ~62% de ancho por
+   vídeo para que asome el siguiente. ≥700px: rejilla de 3. */
+.reels {
+  display: flex; gap: 12px; margin: 0 calc(var(--gutter) * -1) 30px; padding-inline: var(--gutter);
+  max-width: none; /* anula el `* {max-width:100%}` global: el sangrado negativo necesita ancho > contenedor */
+  overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-inline: var(--gutter);
+  -webkit-overflow-scrolling: touch; scrollbar-width: none; overscroll-behavior-x: contain;
+}
+.reels::-webkit-scrollbar { display: none; }
+.reel { margin: 0; flex: 0 0 min(62vw, 260px); scroll-snap-align: start; }
+@media (min-width: 700px) {
+  .reels { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-inline: 0; padding-inline: 0; overflow: visible; }
+  .reel { flex: none; }
+}
+.reel__frame { position: relative; aspect-ratio: 9 / 16; max-height: 78vh; overflow: hidden; background: var(--color-ink); border: 1px solid var(--color-border); border-radius: var(--radius-card); }
+.reel__video { width: 100%; height: 100%; object-fit: cover; background: var(--color-ink); }
+.reel__play {
+  position: absolute; inset: 0; margin: auto; width: 64px; height: 64px; display: flex; align-items: center; justify-content: center;
+  color: var(--color-ink); background: rgba(255,255,255,.9); border: 0; border-radius: 50%; cursor: pointer;
+}
+.reel__play[hidden], .reel__pending[hidden] { display: none; }
+.reel__play:focus-visible { outline: 3px solid var(--color-accent); outline-offset: 3px; }
+.reel.is-playing .reel__play { opacity: 0; }
+.reel.is-playing .reel__play:focus-visible { opacity: 1; }
+.reel__pending { position: absolute; inset: auto 10px 12px; text-align: center; font: 600 .66rem/1.3 var(--font-body); letter-spacing: .06em; color: var(--text-on-dark); }
+.reel__caption { margin-top: 10px; font: 500 .85rem/1.35 var(--font-body); color: var(--color-text-muted); text-align: center; }
+
+/* Reseñas al final + página de todas las reseñas (AE-R4 ronda 3) */
+.reviews--wall { background: var(--color-bg); border-top: 1px solid var(--color-border); }
+.reviews__head { display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 16px 24px; margin-bottom: 8px; }
+.reviews__actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.reviews__score--sm .reviews__score-num { font-size: clamp(1.8rem, 3.4vw, 2.4rem); }
+.reviews__score--sm .reviews__score-stars { font-size: 1.15rem; }
+.reviews__score--center { justify-content: flex-start; margin: 4px 0 10px; }
+.reviews__list--all { grid-template-columns: 1fr; }
+@media (min-width: 640px) { .reviews__list--all { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1024px) { .reviews__list--all { grid-template-columns: repeat(3, 1fr); } }
+.reviews--all .section-more { margin-top: 36px; }
+
+/* Barra de herramientas del catálogo (contador + ordenar) */
+.catalog-toolbar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px 20px; margin-top: 22px; padding-top: 14px; border-top: 1px solid var(--color-border); }
+.catalog-toolbar__count { margin: 0; font: 500 .85rem/1 var(--font-body); color: var(--color-text-muted); }
+.catalog-toolbar__sort { display: inline-flex; align-items: center; gap: 10px; font: 600 .7rem/1 var(--font-body); letter-spacing: .1em; text-transform: uppercase; color: var(--color-ink); }
+.catalog-toolbar__sort select { padding: 9px 30px 9px 12px; font: 500 .85rem/1 var(--font-body); color: var(--color-ink); background: var(--color-white); border: 1.5px solid var(--color-ink); border-radius: var(--radius-soft); }
+.catalog-toolbar__sort { white-space: nowrap; }
+.catalog-toolbar__sort select {
+  -webkit-appearance: none; appearance: none; min-height: 44px; cursor: pointer;
+  background: var(--color-white) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23242422' stroke-width='1.5'/%3E%3C/svg%3E") no-repeat right 12px center;
+}
+@media (max-width: 480px) {
+  .catalog-toolbar__sort { flex: 1 1 100%; justify-content: space-between; }
+  .catalog-toolbar__sort select { flex: 1; }
+  .reviews__actions .btn { flex: 1 1 100%; justify-content: center; text-align: center; }
+}
+.catalog-toolbar__sort select:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+
+/* AE-R5 · Urgencia en perfumes: etiquetas de stock en tarjetas + cuenta atrás en la ficha.
+   Escrito por front en esta copia por autorización de Paul (2026-11-15). */
+.stock-tag {
+  display: flex; align-items: center; gap: 8px; margin: 0 16px 8px;
+  font: 600 .74rem/1.2 var(--font-body); letter-spacing: .02em; color: var(--color-ink);
+}
+.stock-tag::before { content: ""; flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--color-accent-hover); animation: stock-pulse 1.6s ease-in-out infinite; }
+.stock-tag--low { font-weight: 800; text-transform: uppercase; letter-spacing: .06em; font-size: .7rem; }
+@keyframes stock-pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: .35; transform: scale(.7); } }
+@media (prefers-reduced-motion: reduce) { .stock-tag::before { animation: none; } }
+.product-detail__stock, .product-detail__viewers { display: flex; align-items: center; gap: 8px; }
+.product-detail__stock::before, .product-detail__viewers::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--color-accent-hover); animation: stock-pulse 1.6s ease-in-out infinite; }
+.product-detail__stock[hidden], .product-detail__viewers[hidden] { display: none; }
+.product-detail__deadline { margin: -6px 0 16px; font: 600 .78rem/1.3 var(--font-body); letter-spacing: .04em; color: var(--color-ink); font-variant-numeric: tabular-nums; }
+.product-detail__deadline[hidden] { display: none; }
+.product-detail__deadline time { font-weight: 800; }
+
+/* AE-R6 · Redes (mismo patrón que AP Beauty: @usuario + botones + rejilla de posts + iconos en footer).
+   Escrito por front en esta copia por autorización de Paul (2026-11-15). */
+.insta { text-align: center; background: var(--color-white); }
+.insta .eyebrow { text-align: center; }
+.insta-handle { margin: 0 0 10px; font: 700 clamp(1.6rem, 3.4vw, 2.4rem)/1.1 var(--font-display); color: var(--color-ink); word-break: break-word; }
+.insta-text { max-width: 52ch; margin: 0 auto 22px; color: var(--color-text-muted); }
+.insta-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-bottom: 32px; }
+.insta-link {
+  display: inline-flex; align-items: center; padding: 13px 26px;
+  font: 600 .74rem/1 var(--font-body); letter-spacing: .12em; text-transform: uppercase; text-decoration: none;
+  color: var(--color-white); background: var(--color-ink); border: 1.5px solid var(--color-ink); border-radius: var(--radius-soft);
+  transition: background .2s ease, color .2s ease;
+}
+.insta-link:hover { background: transparent; color: var(--color-ink); }
+.insta-link:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 3px; }
+.insta-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+@media (min-width: 768px) { .insta-grid { grid-template-columns: repeat(4, 1fr); } }
+.insta-cell { display: block; aspect-ratio: 1 / 1; overflow: hidden; background: var(--color-bg); border: 1px solid var(--color-border); }
+.insta-cell img { width: 100%; height: 100%; object-fit: cover; transition: transform .3s ease; }
+.insta-cell:hover img { transform: scale(1.06); }
+.insta-cell:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+
+.footer-social { display: flex; gap: 16px; list-style: none; margin: 18px 0 0; padding: 0; }
+.footer-social a { display: inline-flex; color: var(--text-on-dark); transition: color .15s ease, opacity .15s ease; }
+.footer-social a:hover { color: var(--color-white); opacity: .8; }
+.footer-social a:focus-visible { outline: 2px solid var(--color-white); outline-offset: 3px; }
+.footer-social__icon { display: block; width: 20px; height: 20px; }
+
+/* --------------------------------------------------------------------------
+   AE-R7 · 2º COLOR: AZUL MARINO (--color-navy) para separar secciones (decisión de Paul 2026-11-15).
+   `section.section--navy` (0,1,1) gana a `.reviews`/`.lab` aunque se definan después. Secciones en azul marino:
+   banner "Nuevos ingresos", "Hablan por nosotros", "Del laboratorio a tu casa", reseñas del final (+ utility-bar,
+   muestras y footer que ya lo eran). Alterna con las secciones blancas. Escrito por front; css puede reabsorberlo.
+   -------------------------------------------------------------------------- */
+section.section--navy { background: var(--color-navy); color: var(--color-white); border-color: rgba(255,255,255,.14); }
+.section--navy h2, .section--navy h3 { color: var(--color-white); }
+.section--navy .eyebrow { color: var(--text-on-dark-dim); }
+.section--navy .reviews__title, .section--navy .reviews__score-num, .section--navy .reviews__score-stars { color: var(--color-white); }
+.section--navy .reviews__summary, .section--navy .lab__sub { color: var(--text-on-dark); }
+.section--navy .reel__frame { border-color: rgba(255,255,255,.22); }
+.section--navy .reel__caption { color: var(--text-on-dark); }
+.section--navy .btn--outline, .section--navy .btn--ghost { color: var(--color-white); border-color: var(--color-white); background: transparent; }
+.section--navy .btn--outline:hover, .section--navy .btn--ghost:hover { background: var(--color-white); color: var(--color-navy); }
+.section--navy .review-card { color: var(--color-ink); }
+
+/* --------------------------------------------------------------------------
+   12 · Carrusel genérico — reutilizado por trending/nuevo/familias (brief v2
+   §3): mismo HTML/mecanismo, comportamiento distinto por breakpoint. <768px
+   scroll-snap horizontal (nativo, funciona sin JS); ≥768px fila estática sin
+   overflow. Sin agente JS todavía (AE-J1 sin registrar) — las flechas de
+   trending/nuevo llegan con [hidden] desde el HTML (mockup sin ellas, el
+   scroll táctil nativo ya cubre móvil); las de familia-carousel NO llevan
+   [hidden] porque el brief pide que estén visibles desde que carga, quedan
+   presentes pero inertes hasta que exista main.js.
+   -------------------------------------------------------------------------- */
+.carousel { position: relative; }
+.carousel__viewport {
+  overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none;
+  scroll-snap-type: x mandatory;
+}
+.carousel__viewport::-webkit-scrollbar { display: none; }
+.carousel__track { display: flex; gap: 16px; padding-inline: var(--gutter); }
+.carousel__slide { flex: 0 0 68%; scroll-snap-align: start; }
+@media (min-width: 480px) { .carousel__slide { flex-basis: 46%; } }
+
+@media (min-width: 768px) {
+  .carousel__viewport { overflow: visible; scroll-snap-type: none; }
+  .carousel__track { display: grid; padding-inline: 0; }
+  .carousel__slide { flex-basis: auto; scroll-snap-align: none; }
+}
+
+.carousel__arrow {
+  position: absolute; top: 50%; translate: 0 -50%; z-index: 3;
+  width: 40px; height: 40px; border-radius: 50%;
+  background: var(--color-bg-alt); border: 1px solid var(--color-border);
+  display: inline-flex; align-items: center; justify-content: center;
+  color: var(--color-ink); box-shadow: var(--shadow-card);
+  transition: background .2s ease, color .2s ease;
+}
+.carousel__arrow:hover { background: var(--color-ink); color: var(--color-white); }
+.carousel__arrow--prev { left: 4px; }
+.carousel__arrow--next { right: 4px; }
+.carousel__arrow[hidden] { display: none; }
+
+/* --------------------------------------------------------------------------
+   12b · Home — trending / explorar (bloque 4 del brief v2)
+   -------------------------------------------------------------------------- */
+.trending { background: var(--color-bg-alt); }
+.trending h2 { font-size: clamp(1.6rem, 2.8vw, 2.2rem); margin: 0 0 clamp(24px, 3vw, 40px); max-width: 22ch; }
+.trending__grid { gap: 18px; grid-template-columns: repeat(2, 1fr); }
+@media (min-width: 768px)  { .trending__grid { grid-template-columns: repeat(3, 1fr); gap: clamp(20px, 2.4vw, 28px); } }
+@media (min-width: 1024px) { .trending__grid { grid-template-columns: repeat(4, 1fr); } }
+
+/* --------------------------------------------------------------------------
+   18 · Home — 3 valores (bloque 10)
+   -------------------------------------------------------------------------- */
+.valores__grid { display: grid; grid-template-columns: 1fr; gap: 32px; text-align: center; }
+@media (min-width: 768px) { .valores__grid { grid-template-columns: repeat(3, 1fr); } }
+.valor { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+/* AE-C20 (pedido directo de Paul): los íconos se sentían "invisibles" en
+   outline fino de 32px — suben a 60px (HTML, atributos width/height) +
+   stroke-width 1.5→2.5 (más bold; se descartó pasar a relleno sólido porque
+   estos paths son ilustraciones lineales abstractas —gota, reloj— que no
+   leen bien rellenas) + color exclusivo azul marino (`--color-navy-icon`,
+   ver tokens arriba), en vez de heredar `--color-ink` como el resto del texto. */
+.valor__icon { color: var(--color-navy); }
+/* Scopeado a __titulo (antes ".valor p" pescaba cualquier <p>, incluido el
+   __sub nuevo de AE-F7 #4, que necesita jerarquía menor, no la misma). */
+.valor__titulo {
+  font-family: var(--font-display); font-weight: 700; font-size: 1.25rem;
+  margin: 10px 0 0; max-width: 22ch;
+}
+.valor__sub { font: 400 .85rem/1.7 var(--font-body); color: var(--color-text-muted); margin: -6px 0 0; max-width: 26ch; }
+
+/* --------------------------------------------------------------------------
+   14 · Home — muestras promo (sección de peso, cuerpo 3)
+   -------------------------------------------------------------------------- */
+/* AE-C23 (pedido directo de Paul): fondo pasa de --color-ink a --color-navy,
+   mismo criterio que el footer (AE-C21) y los íconos de .valores (AE-C20).
+   Resto sin cambios — h2/p/.btn--ghost ya usan tokens relativos a blanco. */
+.muestras-promo { background: var(--color-navy); color: var(--color-white); text-align: center; }
+.muestras-promo__inner { max-width: 620px; }
+.muestras-promo h2 { color: var(--color-white); font-size: clamp(1.6rem, 3vw, 2.2rem); margin: 0 0 14px; }
+.muestras-promo p { color: var(--text-on-dark); font-size: 1rem; line-height: 1.6; margin: 0 0 28px; }
+
+/* --------------------------------------------------------------------------
+   15 · Page hero genérico — muestras / historia / contacto
+   -------------------------------------------------------------------------- */
+.page-hero { padding-bottom: clamp(32px, 4vw, 56px); }
+.page-hero h1 { font-size: clamp(2rem, 3.6vw, 3rem); line-height: 1.1; margin: 0 0 16px; max-width: 16ch; }
+.page-hero__sub { font-size: clamp(1rem, 1.2vw, 1.1rem); line-height: 1.6; color: var(--color-text-muted); max-width: 56ch; margin: 0 0 28px; }
+
+/* --------------------------------------------------------------------------
+   16 · Catálogo — cabecera + pills + grid
+   -------------------------------------------------------------------------- */
+.catalog-head { padding-bottom: clamp(28px, 3.5vw, 48px); }
+.catalog-head__title { font-size: clamp(2rem, 3.6vw, 3rem); line-height: 1.1; max-width: 16ch; margin: 0; }
+.catalog-pills { display: flex; flex-wrap: wrap; gap: 10px; margin-top: clamp(20px, 2.6vw, 32px); }
+.familia-pill {
+  display: inline-flex; align-items: center;
+  padding: 9px 18px;
+  font: 600 .74rem/1 var(--font-body); letter-spacing: .06em; text-transform: uppercase;
+  color: var(--color-ink); text-decoration: none;
+  border: 1.5px solid var(--color-ink); border-radius: var(--radius-pill);
+  transition: background .2s ease, color .2s ease;
+}
+.familia-pill:hover { background: var(--color-bg); }
+/* Objetivos táctiles ≥44px en móvil (WCAG 2.5.5 / guía de Apple/Google) */
+@media (max-width: 768px) {
+  .familia-pill, .product-detail__size label { min-height: 44px; }
+  .site-footer .site-footer__col { gap: 0; }
+  .site-footer .site-footer__col a { display: flex; align-items: center; min-height: 40px; }
+  .rating-bar__link { display: inline-flex; align-items: center; min-height: 32px; }
+}
+.familia-pill.is-active { background: var(--color-ink); color: var(--color-white); }
+
+.catalog-grid, .muestras-catalogo ul {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;
+  padding-bottom: var(--section-pad-y);
+}
+@media (min-width: 768px)  { .catalog-grid, .muestras-catalogo ul { grid-template-columns: repeat(3, 1fr); } }
+@media (min-width: 1024px) { .catalog-grid, .muestras-catalogo ul { grid-template-columns: repeat(4, 1fr); } }
+
+/* --------------------------------------------------------------------------
+   17 · Muestras — cómo funciona + catálogo de muestras
+   -------------------------------------------------------------------------- */
+.how-it-works__steps { display: grid; grid-template-columns: 1fr; gap: 32px; }
+@media (min-width: 768px) { .how-it-works__steps { grid-template-columns: repeat(3, 1fr); } }
+.how-step__num {
+  display: block; font-family: var(--font-display); font-style: italic; font-weight: 700;
+  font-size: clamp(2rem, 3vw, 2.6rem); color: var(--color-silver-a); margin-bottom: 10px;
+}
+.how-step h3 { font-size: 1.1rem; margin: 0 0 8px; }
+.how-step p { font-size: .92rem; color: var(--color-text-muted); line-height: 1.55; margin: 0; }
+
+.muestras-catalogo h2 { font-size: clamp(1.5rem, 2.6vw, 2rem); margin: 0 0 clamp(20px, 2.6vw, 32px); }
+.muestras-catalogo__note { text-align: center; font-size: .9rem; color: var(--color-text-muted); margin-top: -8px; padding-bottom: var(--section-pad-y); }
+.muestras-catalogo__note a { color: var(--color-ink); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+
+/* --------------------------------------------------------------------------
+   18 · Ficha de producto
+   -------------------------------------------------------------------------- */
+/* AE-R: minmax(0,1fr) — con `1fr` el mínimo es `auto` y el contenido (thumbs,
+   delivery, botones) ensanchaba la columna a 653px en un viewport de 375. */
+.product-detail__layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: clamp(32px, 4vw, 56px); align-items: start; }
+.product-detail__layout > * { min-width: 0; }
+@media (min-width: 1024px) { .product-detail__layout { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+.product-detail__gallery { position: relative; aspect-ratio: 4 / 5; overflow: hidden; background: var(--color-bg); border: 1px solid var(--color-border); }
+.product-detail__img { width: 100%; height: 100%; object-fit: cover; }
+
+.product-detail__familia {
+  font: 600 .72rem/1 var(--font-body); letter-spacing: .12em; text-transform: uppercase;
+  color: var(--color-text-muted); margin: 0 0 10px;
+}
+.product-detail h1 { font-size: clamp(1.8rem, 2.8vw, 2.4rem); line-height: 1.15; margin: 0 0 14px; }
+.product-detail__desc { font-size: 1rem; line-height: 1.65; color: var(--color-text-muted); max-width: 48ch; margin: 0 0 22px; }
+.product-detail__price {
+  font-family: var(--font-display); font-weight: 700; font-size: 1.7rem;
+  margin: 0 0 28px; font-variant-numeric: tabular-nums;
+}
+
+.product-detail__notas, .product-detail__specs {
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-top: 1px solid var(--color-border); border-bottom: 1px solid var(--color-border);
+  margin: 0 0 24px;
+}
+.product-detail__specs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.product-detail__nota dd, .product-detail__spec dd { overflow-wrap: anywhere; }
+.product-detail__nota, .product-detail__spec { min-width: 0; }
+.product-detail__nota, .product-detail__spec { padding: 16px 12px 16px 0; }
+.product-detail__nota:not(:last-child), .product-detail__spec:not(:last-child) { border-right: 1px solid var(--color-border); }
+.product-detail__nota dt, .product-detail__spec dt {
+  font: 600 .66rem/1 var(--font-body); letter-spacing: .1em; text-transform: uppercase;
+  color: var(--color-text-muted); margin: 0 0 6px;
+}
+.product-detail__nota dd, .product-detail__spec dd {
+  font: 600 .9rem/1.3 var(--font-body); color: var(--color-ink);
+}
+
+/* AE-F7 #7: "Elige tu tamaño" — mismo patrón pill que .familia-pill (catálogo),
+   no el fieldset nativo del navegador. El <input> real queda oculto vía
+   .sr-only en vez de display:none — mantiene el radio operable por teclado/
+   lector de pantalla, solo se saca del flujo visual (mismo criterio que el
+   patrón `:has()` ya usado en el header para el grid de 3 columnas). */
+.product-detail__size {
+  border: 0; padding: 0; margin: 0 0 24px;
+  display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
+}
+.product-detail__size legend {
+  width: 100%; padding: 0; margin: 0 0 4px;
+  font: 600 .66rem/1 var(--font-body); letter-spacing: .1em; text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+.product-detail__size label {
+  position: relative;
+  display: inline-flex; align-items: center;
+  padding: 9px 18px;
+  font: 600 .74rem/1 var(--font-body); letter-spacing: .04em;
+  color: var(--color-ink);
+  border: 1.5px solid var(--color-ink); border-radius: var(--radius-pill);
+  cursor: pointer; transition: background .2s ease, color .2s ease;
+}
+.product-detail__size input[type="radio"] {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+}
+.product-detail__size label:has(input:checked) { background: var(--color-ink); color: var(--color-white); }
+.product-detail__size label:has(input:focus-visible) { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+
+/* AE-C26 (handoff front AE-F27, ver inbox/css.md): aviso funcional sobre el
+   empaque de la muestra — de otra naturaleza que `.product-detail__note`
+   (nota suave "referencial"), por eso se diferencia con caja bordeada en vez
+   de texto suelto. Sin color de advertencia nuevo (mantiene la disciplina de
+   paleta: naranja solo en `.btn--primary`) — el borde+fondo es lo único que
+   lo distingue, mismo criterio que los placeholders de imagen del sitio.
+   `display:flex` propio necesita el override de [hidden], mismo patrón
+   AE-C5/AE-J1 documentado varias veces en este archivo (js lo togglea). */
+.product-detail__disclaimer {
+  display: flex; gap: 8px; align-items: flex-start;
+  margin: 0 0 20px; padding: 12px 14px;
+  border: 1px solid var(--color-border); border-radius: var(--radius-soft);
+  background: var(--color-bg);
+  font-size: .78rem; line-height: 1.5; color: var(--color-text-muted);
+}
+.product-detail__disclaimer[hidden] { display: none; }
+
+.product-detail__actions { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 18px; }
+.product-detail__note { font-size: .78rem; color: var(--color-text-muted); line-height: 1.5; }
+
+/* --------------------------------------------------------------------------
+   18b · AE-R2 Ficha reestructurada (escrito por front en esta copia por
+   autorización de Paul 2026-11-15; css puede reabsorberlo).
+   Slots con [hidden] se activan solo con dato real (js). Sin transiciones
+   para el estado visible (patrón: UI no depende de rAF/transitions).
+   -------------------------------------------------------------------------- */
+.product-detail__media { display: grid; gap: 12px; align-content: start; }
+@media (min-width: 1024px) { .product-detail__media { position: sticky; top: 120px; } }
+
+.product-detail__thumbs { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.product-detail__thumb {
+  display: flex; align-items: center; justify-content: center; text-align: center;
+  width: 100%; aspect-ratio: 4 / 5; padding: 0;
+  background: var(--color-bg); border: 1px solid var(--color-border); border-radius: var(--radius-soft);
+  overflow: hidden; cursor: pointer;
+}
+.product-detail__thumb img { width: 100%; height: 100%; object-fit: cover; }
+.product-detail__thumb.is-active { border-color: var(--color-ink); box-shadow: 0 0 0 1px var(--color-ink); }
+.product-detail__thumb:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+.product-detail__thumb--empty {
+  cursor: default; padding: 6px; border-style: dashed;
+  font: 600 .6875rem/1.3 var(--font-body); letter-spacing: .02em; color: var(--color-text-muted); word-break: break-word;
+}
+
+.product-detail__rating { display: flex; align-items: center; gap: 8px; margin: -6px 0 14px; font: 500 .8rem/1 var(--font-body); }
+.product-detail__rating[hidden] { display: none; }
+.product-detail__rating-stars { color: var(--color-ink); letter-spacing: .1em; }
+.product-detail__rating a { color: var(--color-text-muted); text-decoration: underline; }
+
+.product-detail__price-row { display: flex; align-items: center; flex-wrap: wrap; gap: 10px 16px; margin: 0 0 18px; }
+.product-detail__price-row .product-detail__price { margin: 0; }
+.product-detail__badge {
+  display: inline-block; padding: 7px 12px;
+  font: 600 .68rem/1 var(--font-body); letter-spacing: .08em; text-transform: uppercase;
+  color: var(--color-white); background: var(--color-ink); border-radius: var(--radius-soft);
+  text-decoration: none;
+}
+.product-detail__badge:hover { background: var(--color-ink-soft); }
+.product-detail__badge[hidden] { display: none; }
+
+.product-detail__urgency { display: grid; gap: 6px; margin: 0 0 16px; }
+.product-detail__urgency:not(:has(:not([hidden]))) { display: none; }
+.product-detail__viewers, .product-detail__stock { margin: 0; font: 600 .8rem/1.3 var(--font-body); color: var(--color-ink); }
+.product-detail__viewers[hidden], .product-detail__stock[hidden] { display: none; }
+
+.product-detail__delivery {
+  display: flex; align-items: flex-start; gap: 10px; margin: 0 0 16px;
+  padding: 12px 14px; border: 1px solid var(--color-border); border-radius: var(--radius-soft);
+  font: 500 .84rem/1.4 var(--font-body); color: var(--color-ink);
+}
+.product-detail__delivery svg { flex: none; margin-top: 1px; }
+
+.product-detail__benefits { list-style: none; margin: 0 0 24px; padding: 0; display: grid; gap: 10px; }
+.product-detail__benefits li { display: flex; align-items: center; gap: 10px; font: 500 .84rem/1.3 var(--font-body); color: var(--color-ink); }
+.product-detail__benefits svg { flex: none; color: var(--color-text-muted); }
+
+.qty-stepper { display: inline-flex; align-items: stretch; border: 1.5px solid var(--color-ink); border-radius: var(--radius-soft); }
+.qty-stepper__btn { width: 44px; background: transparent; border: 0; font: 500 1.1rem/1 var(--font-body); color: var(--color-ink); cursor: pointer; }
+.qty-stepper__btn:hover { background: var(--color-bg); }
+.qty-stepper__input {
+  width: 52px; border: 0; border-inline: 1px solid var(--color-border); text-align: center;
+  font: 600 .95rem/1 var(--font-body); color: var(--color-ink); background: transparent;
+  -moz-appearance: textfield; appearance: textfield;
+}
+.qty-stepper__input::-webkit-outer-spin-button, .qty-stepper__input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.qty-stepper button:focus-visible, .qty-stepper input:focus-visible { outline: 2px solid var(--color-accent); outline-offset: -2px; }
+
+.product-detail__accordion { margin: 0 0 24px; border-top: 1px solid var(--color-border); }
+.acc { border-bottom: 1px solid var(--color-border); }
+.acc summary {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 16px 0; cursor: pointer; list-style: none;
+  font: 600 .78rem/1 var(--font-body); letter-spacing: .1em; text-transform: uppercase; color: var(--color-ink);
+}
+.acc summary::-webkit-details-marker { display: none; }
+.acc summary::after { content: "+"; font: 400 1.2rem/1 var(--font-body); }
+.acc[open] summary::after { content: "−"; }
+.acc summary:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+.acc > p { margin: 0 0 16px; font-size: .92rem; line-height: 1.6; color: var(--color-text-muted); }
+.acc > p a { color: var(--color-ink); text-decoration: underline; }
+.acc .product-detail__notas, .acc .product-detail__specs { margin: 0 0 16px; }
+
+/* Reseñas (placeholders para las reseñas guardadas de Paul) */
+.reviews { background: var(--color-bg); border-top: 1px solid var(--color-border); }
+.reviews__title, .related__title { font-size: clamp(1.5rem, 2.4vw, 2rem); margin: 0 0 8px; }
+.reviews__summary { margin: 0 0 24px; font: 500 .9rem/1.4 var(--font-body); color: var(--color-text-muted); }
+.reviews__summary[hidden] { display: none; }
+.reviews__list { list-style: none; margin: 24px 0 0; padding: 0; display: grid; gap: 20px; grid-template-columns: 1fr; }
+@media (min-width: 768px) { .reviews__list { grid-template-columns: repeat(3, 1fr); } }
+.review-card { height: 100%; display: flex; flex-direction: column; gap: 10px; padding: 18px; background: var(--color-white); border: 1px solid var(--color-border); border-radius: var(--radius-card); }
+/* Estado vacío (AE-R, punto 6): hueco reservado, no error — borde punteado,
+   fondo --color-bg y texto atenuado para que no compita con contenido real. */
+.review-card--placeholder { border-style: dashed; background: var(--color-bg); }
+.review-card--placeholder .review-card__stars,
+.review-card--placeholder .review-card__author { color: var(--color-text-muted); }
+.review-card--placeholder .review-card__text { color: var(--color-text-muted); font-style: italic; }
+.review-card__photo {
+  display: flex; align-items: center; justify-content: center; text-align: center;
+  width: 100%; aspect-ratio: 1 / 1; background: var(--color-bg); overflow: hidden;
+  font: 600 .66rem/1.3 var(--font-body); letter-spacing: .06em; color: var(--color-text-muted);
+}
+.review-card__photo:empty { display: none; }
+.review-card--placeholder .review-card__photo { aspect-ratio: 3 / 1; }
+.review-card__photo img { width: 100%; height: 100%; object-fit: cover; }
+.review-card__stars { margin: 0; letter-spacing: .12em; color: var(--color-ink); }
+.review-card__text { margin: 0; font-size: .95rem; line-height: 1.6; color: var(--color-ink); }
+.review-card__meta { margin: auto 0 0; display: flex; flex-wrap: wrap; gap: 2px 10px; font: 500 .74rem/1.4 var(--font-body); color: var(--color-text-muted); }
+.review-card__author { font-weight: 600; color: var(--color-ink); }
+.review-card__verified[hidden] { display: none; }
+
+/* Relacionados */
+.related[hidden] { display: none; }
+.related__grid { list-style: none; margin: 24px 0 0; padding: 0; display: grid; gap: 16px; grid-template-columns: repeat(2, 1fr); }
+@media (min-width: 900px) { .related__grid { grid-template-columns: repeat(4, 1fr); } }
+.related-card__link { display: block; text-decoration: none; color: var(--color-ink); }
+.related-card__img { width: 100%; height: auto; aspect-ratio: 4 / 5; object-fit: cover; background: var(--color-bg); border: 1px solid var(--color-border); }
+.related-card__familia { margin: 10px 0 4px; font: 600 .6875rem/1 var(--font-body); letter-spacing: .12em; text-transform: uppercase; color: var(--color-text-muted); }
+.related-card__name { margin: 0 0 4px; font: 600 1rem/1.25 var(--font-display); }
+.related-card__price { margin: 0; font: 600 .9rem/1 var(--font-body); font-variant-numeric: tabular-nums; }
+.related-card__link:hover .related-card__name { text-decoration: underline; }
+
+/* Barra sticky de compra — z-index bajo el header (1000); js la muestra/oculta con [hidden] */
+.buy-bar {
+  position: fixed; inset: auto 0 0 0; z-index: 900;
+  background: var(--color-white); border-top: 1px solid var(--color-border);
+  box-shadow: 0 -6px 24px rgba(36,36,34,.08);
+}
+.buy-bar[hidden] { display: none; }
+.buy-bar__inner { display: flex; align-items: center; gap: 14px; padding-block: 10px; padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px)); }
+.buy-bar__img { flex: none; width: 48px; height: 60px; object-fit: cover; border: 1px solid var(--color-border); }
+.buy-bar__info { flex: 1; min-width: 0; }
+.buy-bar__name { margin: 0; font: 600 .9rem/1.2 var(--font-display); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.buy-bar__price { margin: 2px 0 0; font: 600 .82rem/1 var(--font-body); font-variant-numeric: tabular-nums; color: var(--color-text-muted); }
+.buy-bar__btn { flex: none; }
+body.has-buy-bar { padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px)); }
+@media (max-width: 480px) { .buy-bar__img { display: none; } .buy-bar__btn { padding-inline: 18px; } }
+
+/* --------------------------------------------------------------------------
+   19 · Carrito — página completa
+   -------------------------------------------------------------------------- */
+.cart-page__head { margin-bottom: clamp(24px, 3vw, 40px); }
+.cart-page__head h1 { font-size: clamp(1.8rem, 3vw, 2.4rem); margin: 0; }
+
+.cart-page__empty { text-align: center; padding-block: clamp(56px, 8vw, 96px); }
+.cart-page__empty .cart-empty__icon { color: var(--color-silver-a); }
+
+.cart-page__layout { display: grid; grid-template-columns: 1fr; gap: clamp(32px, 4vw, 56px); align-items: start; }
+@media (min-width: 1024px) { .cart-page__layout { grid-template-columns: 1fr 360px; } }
+/* Único caso del sitio donde una clase con [hidden] define su propio
+   `display` (grid) — override obligatorio por especificidad, ver nota §2. */
+.cart-page__layout[hidden] { display: none; }
+
+.cart-page__items { border-top: 1px solid var(--color-border); }
+
+.cart-summary { background: var(--color-bg-alt); border: 1px solid var(--color-border); padding: clamp(22px, 3vw, 30px); position: sticky; top: 100px; }
+.cart-summary__title { font-size: 1.15rem; margin: 0 0 18px; }
+.cart-summary__row { display: flex; justify-content: space-between; font: 600 .95rem/1 var(--font-body); margin-bottom: 8px; }
+.cart-summary__note { font-size: .78rem; color: var(--color-text-muted); margin: 0 0 20px; }
+.cart-summary__checkout { width: 100%; margin-bottom: 14px; }
+.cart-summary__continue { display: block; text-align: center; font-size: .85rem; color: var(--color-text-muted); text-decoration: none; margin-bottom: 20px; }
+.cart-summary__continue:hover { color: var(--color-ink); }
+.cart-summary__secure {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  font-size: .76rem; color: var(--color-text-muted); margin: 0;
+}
+
+/* --------------------------------------------------------------------------
+   20 · Confirmación de pedido
+   -------------------------------------------------------------------------- */
+.confirmation { min-height: 60vh; display: flex; align-items: center; }
+.confirmation__inner { max-width: 520px; text-align: center; }
+.confirmation h1 { font-size: clamp(1.6rem, 2.6vw, 2rem); margin: 0 0 28px; }
+.confirmation__state-title { font-family: var(--font-display); font-weight: 700; font-size: 1.3rem; margin: 0 0 10px; }
+.confirmation__state p { color: var(--color-text-muted); line-height: 1.6; margin: 0 0 32px; }
+
+/* --------------------------------------------------------------------------
+   21 · Nuestra historia
+   -------------------------------------------------------------------------- */
+.historia-origen__layout { display: grid; grid-template-columns: 1fr; gap: clamp(28px, 4vw, 48px); align-items: center; }
+@media (min-width: 1024px) { .historia-origen__layout { grid-template-columns: 1fr 1fr; } }
+.historia-origen__img { aspect-ratio: 4 / 5; object-fit: cover; background: var(--color-bg); border: 1px solid var(--color-border); width: 100%; }
+.historia-origen__texto p { font-size: 1.05rem; line-height: 1.75; color: var(--color-ink); max-width: 46ch; }
+
+.principio { background: var(--color-ink); color: var(--color-white); text-align: center; }
+.principio__quote {
+  margin: 0 auto 28px; max-width: 46ch;
+  border: 0; padding: 0 0 24px; position: relative;
+}
+.principio__quote::after {
+  content: ""; position: absolute; left: 50%; bottom: 0; transform: translateX(-50%);
+  width: 40px; height: 2px; background: var(--color-silver-a);
+}
+.principio__quote p {
+  font-family: var(--font-display); font-style: italic; font-weight: 700;
+  font-size: clamp(1.3rem, 2.4vw, 1.8rem); line-height: 1.4; margin: 0; color: var(--color-white);
+}
+.principio__mensajes {
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 28px;
+  font: 500 .85rem/1 var(--font-body); color: var(--text-on-dark-dim); letter-spacing: .02em;
+}
+
+/* --------------------------------------------------------------------------
+   22 · Contacto
+   -------------------------------------------------------------------------- */
+.contacto-info__list {
+  display: grid; grid-template-columns: 1fr; gap: 24px;
+  max-width: 460px; margin: 0 auto; text-align: center;
+}
+@media (min-width: 600px) { .contacto-info__list { grid-template-columns: repeat(3, 1fr); max-width: none; } }
+.contacto-info__list dt {
+  font: 600 .68rem/1 var(--font-body); letter-spacing: .12em; text-transform: uppercase;
+  color: var(--color-text-muted); margin: 0 0 8px;
+}
+.contacto-info__list dd { font: 600 1rem/1.4 var(--font-body); color: var(--color-ink); }
+
+/* --------------------------------------------------------------------------
+   23 · Footer v2 (brief §5.12) — políticas + WhatsApp + sello de pago deben
+   leerse como visibles/con peso real, no como link diminuto escondido
+   (señal de confianza #2 del brief: transparencia). Reescrito de flex 2
+   columnas a grid de 4 — el layout anterior no tenía sitio para las 3
+   columnas nuevas (políticas/WhatsApp/sello MP) que trae AE-F4.
+   -------------------------------------------------------------------------- */
+/* AE-C21 (pedido directo de Paul): fondo pasa de --color-ink (carbón grafito
+   de marca) a --color-navy (azul marino, mismo token que ya usan los 3
+   íconos de .valores desde AE-C20) — resto del footer sin cambios, todo su
+   texto/bordes ya usan tokens relativos a blanco (--color-white, --text-on-
+   dark-dim, rgba de blanco) que funcionan igual sobre cualquier fondo
+   oscuro, no dependían del valor exacto de --color-ink. */
+.site-footer { background: var(--color-navy); color: var(--color-white); padding-block: clamp(40px, 5vw, 64px); }
+/* Móvil: 2 columnas (brand+Catálogo / La marca+Ayuda / newsletter+trust),
+   nunca 1 sola columna apilada a la izquierda — pedido directo de Paul. */
+.site-footer__inner { display: grid; grid-template-columns: repeat(2, 1fr); gap: 28px 20px; }
+/* `1fr` por sí solo es `minmax(auto,1fr)` — el mínimo automático de cada
+   pista se calcula sobre el contenido menos flexible de sus hijos (acá el
+   botón "SUSCRIBIRME" con white-space:nowrap), así que las 2 columnas NO
+   quedaban parejas y el grid completo desbordaba el viewport en 390px (503px
+   de contenido en 375px de contenedor, confirmado con clic real). Fix
+   estándar: `min-width:0` en los hijos directos del grid para que `1fr`
+   reparta el espacio real disponible y el texto envuelva dentro de su
+   columna en vez de forzarla a crecer. */
+.site-footer__inner > * { min-width: 0; }
+/* AE-F7 #6: footer reestructurado — de 4 a 6 secciones antes de la fila de
+   copyright (brand, 3×nav-col, newsletter, trust). 900px en vez del 768px
+   viejo: 6 columnas necesitan más aire que las 4 originales, mismo criterio
+   de breakpoint más ancho que ya usa .promesa__inner para su grid de 2. */
+@media (min-width: 900px) {
+  .site-footer__inner {
+    grid-template-columns: 1.3fr 1fr 1fr 1fr 1.3fr 1fr;
+    align-items: start; gap: clamp(20px, 2.4vw, 40px);
+  }
+}
+
+/* El PNG del logo es trazo negro sobre transparente — sobre el footer oscuro
+   (--color-navy desde AE-C21, antes --color-ink) sería invisible.
+   `brightness(0) invert(1)` lo pasa a blanco puro sin necesitar un segundo
+   archivo de marca. */
+.site-footer__brand .header-logo__img { filter: brightness(0) invert(1); }
+.site-footer__tagline { font-size: .85rem; color: var(--text-on-dark-dim); margin: 6px 0 0; }
+
+.site-footer__whatsapp {
+  display: inline-flex; align-items: center; gap: 8px; margin-top: 16px;
+  padding: 10px 16px; border: 1px solid rgba(255,255,255,.32); border-radius: var(--radius-soft);
+  font: 600 .8rem/1 var(--font-body); color: var(--color-white); text-decoration: none;
+  transition: background .2s ease, border-color .2s ease;
+}
+.site-footer__whatsapp:hover { background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.5); }
+
+/* AE-F7 #6: .site-footer__links/.site-footer__policies quedaron sin HTML que
+   los use (confirmado por grep, 0 referencias en las 8 páginas) — la nav de
+   3 columnas ahora es .site-footer__col directo, sin wrapper propio. */
+.site-footer__col, .site-footer__trust { display: flex; flex-direction: column; gap: 10px; }
+.site-footer__policies-title {
+  font: 600 .68rem/1 var(--font-body); letter-spacing: .1em; text-transform: uppercase;
+  color: var(--text-on-dark-dim); margin: 0 0 2px;
+}
+.site-footer__col a { font: 500 .82rem/1 var(--font-body); letter-spacing: .02em; color: var(--text-on-dark); text-decoration: none; }
+.site-footer__col a:hover { color: var(--color-white); }
+
+/* AE-F7 #6: newsletter — único bloque del footer con <form>. Input propio
+   (no reutiliza ningún input existente en el sitio) sobre fondo oscuro
+   (--color-navy desde AE-C21), por eso necesita su propia superficie clara
+   y borde translúcido. */
+.site-footer__newsletter { display: flex; flex-direction: column; gap: 10px; }
+.site-footer__newsletter-sub { font: 400 .82rem/1.5 var(--font-body); color: var(--text-on-dark-dim); margin: 0; max-width: 34ch; }
+.newsletter-form { display: flex; gap: 8px; margin-top: 4px; }
+.newsletter-form input {
+  flex: 1; min-width: 0;
+  background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.24);
+  border-radius: var(--radius-soft); padding: 10px 12px;
+  font: 500 .82rem/1 var(--font-body); color: var(--color-white);
+}
+.newsletter-form input::placeholder { color: var(--text-on-dark-dim); }
+.newsletter-form input:focus-visible { outline: 2px solid var(--color-white); outline-offset: 1px; }
+.newsletter-form .btn--sm { flex: none; }
+
+/* Chip blanco detrás del sello de MP — mantiene los colores reales de marca
+   del badge (señal de confianza real) en vez de forzarlo a blanco plano, que
+   lo volvería irreconocible como sello de pago seguro. */
+.site-footer__mp-badge { background: var(--color-white); padding: 6px 10px; border-radius: var(--radius-soft); }
+
+.site-footer__copy {
+  grid-column: 1 / -1;
+  font-size: .74rem; color: var(--text-on-dark-dim); margin: 0;
+  padding-top: 24px; border-top: 1px solid rgba(255,255,255,.12);
+}
+
+/* --------------------------------------------------------------------------
+   24 · Brief v4 (AE-C11) — 8 elementos nuevos sin CSS, handoff front AE-F8..
+   AE-F15 (inbox/css.md, 2026-08-20).
+   -------------------------------------------------------------------------- */
+
+/* AE-C28 (handoff front AE-F22, ver inbox/css.md): bloque "24a · Por qué
+   Allpa" borrado entero — la sección se eliminó de index.html, no queda
+   ningún otro HTML del sitio que use estas clases (verificado por front con
+   grep). Autocontenido, no dejó nada huérfano en otras secciones. */
+
+/* 24b · Home — journal, 2 CTAs (AE-F12). Antes 1 sola CTA suelta, ahora un
+   par envuelto en .journal__ctas — fila con wrap en vez de depender del
+   flujo inline por defecto de 2 `.btn` (inline-flex) contiguos. Sin
+   tratamiento visual "deshabilitado" para la 2ª CTA a propósito: mismo
+   criterio ya documentado por front para `data-cta-pendiente` en todo el
+   sitio (0 CSS especial en ningún otro punto) — `.btn--outline` ya la
+   distingue lo suficiente de `.btn--ghost`. */
+.journal__ctas { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 4px; }
+
+/* 24c · Footer — FAQ del alcohol (AE-F10). `<details>`/`<summary>` propio,
+   reemplaza el triángulo nativo del navegador por un "+" que rota a "×"
+   (45deg) al abrir — mismo lenguaje visual que el resto del sitio (afilado,
+   sin decoración de más). Colores de texto sobre fondo oscuro, igual que
+   `.site-footer__col a`. */
+.footer-faq { margin-top: 4px; }
+.footer-faq summary {
+  display: flex; align-items: center; gap: 8px; cursor: pointer;
+  list-style: none;
+  font: 500 .82rem/1.3 var(--font-body); color: var(--text-on-dark);
+  padding: 2px 0;
+}
+.footer-faq summary::-webkit-details-marker { display: none; }
+.footer-faq summary::after {
+  content: "+"; margin-left: auto; flex: none;
+  font: 400 1rem/1 var(--font-body); color: var(--text-on-dark-dim);
+  transition: transform .2s ease;
+}
+.footer-faq[open] summary::after { transform: rotate(45deg); }
+.footer-faq p {
+  font: 400 .8rem/1.55 var(--font-body); color: var(--text-on-dark-dim);
+  margin: 8px 0 0; max-width: 34ch;
+}
+
+/* 24d · Footer — lista de confianza antes del sello MP (AE-F9). Mismo
+   patrón icono+texto que .cart-summary__trust (§24h) — íconos heredan
+   currentColor, ya coherente con el texto claro del footer. */
+.site-footer__trust-list { display: flex; flex-direction: column; gap: 8px; margin: 2px 0 14px; }
+.site-footer__trust-list li {
+  display: flex; align-items: center; gap: 8px;
+  font: 500 .78rem/1 var(--font-body); color: var(--text-on-dark);
+}
+.site-footer__trust-list svg { flex: none; color: var(--color-silver-a); }
+
+/* 24e · Catálogo — filtro secundario de género (AE-F13). Mismo componente
+   técnico que .familia-pill (mismo <nav class="catalog-pills">), pero
+   jerarquía visual más liviana a propósito — es un filtro opcional, no debe
+   competir con el filtro principal de familia justo encima: sin borde
+   propio, subrayado en vez de fondo sólido en el estado activo. */
+.catalog-pills--genero { margin-top: 12px; gap: 6px 20px; }
+.genero-pill {
+  display: inline-flex; align-items: center;
+  padding: 4px 2px;
+  font: 500 .74rem/1 var(--font-body); letter-spacing: .04em;
+  color: var(--color-text-muted); text-decoration: none;
+  border-bottom: 1.5px solid transparent;
+  transition: color .15s ease, border-color .15s ease;
+}
+.genero-pill:hover { color: var(--color-ink); }
+.genero-pill.is-active { color: var(--color-ink); border-bottom-color: var(--color-ink); font-weight: 600; }
+
+/* 24f · Catálogo — "Perfumes de temporada" (AE-F14). Bloque editorial entre
+   la cabecera y el grid, mismo espíritu que .promesa/.muestras-promo pero
+   más liviano (sin foto en el HTML) — banda de contraste sutil, texto
+   centrado, reutiliza .eyebrow ya existente. */
+.temporada { background: var(--color-bg-alt); border-block: 1px solid var(--color-border); text-align: center; }
+.temporada__inner { max-width: 620px; }
+.temporada__content h2 { font-size: clamp(1.6rem, 2.6vw, 2.1rem); margin: 0 0 12px; }
+.temporada__content p { color: var(--color-text-muted); line-height: 1.6; margin: 0 0 24px; }
+
+/* 24g · Carrito — .cart-summary__secure pasó de <p> suelto a <li> dentro de
+   .cart-summary__trust (AE-F9) — el <ul> reutiliza el reset global (list-
+   style/margin/padding ya en 0, ver §2), solo necesita layout de columna +
+   estilo del ítem hermano nuevo ("Envío en 72 horas"). .cart-summary__secure
+   conserva su propia regla existente (línea ~963) sin cambios, ya centraba
+   icono+texto igual que este patrón. */
+.cart-summary__trust { display: flex; flex-direction: column; gap: 8px; margin-top: 2px; }
+.cart-summary__trust li {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  font-size: .76rem; color: var(--color-text-muted);
+}
+
+

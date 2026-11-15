@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pedido confirmado — Allpa Essence</title>
+
+  <!-- ===== DOMINIO SEO ===== -->
+  <!-- meta description, noindex (página transaccional) — agente SEO. -->
+  <!-- ===== FIN bloque SEO ===== -->
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="assets/ico/ico.png" type="image/png">
+</head>
+<body data-page="confirmacion">
+
+  <a class="skip-link" href="#main">Saltar al contenido</a>
+
+  <header class="site-header" id="site-header">
+    <div class="container site-header__inner">
+      <a href="index.html" class="header-logo" aria-label="Allpa Essence — inicio">
+        <img class="header-logo__img" src="assets/ico/allpa_ico_header.webp" alt="" width="1408" height="1408">
+      </a>
+      <nav class="nav-main" aria-label="Navegación principal">
+        <a href="index.html" class="nav-main__link">Inicio</a>
+        <a href="catalogo.html" class="nav-main__link">Catálogo</a>
+        <a href="muestras.html" class="nav-main__link">Muestras</a>
+        <a href="historia.html" class="nav-main__link">Nuestra historia</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+
+    <!-- ===== CONFIRMACIÓN — mismo patrón que AP Beauty (?estado=pendiente para Mercado Pago
+         "en revisión", ver AP-J2 en pipeline.md). Contrato JS: leer ?estado= de la URL y alternar
+         entre los 2 bloques por [hidden] — nunca asumir siempre "aprobado". ===== -->
+    <section class="confirmation" aria-labelledby="confirmation-titulo">
+      <div class="container confirmation__inner">
+        <h1 id="confirmation-titulo">Estado de tu pedido</h1>
+
+        <div class="confirmation__state" id="estado-aprobado">
+          <p class="confirmation__state-title">Gracias por tu compra</p>
+          <p>Tu pedido fue confirmado. Te vamos a escribir por WhatsApp para coordinar el envío.</p>
+        </div>
+
+        <div class="confirmation__state" id="estado-pendiente" hidden>
+          <p class="confirmation__state-title">Tu pago está en revisión</p>
+          <p>Mercado Pago todavía está procesando tu pago — te avisamos por WhatsApp apenas se confirme, no hace falta que hagas nada más.</p>
+        </div>
+
+        <a href="catalogo.html" class="btn btn--ghost">Seguir explorando</a>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container site-footer__inner">
+      <div class="site-footer__brand">
+        <img class="header-logo__img" src="assets/ico/allpa_ico-removebg-preview.png" alt="Allpa Essence" width="647" height="386">
+        <p class="site-footer__tagline">Sin etiquetas, solo esencia.</p>
+        <a href="CONTACTO_WHATSAPP_PENDIENTE" data-cta-pendiente="CONTACTO_WHATSAPP" target="_blank" rel="noopener noreferrer" class="site-footer__whatsapp">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12c0 1.85.5 3.58 1.36 5.07L2 22l5.06-1.33A9.94 9.94 0 0 0 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2z"/></svg>
+          WhatsApp
+        </a>
+        <ul class="footer-social" aria-label="Síguenos en redes sociales">
+          <li>
+            <a href="TIKTOK_PENDIENTE" data-cta-pendiente="TIKTOK" target="_blank" rel="noopener noreferrer" aria-label="TikTok">
+              <svg class="footer-social__icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 3v10.5a4.5 4.5 0 1 1-4.5-4.5"/><path d="M16 3c.4 2.6 2.2 4.2 5 4.4"/></svg>
+            </a>
+          </li>
+          <li>
+            <a href="INSTAGRAM_PENDIENTE" data-cta-pendiente="INSTAGRAM" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+              <svg class="footer-social__icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r=".6" fill="currentColor"/></svg>
+            </a>
+          </li>
+          <li>
+            <a href="YOUTUBE_PENDIENTE" data-cta-pendiente="YOUTUBE" target="_blank" rel="noopener noreferrer" aria-label="YouTube">
+              <svg class="footer-social__icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="4"/><path d="M10 9l5 3-5 3z" fill="currentColor"/></svg>
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <nav class="site-footer__col" aria-label="Catálogo">
+        <p class="site-footer__policies-title">Catálogo</p>
+        <a href="catalogo.html">Todas las fragancias</a>
+        <a href="catalogo.html#filtro-genero">Regalos</a>
+        <a href="catalogo.html?familia=amaderada">Amaderadas</a>
+        <a href="catalogo.html?familia=citrica">Cítricas</a>
+        <a href="catalogo.html?familia=floral">Florales</a>
+        <a href="catalogo.html?familia=oriental-especiada">Orientales y especiadas</a>
+        <a href="catalogo.html?familia=fresca-acuatica">Frescas y acuáticas</a>
+      </nav>
+
+      <nav class="site-footer__col" aria-label="La marca">
+        <p class="site-footer__policies-title">La marca</p>
+        <a href="historia.html">Nuestra historia</a>
+        <a href="contacto.html">Contacto</a>
+        <a href="resenas.html">Reseñas</a>
+      </nav>
+
+      <nav class="site-footer__col" aria-label="Ayuda">
+        <p class="site-footer__policies-title">Ayuda</p>
+        <a href="POLITICA_ENVIO_PENDIENTE" data-cta-pendiente="POLITICA_ENVIO">Envíos</a>
+        <a href="muestras.html">Muestras</a>
+        <a href="PAGINA_FAQ_PENDIENTE" data-cta-pendiente="PAGINA_FAQ">Preguntas frecuentes</a>
+        <a href="POLITICA_CAMBIOS_PENDIENTE" data-cta-pendiente="POLITICA_CAMBIOS">Cambios y devoluciones</a>
+        <details class="footer-faq">
+          <summary>¿Por qué mi perfume tiene alcohol?</summary>
+          <p>Todo perfume lo lleva — es lo que libera y transporta el aroma, no un relleno. Lo que sí evitamos es bajar la concentración de esencia para ahorrar costo: la tuya es la que corresponde, no menos.</p>
+        </details>
+      </nav>
+
+      <div class="site-footer__newsletter">
+        <p class="site-footer__policies-title">Entérate antes que nadie</p>
+        <p class="site-footer__newsletter-sub">Nuevos lanzamientos, lives y ofertas reales — nunca más de un correo al mes.</p>
+        <form class="newsletter-form" id="newsletter-form">
+          <label for="newsletter-email" class="sr-only">Tu correo</label>
+          <input type="email" id="newsletter-email" name="email" placeholder="Tu correo" required>
+          <button type="submit" class="btn btn--primary btn--sm">Suscribirme</button>
+        </form>
+      </div>
+
+      <div class="site-footer__trust">
+        <p class="site-footer__policies-title">Pago seguro</p>
+        <ul class="site-footer__trust-list">
+          <li>Envío en 72 horas</li>
+          <li>Pago 100% seguro</li>
+        </ul>
+        <img class="site-footer__mp-badge" src="assets/trustelements/card_payments.webp" alt="Aceptamos Visa, Mastercard, American Express y PayPal" width="140" height="29" loading="lazy">
+      </div>
+
+      <p class="site-footer__copy">© <span id="footer-year">2026</span> Allpa Essence. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+
+  <!-- AE-R4 · Botón flotante de WhatsApp (Elexirium lo tiene en todas las páginas). Destino PENDIENTE (número real de Paul). -->
+  <a class="whatsapp-float" href="CONTACTO_WHATSAPP_PENDIENTE" data-cta-pendiente="CONTACTO_WHATSAPP" target="_blank" rel="noopener noreferrer" aria-label="Escríbenos por WhatsApp">
+    <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.2-4.6-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.8 0-1.3.7-2 1-2.3.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.3 0 .5l-.3.4-.4.4c-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.3 2.4 1.5.3.1.5.1.6-.1l.9-1.1c.2-.3.4-.2.6-.1l1.9.9c.3.1.5.2.5.3.1.1.1.6-.1 1.2z"/></svg>
+  </a>
+  <script type="module" defer src="main.js"></script>
+</body>
+</html>

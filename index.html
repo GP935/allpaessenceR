@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Allpa Essence — Sin etiquetas, solo esencia</title>
+
+  <!-- ===== DOMINIO SEO ===== -->
+  <!-- meta description, canonical, OG (1200x630), Twitter Card, JSON-LD (Organization + Product
+       por item, FAQPage si aplica) — agente SEO. Front no toca este bloque. -->
+  <!-- ===== FIN bloque SEO ===== -->
+
+  <!-- ===== DOMINIO CSS ===== -->
+  <!-- Elegir y enlazar aquí las 2 familias tipográficas: serif moderna de alto contraste para
+       titulares (coherente con el wordmark "Allpa" del logo ya aprobado) + sans-serif limpia y
+       neutra para cuerpo. Ver web/negocios/allpaessence.txt §tipografía — front no elige la
+       fuente exacta, solo deja el hueco. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="assets/ico/ico.png" type="image/png">
+  <!-- ===== FIN bloque CSS ===== -->
+</head>
+<body data-page="home">
+
+  <a class="skip-link" href="#main">Saltar al contenido</a>
+
+  <!-- ===== HEADER v3 (corrección de brief 2026-08-19 §3, sobre la base v2) — contrato
+       compartido en las 8 páginas ===== -->
+  <!-- Contrato JS: #btn-menu (abre menú móvil) · #menu-panel · #menu-backdrop · #btn-menu-close
+       · #btn-cart (abre carrito) · #cart-drawer · #cart-backdrop · #btn-cart-close · #cart-count
+       · #btn-catalogo-nav/#catalogo-nav-menu (dropdown, aria-expanded + hidden) · #utility-message
+       (mensaje vivo/envío/seguridad — copy deck 2026-08-19, 3 mensajes rotativos, ver comentario
+       en el markup de abajo).
+       CORRECCIÓN v3: el brief retiró explícitamente el selector país/moneda ("sin selector de
+       país/moneda por ahora — operación inicial solo en Perú, soles; se agrega cuando se active
+       venta en España, no antes"). #market-select existía en v2 y se retira aquí — si ya hay
+       lógica JS de mercado escrita sobre ese id, queda muerta, ver inbox/js.md. -->
+  <!-- Copy deck 2026-08-19: 3 mensajes rotativos reales (ya no placeholder). HTML deja los 3
+       como hermanos de #utility-message, el primero visible por defecto (progressive
+       enhancement — sin JS se ve un mensaje fijo, no vacío). Rotación real es dominio js, ver
+       inbox/js.md; ocultar los inactivos por defecto es dominio css, ver inbox/css.md. -->
+  <div class="utility-bar">
+    <div class="container utility-bar__inner">
+      <div class="utility-bar__message" id="utility-message">
+        <p class="utility-bar__msg is-active" data-utility-msg>EN VIVO HOY - 8:00 PM</p>
+        <p class="utility-bar__msg" data-utility-msg>Envíos a todo el Perú</p>
+        <p class="utility-bar__msg" data-utility-msg>Compra 100% segura</p>
+      </div>
+    </div>
+  </div>
+
+  <header class="site-header" id="site-header">
+    <div class="container site-header__inner">
+
+      <nav class="nav-main nav-main--left" aria-label="Navegación principal">
+        <div class="nav-dropdown">
+          <button type="button" class="nav-main__link nav-dropdown__toggle" id="btn-catalogo-nav" aria-haspopup="true" aria-expanded="false" aria-controls="catalogo-nav-menu">Catálogo</button>
+          <div class="nav-dropdown__menu" id="catalogo-nav-menu" hidden>
+            <a href="catalogo.html">Todas</a>
+            <a href="catalogo.html?familia=amaderada">Amaderada</a>
+            <a href="catalogo.html?familia=citrica">Cítrica</a>
+            <a href="catalogo.html?familia=floral">Floral</a>
+            <a href="catalogo.html?familia=oriental-especiada">Oriental / Especiada</a>
+            <a href="catalogo.html?familia=fresca-acuatica">Fresca / Acuática</a>
+          </div>
+        </div>
+        <a href="muestras.html" class="nav-main__link">Muestras</a>
+      </nav>
+
+      <a href="index.html" class="header-logo" aria-label="Allpa Essence — inicio" aria-current="page">
+        <img class="header-logo__img" src="assets/ico/allpa_ico_header.webp" alt="" width="1408" height="1408">
+      </a>
+
+      <div class="site-header__actions">
+        <!-- Grupo derecho reestructurado (corrección de brief 2026-08-19 §3): Nuestra
+             historia/Contacto pasan del grupo izquierdo a este nav-main--right, con
+             separación extra (dominio css) antes de cuenta/carrito. -->
+        <nav class="nav-main nav-main--right" aria-label="Navegación secundaria">
+          <a href="historia.html" class="nav-main__link">Nuestra historia</a>
+          <a href="contacto.html" class="nav-main__link">Contacto</a>
+        </nav>
+        <div class="site-header__icons">
+          <!-- CUENTA_PENDIENTE: el brief (§3) pide este ícono en el nav pero no define la página en
+               el mapa del sitio (§4) — sin login/cuenta.html todavía. Confirmar alcance con Paul
+               antes de cablear un destino real; por ahora apunta a contacto.html como fallback no
+               -roto en vez de un href="#" muerto. -->
+          <a href="contacto.html" class="header-icon header-icon--account" aria-label="Mi cuenta" data-account-pendiente="true">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.58-7 8-7s8 3 8 7"/></svg>
+          </a>
+          <button type="button" class="header-icon header-cart" id="btn-cart" aria-label="Abrir carrito" aria-controls="cart-drawer" aria-expanded="false">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+            <span class="cart-count" id="cart-count">0</span>
+          </button>
+          <button type="button" class="menu-toggle" id="btn-menu" aria-label="Abrir menú" aria-expanded="false" aria-controls="menu-panel">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== AE-R1 · BANNER DE CAMPANA CON CUENTA ATRAS (copiado de la mecanica de Elexirium, decision de Paul 2026-11-15).
+       Oferta: 3 por S/ 99 (antes S/ 150), presentacion 50 ml. Precios = placeholders segun Paul.
+       Fin: 2026-11-18 23:59:59 hora Peru (UTC-5), editable en data-countdown-end (UN solo lugar por pagina;
+       js debe leerlo y compartirlo con el drawer del carrito, ver inbox/js.md). Sin JS se ven los guiones y
+       el boton sigue funcionando. Al llegar a 0 js pone [hidden] en la seccion (css: .promo-banner[hidden]{display:none}).
+       Bloque IDENTICO en las paginas con utility-bar. No tocar a mano sin replicar. -->
+  <section class="promo-banner" id="promo-banner" aria-label="Oferta por tiempo limitado">
+    <div class="container">
+      <div class="promo-banner__frame">
+        <p class="promo-banner__eyebrow"><span aria-hidden="true">◇</span> Oferta por tiempo limitado <span aria-hidden="true">◇</span></p>
+        <div class="promo-banner__row">
+          <p class="promo-banner__offer">
+            <strong class="promo-banner__headline">3 por S/ 99</strong>
+            <span class="promo-banner__size">en fragancias de 50 ml</span>
+            <s class="promo-banner__was">antes S/ 150</s>
+          </p>
+          <span class="promo-banner__divider" aria-hidden="true"></span>
+          <p class="promo-banner__timer" role="timer" aria-live="off">
+            <span class="promo-banner__timer-label">Termina en</span>
+            <time class="promo-banner__countdown" data-countdown-end="2026-11-18T23:59:59-05:00" datetime="2026-11-18T23:59:59-05:00">
+              <span class="promo-banner__unit"><span data-cd="d">--</span><small>d</small></span>
+              <span class="promo-banner__unit"><span data-cd="h">--</span><small>h</small></span>
+              <span class="promo-banner__unit"><span data-cd="m">--</span><small>m</small></span>
+              <span class="promo-banner__unit"><span data-cd="s">--</span><small>s</small></span>
+            </time>
+          </p>
+          <a href="catalogo.html" class="promo-banner__cta">Comprar ahora</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="menu-backdrop" id="menu-backdrop" hidden></div>
+  <aside class="menu-panel" id="menu-panel" aria-label="Menú de navegación" aria-hidden="true">
+    <div class="menu-top">
+      <img class="header-logo__img" src="assets/ico/allpa_ico-removebg-preview.png" alt="Allpa Essence" width="647" height="386">
+      <button class="menu-close" id="btn-menu-close" aria-label="Cerrar menú">✕</button>
+    </div>
+    <nav class="menu-primary" aria-label="Navegación principal">
+      <a href="index.html" aria-current="page">Inicio</a>
+      <a href="catalogo.html">Catálogo</a>
+      <a href="muestras.html">Muestras</a>
+      <a href="catalogo.html#filtro-genero">Regalos</a>
+      <a href="historia.html">Nuestra historia</a>
+      <a href="contacto.html">Contacto</a>
+    </nav>
+  </aside>
+
+  <!-- ===== CARRITO · DRAWER (contrato compartido, mismo patrón MP que AP Beauty — ver AP-J2 en pipeline.md) ===== -->
+  <div class="cart-backdrop" id="cart-backdrop" hidden></div>
+  <aside class="cart-drawer" id="cart-drawer" aria-label="Tu carrito" aria-hidden="true">
+    <div class="cart-drawer__top">
+      <h2 class="cart-drawer__title">Tu esencia te espera</h2>
+      <button class="cart-close" id="btn-cart-close" aria-label="Cerrar carrito">✕</button>
+    </div>
+
+    <!-- AE-R3 · Oferta vigente + progreso (BRIEFING §5.1/§5.3). Misma fecha de fin que #promo-banner (js la lee del
+         primer [data-countdown-end]; aqui se repite el atributo solo para que el HTML sea autonomo, mantener sincronizado).
+         Oferta: 3 por S/ 99 (antes S/ 150), 50 ml. js oculta [data-offer-block] al terminar la cuenta atras. -->
+    <div class="cart-drawer__offer" id="cart-offer" data-offer-block>
+      <p class="cart-drawer__offer-title"><strong>3 por S/ 99</strong> <s>antes S/ 150</s> <span>· 50 ml</span></p>
+      <p class="cart-drawer__offer-timer">
+        Termina en
+        <time data-countdown-end="2026-11-18T23:59:59-05:00" datetime="2026-11-18T23:59:59-05:00"><span data-cd="d">--</span>d <span data-cd="h">--</span>h <span data-cd="m">--</span>m <span data-cd="s">--</span>s</time>
+      </p>
+    </div>
+
+    <div class="cart-progress" id="cart-progress" data-offer-block hidden>
+      <p class="cart-progress__msg" id="cart-progress-msg" aria-live="polite"></p>
+      <div class="cart-progress__track" id="cart-progress-track" role="progressbar" aria-label="Progreso hacia la oferta 3 por S/ 99" aria-valuemin="0" aria-valuemax="3" aria-valuenow="0">
+        <span class="cart-progress__fill" id="cart-progress-fill"></span>
+      </div>
+      <ol class="cart-progress__steps" aria-hidden="true">
+        <li>1</li>
+        <li>2</li>
+        <li>3 · S/ 99</li>
+      </ol>
+    </div>
+
+    <div class="cart-drawer__empty" id="cart-empty">
+      <svg class="cart-empty__icon" viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+      <p class="cart-empty__title">Tu carrito está vacío</p>
+      <p class="cart-empty__text">Empieza por la esencia que quieras hacer tuya.</p>
+      <a href="catalogo.html" class="btn btn--primary">Ver catálogo</a>
+    </div>
+
+    <ul class="cart-drawer__items" id="cart-items"></ul>
+
+    <!-- Completar la oferta: js sugiere hasta 2 fragancias que no estan en el carrito (desde data/productos.json) -->
+    <div class="cart-upsell" id="cart-upsell" data-offer-block hidden>
+      <p class="cart-upsell__title">Completa tu oferta</p>
+      <ul class="cart-upsell__list" id="cart-upsell-list"></ul>
+    </div>
+
+    <div class="cart-drawer__foot" id="cart-foot" hidden>
+      <div class="cart-drawer__summary">
+        <span>Subtotal</span>
+        <span id="cart-subtotal">[PRECIO]</span>
+      </div>
+      <div class="cart-drawer__summary cart-drawer__summary--saving" id="cart-discount-row" hidden>
+        <span>Oferta 3 por S/ 99</span>
+        <span id="cart-discount">−S/ 0</span>
+      </div>
+      <div class="cart-drawer__summary cart-drawer__summary--total">
+        <span>Total</span>
+        <span id="cart-total">[PRECIO]</span>
+      </div>
+      <p class="cart-drawer__note">Envío e impuestos calculados al finalizar.</p>
+      <a href="carrito.html" class="btn btn--primary cart-drawer__checkout" id="cart-checkout">Ir a pagar</a>
+    </div>
+  </aside>
+  <template id="cart-upsell-tpl">
+    <li class="cart-upsell__item">
+      <img class="cart-upsell__img" src="assets/ico/ico.png" alt="" width="48" height="60" loading="lazy">
+      <div class="cart-upsell__info">
+        <p class="cart-upsell__name"></p>
+        <p class="cart-upsell__price"></p>
+      </div>
+      <button type="button" class="add-to-cart btn btn--outline btn--sm" data-id="" data-name="" data-price="" data-image="">Añadir</button>
+    </li>
+  </template>
+
+  <template id="cart-line-tpl">
+    <li class="cart-line" data-id="">
+      <img class="cart-line__img" src="" alt="" width="64" height="64" loading="lazy">
+      <div class="cart-line__info">
+        <p class="cart-line__name"></p>
+        <p class="cart-line__price"></p>
+        <div class="cart-line__qty">
+          <button class="qty-btn" data-action="dec" aria-label="Quitar una unidad">−</button>
+          <span class="cart-line__qval">1</span>
+          <button class="qty-btn" data-action="inc" aria-label="Añadir una unidad">+</button>
+        </div>
+      </div>
+      <button class="cart-line__remove" data-action="remove" aria-label="Eliminar del carrito">✕</button>
+    </li>
+  </template>
+
+  <main id="main">
+
+    <!-- ===== AE-R4 · FRANJA DE VALORACIÓN (Elexirium: barra Judge.me bajo el banner). ACTIVA con CIFRAS PLACEHOLDER
+         (data-placeholder-cifra) por decisión de Paul para visualizar el conjunto. js la sobrescribe con la media y el
+         nº reales cuando data/resenas.json tenga reseñas. ANTES DE PUBLICAR hay que quitar/sustituir las cifras de muestra. ===== -->
+    <p class="rating-bar" data-rating-bar>
+      <span class="rating-bar__stars" aria-hidden="true">★★★★★</span>
+      <span class="rating-bar__score" data-rating-bar-text data-placeholder-cifra>4,8/5 · Basado en +1.200 opiniones</span>
+      <a href="#reseñas-titulo" class="rating-bar__link">Ver reseñas</a>
+    </p>
+    <!-- ===== 1 · HERO — AE-R4 (reestructuración, decisión de Paul 2026-11-15): fondo BLANCO, sin foto plana de fondo.
+         Copia la composición del hero de https://elexirium.com/ (allí es UNA imagen ancha 3000×965 con el texto horneado
+         dentro; aquí el texto es HTML vivo —indexable y accesible— y solo las fotos son imagen):
+         titular centrado → subtítulo → [grupo "Para él" · pieza central · grupo "Para ella"] → microbeneficios.
+         FOTOS TEMPORALES: los 6 frascos y la pieza central usan fotos de catálogo CON fondo. El hero final necesita
+         PNG/WebP RECORTADOS sin fondo (ver BRIEFING_REESTRUCTURACION.md §3.3). Sin hotspots "+" (decisión del brief).
+         Prueba social: [data-trust-strip] oculto hasta que Paul entregue cifras reales. -->
+    <section class="hero-split" aria-labelledby="hero-titulo">
+      <div class="container hero-split__inner">
+        <h1 id="hero-titulo" class="hero-split__title">Sin etiquetas, solo esencia</h1>
+        <p class="hero-split__subtitle">Lujo que puedes hacer tuyo</p>
+
+        <div class="hero-split__grid">
+
+          <a class="hero-split__group hero-split__group--him" href="catalogo.html?genero=para-el" aria-label="Ver fragancias para él">
+            <span class="hero-split__bottles">
+              <img src="assets/catalogo/amaderado/forhim/w3.webp" alt="Frasco Allpa Essence de la familia amaderada" width="300" height="375" loading="eager">
+              <img src="assets/catalogo/citrico/forhim/c3.webp" alt="Frasco Allpa Essence de la familia cítrica" width="300" height="375" loading="eager">
+              <img src="assets/catalogo/oriental/forhim/o3.webp" alt="Frasco Allpa Essence de la familia oriental especiada" width="300" height="375" loading="eager">
+            </span>
+            <span class="hero-split__rule" aria-hidden="true"></span>
+            <span class="hero-split__label">Para él</span>
+          </a>
+
+          <a class="hero-split__center" href="muestras.html">
+            <img class="hero-split__feature" src="assets/muestras/1.webp" alt="Muestra de fragancia Allpa Essence en vial de vidrio con tapa plateada" width="480" height="480" loading="eager" fetchpriority="high">
+            <span class="hero-split__feature-caption">Prueba primero tu esencia</span>
+            <span class="hero-split__feature-sub">Pide una muestra antes del frasco completo</span>
+          </a>
+
+          <a class="hero-split__group hero-split__group--her" href="catalogo.html?genero=para-ella" aria-label="Ver fragancias para ella">
+            <span class="hero-split__bottles">
+              <img src="assets/catalogo/floral/forher/f1.webp" alt="Frasco Allpa Essence de la familia floral" width="300" height="375" loading="eager">
+              <img src="assets/catalogo/citrico/forher/c1.webp" alt="Frasco Allpa Essence de la familia cítrica" width="300" height="375" loading="eager">
+              <img src="assets/catalogo/oriental/forher/o1.webp" alt="Frasco Allpa Essence de la familia oriental especiada" width="300" height="375" loading="eager">
+            </span>
+            <span class="hero-split__rule" aria-hidden="true"></span>
+            <span class="hero-split__label">Para ella</span>
+          </a>
+
+        </div>
+
+        <!-- Microbeneficios: solo afirmaciones que el sitio ya hace (utility-bar / ficha). Los de Elexirium
+             ("alta concentración", "larga duración") NO se copian hasta que Paul los confirme (MICROBENEFICIOS_PENDIENTE). -->
+        <ul class="hero-split__benefits">
+          <li>Envíos a todo el Perú</li>
+          <li>Compra 100% segura</li>
+          <li>Muestra antes de comprar</li>
+        </ul>
+
+        <a href="catalogo.html" class="btn btn--outline hero-split__cta">Explorar fragancias</a>
+
+        <p class="hero-split__trust" data-trust-strip hidden>[PRUEBA_SOCIAL_PENDIENTE]</p>
+      </div>
+    </section>
+
+    <!-- ===== AE-R4 · BUSCADOR DESTACADO (Elexirium: "Encuentra tu perfume favorito"). Busca por nombre o familia; NUNCA por
+         marca original (riesgo legal): el placeholder no sugiere marcas. Sin JS envía ?q= a catalogo.html. ===== -->
+    <section class="home-search" aria-labelledby="home-search-titulo">
+      <div class="container home-search__inner">
+        <h2 id="home-search-titulo" class="home-search__title">Encuentra tu fragancia</h2>
+        <p class="home-search__sub">Busca por nombre o por familia olfativa: amaderada, cítrica, floral, oriental o fresca.</p>
+        <form class="home-search__form" role="search" action="catalogo.html" method="get">
+          <label for="home-search-input" class="sr-only">Buscar fragancia</label>
+          <input class="home-search__input" id="home-search-input" type="search" name="q" placeholder="Ej.: cedro, jazmín, cítrica…" autocomplete="off" list="home-search-list">
+          <datalist id="home-search-list"></datalist>
+          <button type="submit" class="btn btn--primary home-search__btn">Buscar</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- ===== AE-R4 · MARQUEE (Elexirium: banda naranja en movimiento). Mensajes REALES del sitio; el de la oferta lleva
+         data-offer-block y desaparece al terminar la cuenta atrás. 2ª copia aria-hidden para el bucle continuo. ===== -->
+    <div class="marquee" aria-label="Mensajes de Allpa Essence">
+      <div class="marquee__track">
+        <ul class="marquee__group">
+          <li>Envíos a todo el Perú</li>
+          <li>Prueba una muestra primero</li>
+          <li data-offer-block>3 por S/ 99 · 50 ml</li>
+          <li>Compra 100% segura</li>
+          <li>Sin etiquetas, solo esencia</li>
+        </ul>
+        <ul class="marquee__group" aria-hidden="true">
+          <li>Envíos a todo el Perú</li>
+          <li>Prueba una muestra primero</li>
+          <li data-offer-block>3 por S/ 99 · 50 ml</li>
+          <li>Compra 100% segura</li>
+          <li>Sin etiquetas, solo esencia</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- ===== AE-R4 · FAVORITOS CON PESTAÑAS (Elexirium: "Más vendidos" con pestañas Más vendidos / Hombre / Mujer).
+         Pestañas = Favoritos del live / Para él / Para ella (género real desde data/productos.json). js renderiza 4
+         tarjetas por pestaña; las 4 estáticas de abajo son el FALLBACK sin JS. Valoración por tarjeta: slot oculto
+         hasta tener reseñas reales. ===== -->
+    <section class="trending favoritos" aria-labelledby="trending-titulo">
+      <div class="container">
+        <p class="eyebrow">LOS MÁS ELEGIDOS</p>
+        <h2 id="trending-titulo">Favoritos del live</h2>
+
+        <div class="tabs" role="tablist" aria-label="Filtrar favoritos" data-tabs="favoritos">
+          <button type="button" class="tabs__tab is-active" role="tab" aria-selected="true" data-tab="favoritos">Favoritos</button>
+          <button type="button" class="tabs__tab" role="tab" aria-selected="false" data-tab="para-el">Para él</button>
+          <button type="button" class="tabs__tab" role="tab" aria-selected="false" data-tab="para-ella">Para ella</button>
+        </div>
+
+        <div class="carousel" data-carousel="trending">
+          <div class="carousel__viewport">
+            <ul class="carousel__track trending__grid" id="trending-track">
+
+              <li class="carousel__slide product-card" data-familia="citrica" data-flag="trending">
+                <span class="product-card__badge product-card__badge--trending">Trending</span>
+                <div class="product-card__media">
+                  <img src="assets/section-class-trending/1.webp" alt="Frasco Allpa Essence Nº02, Bergamota Viva, familia cítrica" width="600" height="750" loading="lazy">
+                </div>
+                <p class="product-card__familia">Cítrica</p>
+                <h3 class="product-card__name">Bergamota Viva · Nº02</h3>
+                <p class="product-card__price">S/. 75</p>
+                <button class="add-to-cart btn btn--outline" data-id="ae-02" data-name="Bergamota Viva Nº02" data-price="75" data-image="assets/section-class-trending/1.webp">Añadir</button>
+              </li>
+
+              <li class="carousel__slide product-card" data-familia="oriental-especiada" data-flag="trending">
+                <span class="product-card__badge product-card__badge--trending">Trending</span>
+                <div class="product-card__media">
+                  <img src="assets/section-class-trending/2.webp" alt="Frasco Allpa Essence Nº04, Oud Íntimo, familia oriental/especiada" width="600" height="750" loading="lazy">
+                </div>
+                <p class="product-card__familia">Oriental / Especiada</p>
+                <h3 class="product-card__name">Oud Íntimo · Nº04</h3>
+                <p class="product-card__price">S/. 90</p>
+                <button class="add-to-cart btn btn--outline" data-id="ae-04" data-name="Oud Íntimo Nº04" data-price="90" data-image="assets/section-class-trending/2.webp">Añadir</button>
+              </li>
+
+              <li class="carousel__slide product-card" data-familia="amaderada" data-flag="trending">
+                <span class="product-card__badge product-card__badge--trending">Trending</span>
+                <div class="product-card__media">
+                  <img src="assets/section-class-trending/3.webp" alt="Frasco Allpa Essence Nº06, Roble Nocturno, familia amaderada" width="600" height="750" loading="lazy">
+                </div>
+                <p class="product-card__familia">Amaderada</p>
+                <h3 class="product-card__name">Roble Nocturno · Nº06</h3>
+                <p class="product-card__price">S/. 75</p>
+                <button class="add-to-cart btn btn--outline" data-id="ae-06" data-name="Roble Nocturno Nº06" data-price="75" data-image="assets/section-class-trending/3.webp">Añadir</button>
+              </li>
+
+              <li class="carousel__slide product-card" data-familia="floral" data-flag="trending">
+                <span class="product-card__badge product-card__badge--trending">Trending</span>
+                <div class="product-card__media">
+                  <img src="assets/section-class-trending/4.webp" alt="Frasco Allpa Essence Nº08, Flor de Azahar, familia floral" width="600" height="750" loading="lazy">
+                </div>
+                <p class="product-card__familia">Floral</p>
+                <h3 class="product-card__name">Flor de Azahar · Nº08</h3>
+                <p class="product-card__price">S/. 90</p>
+                <button class="add-to-cart btn btn--outline" data-id="ae-08" data-name="Flor de Azahar Nº08" data-price="90" data-image="assets/section-class-trending/4.webp">Añadir</button>
+              </li>
+
+            </ul>
+          </div>
+          <button type="button" class="carousel__arrow carousel__arrow--prev" data-carousel-prev aria-label="Producto anterior" hidden>
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+          </button>
+          <button type="button" class="carousel__arrow carousel__arrow--next" data-carousel-next aria-label="Producto siguiente" hidden>
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+        </div>
+
+        <p class="section-more"><a href="catalogo.html" class="btn btn--ghost">Ver todo</a></p>
+      </div>
+    </section>
+
+    <!-- ===== AE-R4 · BANNER TIPOGRÁFICO "NUEVOS INGRESOS" (Elexirium: "NEW ARRIVAL" repetido como separador) ===== -->
+    <div class="new-arrival" aria-hidden="true">
+      <div class="new-arrival__track">
+        <p class="new-arrival__group"><span>Nuevos ingresos</span><span>Nuevos ingresos</span><span>Nuevos ingresos</span><span>Nuevos ingresos</span><span>Nuevos ingresos</span><span>Nuevos ingresos</span></p>
+        <p class="new-arrival__group"><span>Nuevos ingresos</span><span>Nuevos ingresos</span><span>Nuevos ingresos</span><span>Nuevos ingresos</span><span>Nuevos ingresos</span><span>Nuevos ingresos</span></p>
+      </div>
+    </div>
+
+    <!-- ===== AE-R4 · RECIÉN LLEGADOS (Elexirium: "Recién llegados otoño 2026", 8 novedades con etiqueta NUEVO + botón
+         "Ver todos los nuevos"). Reemplaza el bloque "promesa" (decisión de Paul). js pinta 8 de las fragancias con
+         "nuevo": true en data/productos.json (ae-10..ae-20). Cada tarjeta ya viene en el HTML (visible sin JS); js las vuelve a pintar desde el JSON. ===== -->
+    <section class="nuevos" aria-labelledby="nuevos-titulo">
+      <div class="container">
+        <p class="eyebrow">RECIÉN LLEGADOS</p>
+        <h2 id="nuevos-titulo">Nuevos ingresos · primavera 2026</h2>
+        <ul class="nuevos__grid" id="nuevos-grid">
+          <li class="carousel__slide product-card" data-familia="amaderada">
+            <span class="product-card__badge">Nuevo</span>
+            <a class="product-card__link" href="producto.html?id=ae-10">
+              <div class="product-card__media"><img src="assets/catalogo/amaderado/forhim/w3.webp" alt="[ALT_PENDIENTE — frasco Allpa Essence Nº10, familia amaderada]" width="600" height="750" loading="lazy"></div>
+            </a>
+            <p class="product-card__familia">Amaderada</p>
+            <h3 class="product-card__name"><a href="producto.html?id=ae-10">Ámbar Seco · Nº10</a></h3>
+            <p class="product-card__rating" data-card-rating hidden></p>
+            <p class="product-card__price">S/. 75</p>
+            <button type="button" class="add-to-cart btn btn--outline" data-id="ae-10" data-name="Ámbar Seco · Nº10" data-price="75" data-image="assets/catalogo/amaderado/forhim/w3.webp">Añadir</button>
+          </li>
+          <li class="carousel__slide product-card" data-familia="amaderada">
+            <span class="product-card__badge">Nuevo</span>
+            <a class="product-card__link" href="producto.html?id=ae-11">
+              <div class="product-card__media"><img src="assets/catalogo/amaderado/forhim/w4.webp" alt="[ALT_PENDIENTE — frasco Allpa Essence Nº11, familia amaderada]" width="600" height="750" loading="lazy"></div>
+            </a>
+            <p class="product-card__familia">Amaderada</p>
+            <h3 class="product-card__name"><a href="producto.html?id=ae-11">Vetiver Salvaje · Nº11</a></h3>
+            <p class="product-card__rating" data-card-rating hidden></p>
+            <p class="product-card__price">S/. 50</p>
+            <button type="button" class="add-to-cart btn btn--outline" data-id="ae-11" data-name="Vetiver Salvaje · Nº11" data-price="50" data-image="assets/catalogo/amaderado/forhim/w4.webp">Añadir</button>
+          </li>
+          <li class="carousel__slide product-card" data-familia="citrica">
+            <span class="product-card__badge">Nuevo</span>
+            <a class="product-card__link" href="producto.html?id=ae-12">
+              <div class="product-card__media"><img src="assets/catalogo/citrico/forhim/c3.webp" alt="[ALT_PENDIENTE — frasco Allpa Essence Nº12, familia cítrica]" width="600" height="750" loading="lazy"></div>
+            </a>
+            <p class="product-card__familia">Cítrica</p>
+            <h3 class="product-card__name"><a href="producto.html?id=ae-12">Mandarina Dorada · Nº12</a></h3>
+            <p class="product-card__rating" data-card-rating hidden></p>
+            <p class="product-card__price">S/. 75</p>
+            <button type="button" class="add-to-cart btn btn--outline" data-id="ae-12" data-name="Mandarina Dorada · Nº12" data-price="75" data-image="assets/catalogo/citrico/forhim/c3.webp">Añadir</button>
+          </li>
+          <li class="carousel__slide product-card" data-familia="citrica">
+            <span class="product-card__badge">Nuevo</span>
+            <a class="product-card__link" href="producto.html?id=ae-13">
+              <div class="product-card__media"><img src="assets/catalogo/citrico/forhim/c4.webp" alt="[ALT_PENDIENTE — frasco Allpa Essence Nº13, familia cítrica]" width="600" height="750" loading="lazy"></div>
+            </a>
+            <p class="product-card__familia">Cítrica</p>
+            <h3 class="product-card__name"><a href="producto.html?id=ae-13">Neroli Claro · Nº13</a></h3>
+            <p class="product-card__rating" data-card-rating hidden></p>
+            <p class="product-card__price">S/. 90</p>
+            <button type="button" class="add-to-cart btn btn--outline" data-id="ae-13" data-name="Neroli Claro · Nº13" data-price="90" data-image="assets/catalogo/citrico/forhim/c4.webp">Añadir</button>
+          </li>
+          <li class="carousel__slide product-card" data-familia="floral">
+            <span class="product-card__badge">Nuevo</span>
+            <a class="product-card__link" href="producto.html?id=ae-14">
+              <div class="product-card__media"><img src="assets/catalogo/floral/forhim/f3.webp" alt="[ALT_PENDIENTE — frasco Allpa Essence Nº14, familia floral]" width="600" height="750" loading="lazy"></div>
+            </a>
+            <p class="product-card__familia">Floral</p>
+            <h3 class="product-card__name"><a href="producto.html?id=ae-14">Iris Desnudo · Nº14</a></h3>
+            <p class="product-card__rating" data-card-rating hidden></p>
+            <p class="product-card__price">S/. 75</p>
+            <button type="button" class="add-to-cart btn btn--outline" data-id="ae-14" data-name="Iris Desnudo · Nº14" data-price="75" data-image="assets/catalogo/floral/forhim/f3.webp">Añadir</button>
+          </li>
+          <li class="carousel__slide product-card" data-familia="floral">
+            <span class="product-card__badge">Nuevo</span>
+            <a class="product-card__link" href="producto.html?id=ae-15">
+              <div class="product-card__media"><img src="assets/catalogo/floral/forhim/f4.webp" alt="[ALT_PENDIENTE — frasco Allpa Essence Nº15, familia floral]" width="600" height="750" loading="lazy"></div>
+            </a>
+            <p class="product-card__familia">Floral</p>
+            <h3 class="product-card__name"><a href="producto.html?id=ae-15">Rosa Oscura · Nº15</a></h3>
+            <p class="product-card__rating" data-card-rating hidden></p>
+            <p class="product-card__price">S/. 50</p>
+            <button type="button" class="add-to-cart btn btn--outline" data-id="ae-15" data-name="Rosa Oscura · Nº15" data-price="50" data-image="assets/catalogo/floral/forhim/f4.webp">Añadir</button>
+          </li>
+          <li class="carousel__slide product-card" data-familia="oriental-especiada">
+            <span class="product-card__badge">Nuevo</span>
+            <a class="product-card__link" href="producto.html?id=ae-16">
+              <div class="product-card__media"><img src="assets/catalogo/oriental/forhim/o3.webp" alt="[ALT_PENDIENTE — frasco Allpa Essence Nº16, familia oriental/especiada]" width="600" height="750" loading="lazy"></div>
+            </a>
+            <p class="product-card__familia">Oriental / Especiada</p>
+            <h3 class="product-card__name"><a href="producto.html?id=ae-16">Sándalo Rojo · Nº16</a></h3>
+            <p class="product-card__rating" data-card-rating hidden></p>
+            <p class="product-card__price">S/. 50</p>
+            <button type="button" class="add-to-cart btn btn--outline" data-id="ae-16" data-name="Sándalo Rojo · Nº16" data-price="50" data-image="assets/catalogo/oriental/forhim/o3.webp">Añadir</button>
+          </li>
+          <li class="carousel__slide product-card" data-familia="oriental-especiada">
+            <span class="product-card__badge">Nuevo</span>
+            <a class="product-card__link" href="producto.html?id=ae-17">
+              <div class="product-card__media"><img src="assets/catalogo/oriental/forhim/o4.webp" alt="[ALT_PENDIENTE — frasco Allpa Essence Nº17, familia oriental/especiada]" width="600" height="750" loading="lazy"></div>
+            </a>
+            <p class="product-card__familia">Oriental / Especiada</p>
+            <h3 class="product-card__name"><a href="producto.html?id=ae-17">Especia Prohibida · Nº17</a></h3>
+            <p class="product-card__rating" data-card-rating hidden></p>
+            <p class="product-card__price">S/. 75</p>
+            <button type="button" class="add-to-cart btn btn--outline" data-id="ae-17" data-name="Especia Prohibida · Nº17" data-price="75" data-image="assets/catalogo/oriental/forhim/o4.webp">Añadir</button>
+          </li>
+        </ul>
+        <p class="section-more"><a href="catalogo.html" class="btn btn--outline">Ver todos los nuevos</a></p>
+      </div>
+    </section>
+    <!-- ===== AE-R4 · "HABLAN POR NOSOTROS" (Elexirium: media 4,83 sobre 1.869 reseñas + carrusel con foto). Reemplaza el
+         banner partido (decisión de Paul). Cifra = PLACEHOLDER (data-placeholder-cifra) hasta tener el nº real; js la
+         sobrescribe desde data/resenas.json. Tarjetas = placeholders para las reseñas en texto de Paul. ===== -->
+    <section class="reviews home-reviews section--navy" aria-labelledby="reseñas-titulo">
+      <div class="container">
+        <h2 id="reseñas-titulo" class="reviews__title">Hablan por nosotros</h2>
+        <div class="reviews__score">
+          <span class="reviews__score-num" data-rating-num data-placeholder-cifra>4,8</span>
+          <span class="reviews__score-stars" aria-hidden="true">★★★★★</span>
+          <p class="reviews__summary" data-rating-summary data-placeholder-cifra>Basado en +1.200 reseñas</p>
+        </div>
+        <ul class="reviews__list" id="reviews-list">
+          <li>
+            <article class="review-card review-card--placeholder">
+              <div class="review-card__photo" data-review-photo>[FOTO_CLIENTE_PENDIENTE]</div>
+              <p class="review-card__stars" data-stars="" aria-label="[ESTRELLAS] de 5 estrellas"><span aria-hidden="true">☆☆☆☆☆</span></p>
+              <p class="review-card__text">[RESEÑA_TEXTO]</p>
+              <p class="review-card__meta"><span class="review-card__author">[RESEÑA_AUTOR]</span> <span class="review-card__verified" hidden>Compra verificada</span> <span class="review-card__product">[RESEÑA_PRODUCTO]</span> <time class="review-card__date" datetime="">[RESEÑA_FECHA]</time></p>
+            </article>
+          </li>
+          <li>
+            <article class="review-card review-card--placeholder">
+              <div class="review-card__photo" data-review-photo>[FOTO_CLIENTE_PENDIENTE]</div>
+              <p class="review-card__stars" data-stars="" aria-label="[ESTRELLAS] de 5 estrellas"><span aria-hidden="true">☆☆☆☆☆</span></p>
+              <p class="review-card__text">[RESEÑA_TEXTO]</p>
+              <p class="review-card__meta"><span class="review-card__author">[RESEÑA_AUTOR]</span> <span class="review-card__verified" hidden>Compra verificada</span> <span class="review-card__product">[RESEÑA_PRODUCTO]</span> <time class="review-card__date" datetime="">[RESEÑA_FECHA]</time></p>
+            </article>
+          </li>
+          <li>
+            <article class="review-card review-card--placeholder">
+              <div class="review-card__photo" data-review-photo>[FOTO_CLIENTE_PENDIENTE]</div>
+              <p class="review-card__stars" data-stars="" aria-label="[ESTRELLAS] de 5 estrellas"><span aria-hidden="true">☆☆☆☆☆</span></p>
+              <p class="review-card__text">[RESEÑA_TEXTO]</p>
+              <p class="review-card__meta"><span class="review-card__author">[RESEÑA_AUTOR]</span> <span class="review-card__verified" hidden>Compra verificada</span> <span class="review-card__product">[RESEÑA_PRODUCTO]</span> <time class="review-card__date" datetime="">[RESEÑA_FECHA]</time></p>
+            </article>
+          </li>
+        </ul>
+        <p class="section-more"><a href="resenas.html" class="btn btn--ghost">Ver todas las reseñas</a></p>
+      </div>
+    </section>
+    <!-- ===== AE-R4 · TRUST GRID bajo las reseñas (Elexirium: Clientes reales / Envío 24-48h / Pago seguro / Devolución fácil),
+         ADAPTADO a Allpa. Cifra de pedidos = PLACEHOLDER (data-placeholder-cifra); plazos y política de cambios PENDIENTES. ===== -->
+    <section class="trust-strip" aria-label="Por qué comprar con confianza">
+      <div class="container">
+        <ul class="trust-strip__grid">
+          <li class="trust-strip__item">
+            <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 2l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 16.8 6.1 20l1.2-6.5L2.5 8.9l6.6-.9z"/></svg>
+            <p class="trust-strip__title">Clientes reales</p>
+            <p class="trust-strip__sub"><span data-placeholder-cifra>+1.200</span> pedidos entregados</p>
+          </li>
+          <li class="trust-strip__item">
+            <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="1" y="6" width="14" height="11" rx="1"/><path d="M15 9h4l3 3v5h-7"/><circle cx="6" cy="18" r="2"/><circle cx="18" cy="18" r="2"/></svg>
+            <p class="trust-strip__title">Envío a todo el Perú</p>
+            <p class="trust-strip__sub">Plazo de entrega [PLAZO_ENTREGA_PENDIENTE]</p>
+          </li>
+          <li class="trust-strip__item">
+            <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="1"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+            <p class="trust-strip__title">Pago seguro</p>
+            <p class="trust-strip__sub">Con Mercado Pago, tarjeta y billeteras</p>
+          </li>
+          <li class="trust-strip__item">
+            <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 12a9 9 0 0 1 15.5-6.2L21 8M21 3v5h-5M21 12a9 9 0 0 1-15.5 6.2L3 16M3 21v-5h5"/></svg>
+            <p class="trust-strip__title">Cambios y devoluciones</p>
+            <p class="trust-strip__sub">[POLITICA_CAMBIOS_PENDIENTE]</p>
+          </li>
+        </ul>
+      </div>
+    </section>
+    <!-- ===== AE-R4 · "DEL LABORATORIO A TU CASA" + REELS WRAPPER (Elexirium: 3 piezas verticales tipo video bajo el título).
+         Subtítulo de Paul: "Esencias concentradas con dedicación". Cada .reel es un vídeo vertical 9:16: poner el archivo en
+         data-reel-src="assets/reels/N.mp4" y js muestra el botón de reproducir (sin src, queda el placeholder). Si Paul prefiere
+         incrustar Reels/TikTok (iframe), se sustituye el <video> dentro de .reel__frame. Mantiene las CTAs del brief v4. ===== -->
+    <section class="lab section--navy" aria-labelledby="journal-titulo">
+      <div class="container">
+        <p class="eyebrow">DETRÁS DE CADA FRASCO</p>
+        <h2 id="journal-titulo">Del laboratorio a tu casa</h2>
+        <p class="lab__sub">Esencias concentradas con dedicación</p>
+        <div class="reels" data-reels>
+          <figure class="reel">
+            <div class="reel__frame">
+              <video class="reel__video" muted loop playsinline preload="none" poster="assets/section-class-journal/1.webp" data-reel-src=""></video>
+              <button type="button" class="reel__play" aria-label="Reproducir video 1" hidden>
+                <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+              </button>
+              <span class="reel__pending">[REEL_1_PENDIENTE]</span>
+            </div>
+            <figcaption class="reel__caption">[REEL_TITULO_PENDIENTE]</figcaption>
+          </figure>
+          <figure class="reel">
+            <div class="reel__frame">
+              <video class="reel__video" muted loop playsinline preload="none" poster="assets/section-class-journal/2.webp" data-reel-src=""></video>
+              <button type="button" class="reel__play" aria-label="Reproducir video 2" hidden>
+                <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+              </button>
+              <span class="reel__pending">[REEL_2_PENDIENTE]</span>
+            </div>
+            <figcaption class="reel__caption">[REEL_TITULO_PENDIENTE]</figcaption>
+          </figure>
+          <figure class="reel">
+            <div class="reel__frame">
+              <video class="reel__video" muted loop playsinline preload="none" poster="assets/muestras/1.webp" data-reel-src=""></video>
+              <button type="button" class="reel__play" aria-label="Reproducir video 3" hidden>
+                <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+              </button>
+              <span class="reel__pending">[REEL_3_PENDIENTE]</span>
+            </div>
+            <figcaption class="reel__caption">[REEL_TITULO_PENDIENTE]</figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+    <!-- ===== AE-R4 · "¿POR QUÉ ELEGIR ALLPA?" (Elexirium: 6 tarjetas con icono). 3 valores de marca del brief +
+         3 de proceso. Copy ya existente del sitio; nada de cifras ni plazos inventados. ===== -->
+    <section class="valores porque" aria-labelledby="valores-titulo">
+      <div class="container">
+        <p class="eyebrow">POR QUÉ ALLPA</p>
+        <h2 id="valores-titulo" class="porque__title">¿Por qué elegir Allpa Essence?</h2>
+        <ul class="porque__grid">
+          <li class="valor">
+            <svg class="valor__icon" viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 2 4 6v6c0 5 3.4 8.4 8 10 4.6-1.6 8-5 8-10V6l-8-4z"/></svg>
+            <p class="valor__titulo">Sin etiquetas, solo esencia</p>
+            <p class="valor__sub">Notas y concentración a la vista en cada ficha — nunca una fórmula escondida.</p>
+          </li>
+          <li class="valor">
+            <svg class="valor__icon" viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 3c2 3 6 6.5 6 11a6 6 0 1 1-12 0c0-4.5 4-8 6-11z"/></svg>
+            <p class="valor__titulo">Calidad real, no diluida</p>
+            <p class="valor__sub">Concentración real, ingredientes reales, duración honesta.</p>
+          </li>
+          <li class="valor">
+            <svg class="valor__icon" viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 16 14"/></svg>
+            <p class="valor__titulo">Hecha para durar</p>
+            <p class="valor__sub">Pensada para volver a ella, no para una sola ocasión.</p>
+          </li>
+          <li class="valor">
+            <svg class="valor__icon" viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M9 3h6M10 3v5l-5 9a3 3 0 0 0 3 4h8a3 3 0 0 0 3-4l-5-9V3"/></svg>
+            <p class="valor__titulo">Muestra antes del frasco</p>
+            <p class="valor__sub">Pruébala en tu piel y decide con calma, sin compromiso.</p>
+          </li>
+          <li class="valor">
+            <svg class="valor__icon" viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-12.2 7.5L3 21l2-5.6A8.5 8.5 0 1 1 21 11.5z"/></svg>
+            <p class="valor__titulo">Personas reales detrás</p>
+            <p class="valor__sub">Nos ves en el live y te respondemos por WhatsApp.</p>
+          </li>
+          <li class="valor">
+            <svg class="valor__icon" viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="1"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+            <p class="valor__titulo">Compra segura</p>
+            <p class="valor__sub">Pagas con Mercado Pago; tus datos no pasan por nosotros.</p>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ===== AE-R4 · RESEÑAS AL FINAL DE LA PÁGINA (Elexirium repite un 2º bloque de reseñas hacia el final: carrusel con foto,
+         "Leer más reseñas", "Escribir una reseña"). Mismo componente .review-card; js lo rellena desde data/resenas.json
+         (offset 3 = las siguientes a las del bloque "Hablan por nosotros"). "Leer más reseñas" → resenas.html (todas).
+         Cifras = PLACEHOLDER (data-placeholder-cifra). "Escribir una reseña": destino pendiente de Paul. ===== -->
+    <section class="reviews reviews--wall section--navy" aria-labelledby="reseñas-final-titulo">
+      <div class="container">
+        <div class="reviews__head">
+          <div>
+            <h2 id="reseñas-final-titulo" class="reviews__title">Reseñas de nuestros clientes</h2>
+            <div class="reviews__score reviews__score--sm">
+              <span class="reviews__score-num" data-rating-num data-placeholder-cifra>4,8</span>
+              <span class="reviews__score-stars" aria-hidden="true">★★★★★</span>
+              <p class="reviews__summary" data-rating-summary data-placeholder-cifra>Basado en +1.200 reseñas</p>
+            </div>
+          </div>
+          <div class="reviews__actions">
+            <a href="resenas.html" class="btn btn--outline">Leer más reseñas</a>
+            <a href="RESENA_FORMULARIO_PENDIENTE" data-cta-pendiente="RESENA_FORMULARIO" class="btn btn--ghost">Escribir una reseña</a>
+          </div>
+        </div>
+        <ul class="reviews__list" data-reviews-list data-reviews-offset="3" data-reviews-count="3">
+          <li>
+            <article class="review-card review-card--placeholder">
+              <div class="review-card__photo" data-review-photo>[FOTO_CLIENTE_PENDIENTE]</div>
+              <p class="review-card__stars" data-stars="" aria-label="[ESTRELLAS] de 5 estrellas"><span aria-hidden="true">☆☆☆☆☆</span></p>
+              <p class="review-card__text">[RESEÑA_TEXTO]</p>
+              <p class="review-card__meta"><span class="review-card__author">[RESEÑA_AUTOR]</span> <span class="review-card__verified" hidden>Compra verificada</span> <span class="review-card__product">[RESEÑA_PRODUCTO]</span> <time class="review-card__date" datetime="">[RESEÑA_FECHA]</time></p>
+            </article>
+          </li>
+          <li>
+            <article class="review-card review-card--placeholder">
+              <div class="review-card__photo" data-review-photo>[FOTO_CLIENTE_PENDIENTE]</div>
+              <p class="review-card__stars" data-stars="" aria-label="[ESTRELLAS] de 5 estrellas"><span aria-hidden="true">☆☆☆☆☆</span></p>
+              <p class="review-card__text">[RESEÑA_TEXTO]</p>
+              <p class="review-card__meta"><span class="review-card__author">[RESEÑA_AUTOR]</span> <span class="review-card__verified" hidden>Compra verificada</span> <span class="review-card__product">[RESEÑA_PRODUCTO]</span> <time class="review-card__date" datetime="">[RESEÑA_FECHA]</time></p>
+            </article>
+          </li>
+          <li>
+            <article class="review-card review-card--placeholder">
+              <div class="review-card__photo" data-review-photo>[FOTO_CLIENTE_PENDIENTE]</div>
+              <p class="review-card__stars" data-stars="" aria-label="[ESTRELLAS] de 5 estrellas"><span aria-hidden="true">☆☆☆☆☆</span></p>
+              <p class="review-card__text">[RESEÑA_TEXTO]</p>
+              <p class="review-card__meta"><span class="review-card__author">[RESEÑA_AUTOR]</span> <span class="review-card__verified" hidden>Compra verificada</span> <span class="review-card__product">[RESEÑA_PRODUCTO]</span> <time class="review-card__date" datetime="">[RESEÑA_FECHA]</time></p>
+            </article>
+          </li>
+        </ul>
+      </div>
+    </section>
+    <!-- ===== AE-R6 · REDES (mismo patrón que AP Beauty: @usuario + botones "Síguenos en…" + rejilla de posts que enlaza al perfil).
+         Usuario/URLs PENDIENTES de Paul (data-cta-pendiente). Fotos de la rejilla = TEMPORALES (catálogo); sustituir por los posts reales.
+         TikTok primero: el live es el canal principal. ===== -->
+    <section class="insta" aria-labelledby="insta-titulo">
+      <div class="container">
+        <p class="eyebrow">SÍGUENOS</p>
+        <h2 class="insta-handle" id="insta-titulo">@[USUARIO_PENDIENTE]</h2>
+        <p class="insta-text">Lives, lanzamientos y fragancias en acción. Entra y cuéntanos cuál es la tuya.</p>
+        <div class="insta-links">
+          <a href="TIKTOK_PENDIENTE" data-cta-pendiente="TIKTOK" class="insta-link" target="_blank" rel="noopener noreferrer">Síguenos en TikTok</a>
+          <a href="INSTAGRAM_PENDIENTE" data-cta-pendiente="INSTAGRAM" class="insta-link" target="_blank" rel="noopener noreferrer">Síguenos en Instagram</a>
+        </div>
+        <div class="insta-grid">
+          <a href="INSTAGRAM_PENDIENTE" data-cta-pendiente="INSTAGRAM" class="insta-cell" aria-label="Ver Allpa Essence en Instagram" target="_blank" rel="noopener noreferrer"><img src="assets/catalogo/amaderado/forher/w1.webp" alt="" width="300" height="300" loading="lazy"></a>
+          <a href="INSTAGRAM_PENDIENTE" data-cta-pendiente="INSTAGRAM" class="insta-cell" aria-label="Ver Allpa Essence en Instagram" target="_blank" rel="noopener noreferrer"><img src="assets/catalogo/citrico/forher/c1.webp" alt="" width="300" height="300" loading="lazy"></a>
+          <a href="INSTAGRAM_PENDIENTE" data-cta-pendiente="INSTAGRAM" class="insta-cell" aria-label="Ver Allpa Essence en Instagram" target="_blank" rel="noopener noreferrer"><img src="assets/catalogo/floral/forher/f1.webp" alt="" width="300" height="300" loading="lazy"></a>
+          <a href="INSTAGRAM_PENDIENTE" data-cta-pendiente="INSTAGRAM" class="insta-cell" aria-label="Ver Allpa Essence en Instagram" target="_blank" rel="noopener noreferrer"><img src="assets/catalogo/oriental/forher/o1.webp" alt="" width="300" height="300" loading="lazy"></a>
+          <a href="INSTAGRAM_PENDIENTE" data-cta-pendiente="INSTAGRAM" class="insta-cell" aria-label="Ver Allpa Essence en Instagram" target="_blank" rel="noopener noreferrer"><img src="assets/catalogo/amaderado/forhim/w3.webp" alt="" width="300" height="300" loading="lazy"></a>
+          <a href="INSTAGRAM_PENDIENTE" data-cta-pendiente="INSTAGRAM" class="insta-cell" aria-label="Ver Allpa Essence en Instagram" target="_blank" rel="noopener noreferrer"><img src="assets/catalogo/citrico/forhim/c3.webp" alt="" width="300" height="300" loading="lazy"></a>
+          <a href="INSTAGRAM_PENDIENTE" data-cta-pendiente="INSTAGRAM" class="insta-cell" aria-label="Ver Allpa Essence en Instagram" target="_blank" rel="noopener noreferrer"><img src="assets/catalogo/floral/forhim/f3.webp" alt="" width="300" height="300" loading="lazy"></a>
+          <a href="INSTAGRAM_PENDIENTE" data-cta-pendiente="INSTAGRAM" class="insta-cell" aria-label="Ver Allpa Essence en Instagram" target="_blank" rel="noopener noreferrer"><img src="assets/catalogo/oriental/forhim/o3.webp" alt="" width="300" height="300" loading="lazy"></a>
+        </div>
+      </div>
+    </section>
+    <!-- ===== MUESTRAS — gancho de confianza sin descuento permanente (principio rector §0) ===== -->
+    <section class="muestras-promo" aria-labelledby="muestras-promo-titulo">
+      <div class="container muestras-promo__inner">
+        <div class="muestras-promo__content reveal">
+          <h2 id="muestras-promo-titulo">¿No sabes por dónde empezar?</h2>
+          <p>Probá antes de decidir. Sin compromiso, sin etiqueta de descuento permanente — solo la fragancia hablando por sí misma.</p>
+          <a href="muestras.html" class="btn btn--ghost">Ver muestras</a>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ===== AE-R4 · AVISO LEGAL DISCRETO (Elexirium lo tiene al final de la home). Borrador de front: seo/legal debe validarlo
+         con el marco peruano (Ley 29571 / INDECOPI) antes de publicar. ===== -->
+    <p class="legal-note container">Las fragancias Allpa Essence son composiciones propias y no tienen relación ni vinculación con marcas comerciales; cualquier similitud olfativa es solo una referencia de familia. Las ofertas no son acumulables. [AVISO_LEGAL_REVISAR_SEO]</p>
+
+  </main>
+
+  <template id="home-card-tpl">
+    <li class="carousel__slide product-card">
+      <span class="product-card__badge" hidden></span>
+      <a class="product-card__link" href="producto.html">
+        <div class="product-card__media"><img src="assets/ico/ico.png" alt="" width="600" height="750" loading="lazy"></div>
+      </a>
+      <p class="product-card__familia"></p>
+      <h3 class="product-card__name"><a href="producto.html"></a></h3>
+      <p class="product-card__rating" data-card-rating hidden></p>
+      <p class="product-card__price"></p>
+      <button type="button" class="add-to-cart btn btn--outline" data-id="" data-name="" data-price="" data-image="">Añadir</button>
+    </li>
+  </template>
+
+  <template id="review-card-tpl">
+    <li>
+      <article class="review-card">
+        <div class="review-card__photo" data-review-photo></div>
+        <p class="review-card__stars" data-stars=""></p>
+        <p class="review-card__text"></p>
+        <p class="review-card__meta">
+          <span class="review-card__author"></span>
+          <span class="review-card__verified" hidden>Compra verificada</span>
+          <span class="review-card__product"></span>
+          <time class="review-card__date" datetime=""></time>
+        </p>
+      </article>
+    </li>
+  </template>
+  <!-- ===== 12 · FOOTER v2 (brief §5.12) — políticas visibles (no en link diminuto), WhatsApp
+       visible, sello de pago seguro. Contrato compartido en las 8 páginas. ===== -->
+  <footer class="site-footer">
+    <div class="container site-footer__inner">
+      <div class="site-footer__brand">
+        <img class="header-logo__img" src="assets/ico/allpa_ico-removebg-preview.png" alt="Allpa Essence" width="647" height="386">
+        <p class="site-footer__tagline">Sin etiquetas, solo esencia.</p>
+        <a href="CONTACTO_WHATSAPP_PENDIENTE" data-cta-pendiente="CONTACTO_WHATSAPP" target="_blank" rel="noopener noreferrer" class="site-footer__whatsapp">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12c0 1.85.5 3.58 1.36 5.07L2 22l5.06-1.33A9.94 9.94 0 0 0 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2z"/></svg>
+          WhatsApp
+        </a>
+        <ul class="footer-social" aria-label="Síguenos en redes sociales">
+          <li>
+            <a href="TIKTOK_PENDIENTE" data-cta-pendiente="TIKTOK" target="_blank" rel="noopener noreferrer" aria-label="TikTok">
+              <svg class="footer-social__icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 3v10.5a4.5 4.5 0 1 1-4.5-4.5"/><path d="M16 3c.4 2.6 2.2 4.2 5 4.4"/></svg>
+            </a>
+          </li>
+          <li>
+            <a href="INSTAGRAM_PENDIENTE" data-cta-pendiente="INSTAGRAM" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+              <svg class="footer-social__icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r=".6" fill="currentColor"/></svg>
+            </a>
+          </li>
+          <li>
+            <a href="YOUTUBE_PENDIENTE" data-cta-pendiente="YOUTUBE" target="_blank" rel="noopener noreferrer" aria-label="YouTube">
+              <svg class="footer-social__icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="4"/><path d="M10 9l5 3-5 3z" fill="currentColor"/></svg>
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <nav class="site-footer__col" aria-label="Catálogo">
+        <p class="site-footer__policies-title">Catálogo</p>
+        <a href="catalogo.html">Todas las fragancias</a>
+        <a href="catalogo.html#filtro-genero">Regalos</a>
+        <a href="catalogo.html?familia=amaderada">Amaderadas</a>
+        <a href="catalogo.html?familia=citrica">Cítricas</a>
+        <a href="catalogo.html?familia=floral">Florales</a>
+        <a href="catalogo.html?familia=oriental-especiada">Orientales y especiadas</a>
+        <a href="catalogo.html?familia=fresca-acuatica">Frescas y acuáticas</a>
+      </nav>
+
+      <nav class="site-footer__col" aria-label="La marca">
+        <p class="site-footer__policies-title">La marca</p>
+        <a href="historia.html">Nuestra historia</a>
+        <a href="contacto.html">Contacto</a>
+        <a href="resenas.html">Reseñas</a>
+      </nav>
+
+      <nav class="site-footer__col" aria-label="Ayuda">
+        <p class="site-footer__policies-title">Ayuda</p>
+        <a href="POLITICA_ENVIO_PENDIENTE" data-cta-pendiente="POLITICA_ENVIO">Envíos</a>
+        <a href="muestras.html">Muestras</a>
+        <a href="PAGINA_FAQ_PENDIENTE" data-cta-pendiente="PAGINA_FAQ">Preguntas frecuentes</a>
+        <a href="POLITICA_CAMBIOS_PENDIENTE" data-cta-pendiente="POLITICA_CAMBIOS">Cambios y devoluciones</a>
+        <details class="footer-faq">
+          <summary>¿Por qué mi perfume tiene alcohol?</summary>
+          <p>Todo perfume lo lleva — es lo que libera y transporta el aroma, no un relleno. Lo que sí evitamos es bajar la concentración de esencia para ahorrar costo: la tuya es la que corresponde, no menos.</p>
+        </details>
+      </nav>
+
+      <div class="site-footer__newsletter">
+        <p class="site-footer__policies-title">Entérate antes que nadie</p>
+        <p class="site-footer__newsletter-sub">Nuevos lanzamientos, lives y ofertas reales — nunca más de un correo al mes.</p>
+        <form class="newsletter-form" id="newsletter-form">
+          <label for="newsletter-email" class="sr-only">Tu correo</label>
+          <input type="email" id="newsletter-email" name="email" placeholder="Tu correo" required>
+          <button type="submit" class="btn btn--primary btn--sm">Suscribirme</button>
+        </form>
+      </div>
+
+      <div class="site-footer__trust">
+        <p class="site-footer__policies-title">Pago seguro</p>
+        <ul class="site-footer__trust-list">
+          <li>Envío en 72 horas</li>
+          <li>Pago 100% seguro</li>
+        </ul>
+        <img class="site-footer__mp-badge" src="assets/trustelements/card_payments.webp" alt="Aceptamos Visa, Mastercard, American Express y PayPal" width="140" height="29" loading="lazy">
+      </div>
+
+      <p class="site-footer__copy">© <span id="footer-year">2026</span> Allpa Essence. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+
+  <!-- AE-R4 · Botón flotante de WhatsApp (Elexirium lo tiene en todas las páginas). Destino PENDIENTE (número real de Paul). -->
+  <a class="whatsapp-float" href="CONTACTO_WHATSAPP_PENDIENTE" data-cta-pendiente="CONTACTO_WHATSAPP" target="_blank" rel="noopener noreferrer" aria-label="Escríbenos por WhatsApp">
+    <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.2-4.6-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.8 0-1.3.7-2 1-2.3.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.3 0 .5l-.3.4-.4.4c-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.3 2.4 1.5.3.1.5.1.6-.1l.9-1.1c.2-.3.4-.2.6-.1l1.9.9c.3.1.5.2.5.3.1.1.1.6-.1 1.2z"/></svg>
+  </a>
+  <script type="module" defer src="main.js"></script>
+</body>
+</html>
