@@ -38,11 +38,11 @@
           <button type="button" class="nav-main__link nav-dropdown__toggle" id="btn-catalogo-nav" aria-haspopup="true" aria-expanded="false" aria-controls="catalogo-nav-menu" aria-current="page">Catálogo</button>
           <div class="nav-dropdown__menu" id="catalogo-nav-menu" hidden>
             <a href="catalogo.html">Todas</a>
-            <a href="catalogo.html?familia=amaderada">Amaderada</a>
-            <a href="catalogo.html?familia=citrica">Cítrica</a>
+            <a href="catalogo.html?familia=amaderado">Amaderada</a>
+            <a href="catalogo.html?familia=citrico">Cítrica</a>
             <a href="catalogo.html?familia=floral">Floral</a>
-            <a href="catalogo.html?familia=oriental-especiada">Oriental / Especiada</a>
-            <a href="catalogo.html?familia=fresca-acuatica">Fresca / Acuática</a>
+            <a href="catalogo.html?familia=especiado">Oriental / Especiada</a>
+            <a href="catalogo.html?familia=fresco">Fresca / Acuática</a>
           </div>
         </div>
         <a href="muestras.html" class="nav-main__link">Muestras</a>
@@ -226,11 +226,17 @@
         <h1 class="catalog-head__title">Todas las fragancias</h1>
         <nav class="catalog-pills" aria-label="Filtrar por familia olfativa">
           <a class="familia-pill is-active" href="catalogo.html" data-familia="">Todas</a>
-          <a class="familia-pill" href="catalogo.html?familia=amaderada" data-familia="amaderada">Amaderada</a>
-          <a class="familia-pill" href="catalogo.html?familia=citrica" data-familia="citrica">Cítrica</a>
           <a class="familia-pill" href="catalogo.html?familia=floral" data-familia="floral">Floral</a>
-          <a class="familia-pill" href="catalogo.html?familia=oriental-especiada" data-familia="oriental-especiada">Oriental / Especiada</a>
-          <a class="familia-pill" href="catalogo.html?familia=fresca-acuatica" data-familia="fresca-acuatica">Fresca / Acuática</a>
+          <a class="familia-pill" href="catalogo.html?familia=dulce" data-familia="dulce">Dulce</a>
+          <a class="familia-pill" href="catalogo.html?familia=citrico" data-familia="citrico">Cítrico</a>
+          <a class="familia-pill" href="catalogo.html?familia=aromatico" data-familia="aromatico">Aromático</a>
+          <a class="familia-pill" href="catalogo.html?familia=afrutado" data-familia="afrutado">Afrutado</a>
+          <a class="familia-pill" href="catalogo.html?familia=especiado" data-familia="especiado">Especiado</a>
+          <a class="familia-pill" href="catalogo.html?familia=fresco" data-familia="fresco">Fresco</a>
+          <a class="familia-pill" href="catalogo.html?familia=amaderado" data-familia="amaderado">Amaderado</a>
+          <a class="familia-pill" href="catalogo.html?familia=ambar" data-familia="ambar">Ámbar</a>
+          <a class="familia-pill" href="catalogo.html?familia=cuero-tabaco" data-familia="cuero-tabaco">Cuero y tabaco</a>
+          <a class="familia-pill" href="catalogo.html?familia=almizclado" data-familia="almizclado">Almizclado</a>
         </nav>
 
         <!-- ===== FILTRO DE GÉNERO — brief v4 §7.3. Opcional, NUNCA gate de entrada (no hay
@@ -249,7 +255,11 @@
 
         <!-- AE-R4 · BARRA DE HERRAMIENTAS DEL CATÁLOGO (Elexirium: contador + "Ordenar por"). js ordena y cuenta; sin JS el select no hace nada. -->
         <div class="catalog-toolbar">
-          <p class="catalog-toolbar__count" id="catalog-count" aria-live="polite">20 fragancias</p>
+          <p class="catalog-toolbar__count" id="catalog-count" aria-live="polite">Cargando fragancias…</p>
+          <form class="catalog-toolbar__search" role="search" id="catalog-search-form">
+            <label class="sr-only" for="catalog-search">Buscar fragancia</label>
+            <input type="search" id="catalog-search" name="q" placeholder="Busca por nombre o referencia" autocomplete="off">
+          </form>
           <label class="catalog-toolbar__sort" for="catalog-sort">
             <span>Ordenar por</span>
             <select id="catalog-sort">
@@ -278,7 +288,7 @@
           <p class="eyebrow">EDICIÓN DE TEMPORADA</p>
           <h2 id="temporada-titulo">Perfumes de invierno</h2>
           <p>Notas cálidas y envolventes para los días fríos — amaderadas y especiadas que se sienten como una manta.</p>
-          <a href="catalogo.html?familia=amaderada" class="btn btn--ghost">Ver selección de invierno</a>
+          <a href="catalogo.html?familia=amaderado" class="btn btn--ghost">Ver selección de invierno</a>
         </div>
       </div>
     </section>
@@ -289,276 +299,11 @@
          ni en título ni en descripción visible — solo "familia olfativa" + "inspirada en fragancias
          [tipo]". Nombres reales de cada Nº pendientes de Paul (ver allpaessence.txt). -->
     <div class="container">
-      <ul class="catalog-grid" id="catalog-grid" data-animate="stagger">
-
-        <li class="product-item reveal" data-familia="amaderada" data-flag="bestseller" data-genero="para-ella">
-          <a href="producto.html?id=ae-01" class="product-item__link">
-            <span class="product-item__badge">Bestseller</span>
-            <div class="product-item__media">
-              <img src="assets/catalogo/amaderado/forher/w1.webp" alt="Frasco Allpa Essence Nº01, Cedro Real, con caja de madera grabada al fondo, tapa plateada" width="600" height="750" loading="lazy">
-            </div>
-            <p class="product-item__familia">Amaderada</p>
-            <h2 class="product-item__name">Cedro Real · Nº01</h2>
-            <p class="product-item__desc">Inspirada en fragancias amaderadas orientales.</p>
-            <p class="product-item__price">S/. 75</p>
-          </a>
-          <button class="add-to-cart btn btn--outline" data-id="ae-01" data-name="Cedro Real Nº01" data-price="75" data-image="assets/catalogo/amaderado/forher/w1.webp">Añadir</button>
-        </li>
-
-        <li class="product-item reveal" data-familia="citrica" data-flag="trending" data-genero="para-ella">
-          <a href="producto.html?id=ae-02" class="product-item__link">
-            <span class="product-item__badge product-item__badge--trending">Trending</span>
-            <div class="product-item__media">
-              <img src="assets/catalogo/citrico/forher/c1.webp" alt="Frasco Allpa Essence Nº02, Bergamota Viva, con ilustración de cítricos en negro y dorado, fondo de hojas verdes" width="600" height="750" loading="lazy">
-            </div>
-            <p class="product-item__familia">Cítrica</p>
-            <h2 class="product-item__name">Bergamota Viva · Nº02</h2>
-            <p class="product-item__desc">Inspirada en fragancias cítricas frescas.</p>
-            <p class="product-item__price">S/. 75</p>
-          </a>
-          <button class="add-to-cart btn btn--outline" data-id="ae-02" data-name="Bergamota Viva Nº02" data-price="75" data-image="assets/catalogo/citrico/forher/c1.webp">Añadir</button>
-        </li>
-
-        <li class="product-item reveal" data-familia="floral" data-flag="bestseller" data-genero="para-ella">
-          <a href="producto.html?id=ae-03" class="product-item__link">
-            <span class="product-item__badge">Bestseller</span>
-            <div class="product-item__media">
-              <img src="assets/catalogo/floral/forher/f1.webp" alt="Frasco Allpa Essence Nº03, Jazmín Blanco, con flores doradas grabadas sobre fondo negro dentro del vidrio" width="600" height="750" loading="lazy">
-            </div>
-            <p class="product-item__familia">Floral</p>
-            <h2 class="product-item__name">Jazmín Blanco · Nº03</h2>
-            <p class="product-item__desc">Inspirada en fragancias florales blancas.</p>
-            <p class="product-item__price">S/. 90</p>
-          </a>
-          <button class="add-to-cart btn btn--outline" data-id="ae-03" data-name="Jazmín Blanco Nº03" data-price="90" data-image="assets/catalogo/floral/forher/f1.webp">Añadir</button>
-        </li>
-
-        <li class="product-item reveal" data-familia="oriental-especiada" data-flag="trending" data-genero="para-ella">
-          <a href="producto.html?id=ae-04" class="product-item__link">
-            <span class="product-item__badge product-item__badge--trending">Trending</span>
-            <div class="product-item__media">
-              <img src="assets/catalogo/oriental/forher/o1.webp" alt="Frasco Allpa Essence Nº04, Oud Íntimo, vidrio ámbar oscuro con grabado geométrico Art Déco blanco, fondo claro" width="600" height="750" loading="lazy">
-            </div>
-            <p class="product-item__familia">Oriental / Especiada</p>
-            <h2 class="product-item__name">Oud Íntimo · Nº04</h2>
-            <p class="product-item__desc">Inspirada en fragancias orientales especiadas.</p>
-            <p class="product-item__price">S/. 90</p>
-          </a>
-          <button class="add-to-cart btn btn--outline" data-id="ae-04" data-name="Oud Íntimo Nº04" data-price="90" data-image="assets/catalogo/oriental/forher/o1.webp">Añadir</button>
-        </li>
-
-        <li class="product-item reveal" data-familia="fresca-acuatica" data-flag="bestseller" data-genero="para-el">
-          <a href="producto.html?id=ae-05" class="product-item__link">
-            <span class="product-item__badge">Bestseller</span>
-            <div class="product-item__media">
-              <img src="assets/catalogo/acuoso/forhim/a1.webp" alt="2 frascos Allpa Essence Nº05, Brisa de Sal, con grabado de líneas onduladas tipo agua, fondo gris con luz cruzada" width="600" height="750" loading="lazy">
-            </div>
-            <p class="product-item__familia">Fresca / Acuática</p>
-            <h2 class="product-item__name">Brisa de Sal · Nº05</h2>
-            <p class="product-item__desc">Inspirada en fragancias frescas acuáticas.</p>
-            <p class="product-item__price">S/. 50</p>
-          </a>
-          <button class="add-to-cart btn btn--outline" data-id="ae-05" data-name="Brisa de Sal Nº05" data-price="50" data-image="assets/catalogo/acuoso/forhim/a1.webp">Añadir</button>
-        </li>
-
-        <li class="product-item reveal" data-familia="amaderada" data-flag="trending" data-genero="para-ella">
-          <a href="producto.html?id=ae-06" class="product-item__link">
-            <span class="product-item__badge product-item__badge--trending">Trending</span>
-            <div class="product-item__media">
-              <img src="assets/catalogo/amaderado/forher/w2.webp" alt="Frasco Allpa Essence Nº06, Roble Nocturno, con grabado geométrico en el vidrio, frasco de madera desenfocado al fondo" width="600" height="750" loading="lazy">
-            </div>
-            <p class="product-item__familia">Amaderada</p>
-            <h2 class="product-item__name">Roble Nocturno · Nº06</h2>
-            <p class="product-item__desc">Inspirada en fragancias amaderadas secas.</p>
-            <p class="product-item__price">S/. 75</p>
-          </a>
-          <button class="add-to-cart btn btn--outline" data-id="ae-06" data-name="Roble Nocturno Nº06" data-price="75" data-image="assets/catalogo/amaderado/forher/w2.webp">Añadir</button>
-        </li>
-
-        <li class="product-item reveal" data-familia="citrica" data-genero="para-ella">
-          <a href="producto.html?id=ae-07" class="product-item__link">
-            <div class="product-item__media">
-              <img src="assets/catalogo/citrico/forher/c2.webp" alt="Frasco Allpa Essence Nº07, Lima Intensa, con grabado blanco de limas y hojas, fondo cálido con destellos de luz" width="600" height="750" loading="lazy">
-            </div>
-            <p class="product-item__familia">Cítrica</p>
-            <h2 class="product-item__name">Lima Intensa · Nº07</h2>
-            <p class="product-item__desc">Inspirada en fragancias cítricas amaderadas.</p>
-            <p class="product-item__price">S/. 75</p>
-          </a>
-          <button class="add-to-cart btn btn--outline" data-id="ae-07" data-name="Lima Intensa Nº07" data-price="75" data-image="assets/catalogo/citrico/forher/c2.webp">Añadir</button>
-        </li>
-
-        <li class="product-item reveal" data-familia="floral" data-flag="trending" data-genero="para-ella">
-          <a href="producto.html?id=ae-08" class="product-item__link">
-            <span class="product-item__badge product-item__badge--trending">Trending</span>
-            <div class="product-item__media">
-              <img src="assets/catalogo/floral/forher/f2.webp" alt="Frasco Allpa Essence Nº08, Flor de Azahar, vidrio oscuro con relieve metálico de flores, fondo gris" width="600" height="750" loading="lazy">
-            </div>
-            <p class="product-item__familia">Floral</p>
-            <h2 class="product-item__name">Flor de Azahar · Nº08</h2>
-            <p class="product-item__desc">Inspirada en fragancias florales frutales.</p>
-            <p class="product-item__price">S/. 90</p>
-          </a>
-          <button class="add-to-cart btn btn--outline" data-id="ae-08" data-name="Flor de Azahar Nº08" data-price="90" data-image="assets/catalogo/floral/forher/f2.webp">Añadir</button>
-        </li>
-
-        <li class="product-item reveal" data-familia="oriental-especiada" data-genero="para-ella">
-          <a href="producto.html?id=ae-09" class="product-item__link">
-            <div class="product-item__media">
-              <img src="assets/catalogo/oriental/forher/o2.webp" alt="Frasco Allpa Essence Nº09, Canela Nocturna, vidrio negro mate con relieve geométrico tallado, fondo de tela oscura" width="600" height="750" loading="lazy">
-            </div>
-            <p class="product-item__familia">Oriental / Especiada</p>
-            <h2 class="product-item__name">Canela Nocturna · Nº09</h2>
-            <p class="product-item__desc">Inspirada en fragancias orientales dulces.</p>
-            <p class="product-item__price">S/. 90</p>
-          </a>
-          <button class="add-to-cart btn btn--outline" data-id="ae-09" data-name="Canela Nocturna Nº09" data-price="90" data-image="assets/catalogo/oriental/forher/o2.webp">Añadir</button>
-        </li>
-
-        <li class="product-item reveal" data-familia="amaderada" data-flag="" data-genero="para-el">
-          <a href="producto.html?id=ae-10" class="product-item__link">
-            <div class="product-item__media">
-              <img src="assets/catalogo/amaderado/forhim/w3.webp" alt="Frasco Allpa Essence Nº10, Ámbar Seco, panel de madera tallada con monograma geométrico, sobre mesa de madera oscura" width="600" height="750" loading="lazy">
-            </div>
-            <p class="product-item__familia">Amaderada</p>
-            <h2 class="product-item__name">Ámbar Seco · Nº10</h2>
-            <p class="product-item__desc">Inspirada en fragancias amaderadas ambaradas.</p>
-            <p class="product-item__price">S/. 75</p>
-          </a>
-          <button class="add-to-cart btn btn--outline" data-id="ae-10" data-name="Ámbar Seco Nº10" data-price="75" data-image="assets/catalogo/amaderado/forhim/w3.webp">Añadir</button>
-        </li>
-
-        <li class="product-item reveal" data-familia="amaderada" data-flag="" data-genero="para-el">
-          <a href="producto.html?id=ae-11" class="product-item__link">
-            <div class="product-item__media">
-              <img src="assets/catalogo/amaderado/forhim/w4.webp" alt="Frasco Allpa Essence Nº11, Vetiver Salvaje, superficie de madera veteada tallada con monograma angular" width="600" height="750" loading="lazy">
-            </div>
-            <p class="product-item__familia">Amaderada</p>
-            <h2 class="product-item__name">Vetiver Salvaje · Nº11</h2>
-            <p class="product-item__desc">Inspirada en fragancias amaderadas verdes.</p>
-            <p class="product-item__price">S/. 50</p>
-          </a>
-          <button class="add-to-cart btn btn--outline" data-id="ae-11" data-name="Vetiver Salvaje Nº11" data-price="50" data-image="assets/catalogo/amaderado/forhim/w4.webp">Añadir</button>
-        </li>
-
-        <li class="product-item reveal" data-familia="citrica" data-flag="" data-genero="para-el">
-          <a href="producto.html?id=ae-12" class="product-item__link">
-            <div class="product-item__media">
-              <img src="assets/catalogo/citrico/forhim/c3.webp" alt="Frasco Allpa Essence Nº12, Mandarina Dorada, grabado dorado de flores cítricas en relieve, fondo gris degradado" width="600" height="750" loading="lazy">
-            </div>
-            <p class="product-item__familia">Cítrica</p>
-            <h2 class="product-item__name">Mandarina Dorada · Nº12</h2>
-            <p class="product-item__desc">Inspirada en fragancias cítricas dulces.</p>
-            <p class="product-item__price">S/. 75</p>
-          </a>
-          <button class="add-to-cart btn btn--outline" data-id="ae-12" data-name="Mandarina Dorada Nº12" data-price="75" data-image="assets/catalogo/citrico/forhim/c3.webp">Añadir</button>
-        </li>
-
-        <li class="product-item reveal" data-familia="citrica" data-flag="" data-genero="para-el">
-          <a href="producto.html?id=ae-13" class="product-item__link">
-            <div class="product-item__media">
-              <img src="assets/catalogo/citrico/forhim/c4.webp" alt="Tapa de frasco Allpa Essence Nº13, Neroli Claro, con emblema circular tipo brújula, cuerpo oscuro grabado con cítricos" width="600" height="750" loading="lazy">
-            </div>
-            <p class="product-item__familia">Cítrica</p>
-            <h2 class="product-item__name">Neroli Claro · Nº13</h2>
-            <p class="product-item__desc">Inspirada en fragancias cítricas florales.</p>
-            <p class="product-item__price">S/. 90</p>
-          </a>
-          <button class="add-to-cart btn btn--outline" data-id="ae-13" data-name="Neroli Claro Nº13" data-price="90" data-image="assets/catalogo/citrico/forhim/c4.webp">Añadir</button>
-        </li>
-
-        <li class="product-item reveal" data-familia="floral" data-flag="" data-genero="para-el">
-          <a href="producto.html?id=ae-14" class="product-item__link">
-            <div class="product-item__media">
-              <img src="assets/catalogo/floral/forhim/f3.webp" alt="Frasco Allpa Essence Nº14, Iris Desnudo, grabado de flores azul oscuro sobre vidrio ahumado, tapa negra" width="600" height="750" loading="lazy">
-            </div>
-            <p class="product-item__familia">Floral</p>
-            <h2 class="product-item__name">Iris Desnudo · Nº14</h2>
-            <p class="product-item__desc">Inspirada en fragancias florales polvorientas.</p>
-            <p class="product-item__price">S/. 75</p>
-          </a>
-          <button class="add-to-cart btn btn--outline" data-id="ae-14" data-name="Iris Desnudo Nº14" data-price="75" data-image="assets/catalogo/floral/forhim/f3.webp">Añadir</button>
-        </li>
-
-        <li class="product-item reveal" data-familia="floral" data-flag="" data-genero="para-el">
-          <a href="producto.html?id=ae-15" class="product-item__link">
-            <div class="product-item__media">
-              <img src="assets/catalogo/floral/forhim/f4.webp" alt="Primer plano de frasco Allpa Essence Nº15, Rosa Oscura, con una rosa grabada en relieve metálico plateado" width="600" height="750" loading="lazy">
-            </div>
-            <p class="product-item__familia">Floral</p>
-            <h2 class="product-item__name">Rosa Oscura · Nº15</h2>
-            <p class="product-item__desc">Inspirada en fragancias florales intensas.</p>
-            <p class="product-item__price">S/. 50</p>
-          </a>
-          <button class="add-to-cart btn btn--outline" data-id="ae-15" data-name="Rosa Oscura Nº15" data-price="50" data-image="assets/catalogo/floral/forhim/f4.webp">Añadir</button>
-        </li>
-
-        <li class="product-item reveal" data-familia="oriental-especiada" data-flag="" data-genero="para-el">
-          <a href="producto.html?id=ae-16" class="product-item__link">
-            <div class="product-item__media">
-              <img src="assets/catalogo/oriental/forhim/o3.webp" alt="Frasco Allpa Essence Nº16, Sándalo Rojo, vidrio oscuro con patrón geométrico plateado en relieve, tela satinada" width="600" height="750" loading="lazy">
-            </div>
-            <p class="product-item__familia">Oriental / Especiada</p>
-            <h2 class="product-item__name">Sándalo Rojo · Nº16</h2>
-            <p class="product-item__desc">Inspirada en fragancias orientales amaderadas.</p>
-            <p class="product-item__price">S/. 50</p>
-          </a>
-          <button class="add-to-cart btn btn--outline" data-id="ae-16" data-name="Sándalo Rojo Nº16" data-price="50" data-image="assets/catalogo/oriental/forhim/o3.webp">Añadir</button>
-        </li>
-
-        <li class="product-item reveal" data-familia="oriental-especiada" data-flag="" data-genero="para-el">
-          <a href="producto.html?id=ae-17" class="product-item__link">
-            <div class="product-item__media">
-              <img src="assets/catalogo/oriental/forhim/o4.webp" alt="Frasco Allpa Essence Nº17, Especia Prohibida, negro con grabado ornamental plateado tipo medallón circular" width="600" height="750" loading="lazy">
-            </div>
-            <p class="product-item__familia">Oriental / Especiada</p>
-            <h2 class="product-item__name">Especia Prohibida · Nº17</h2>
-            <p class="product-item__desc">Inspirada en fragancias orientales picantes.</p>
-            <p class="product-item__price">S/. 75</p>
-          </a>
-          <button class="add-to-cart btn btn--outline" data-id="ae-17" data-name="Especia Prohibida Nº17" data-price="75" data-image="assets/catalogo/oriental/forhim/o4.webp">Añadir</button>
-        </li>
-
-        <li class="product-item reveal" data-familia="fresca-acuatica" data-flag="" data-genero="para-el">
-          <a href="producto.html?id=ae-18" class="product-item__link">
-            <div class="product-item__media">
-              <img src="assets/catalogo/acuoso/forhim/a2.webp" alt="Frasco Allpa Essence Nº18, Agua de Piedra, junto a una escultura de vidrio ondulado color turquesa, fondo cálido" width="600" height="750" loading="lazy">
-            </div>
-            <p class="product-item__familia">Fresca / Acuática</p>
-            <h2 class="product-item__name">Agua de Piedra · Nº18</h2>
-            <p class="product-item__desc">Inspirada en fragancias frescas minerales.</p>
-            <p class="product-item__price">S/. 50</p>
-          </a>
-          <button class="add-to-cart btn btn--outline" data-id="ae-18" data-name="Agua de Piedra Nº18" data-price="50" data-image="assets/catalogo/acuoso/forhim/a2.webp">Añadir</button>
-        </li>
-
-        <li class="product-item reveal" data-familia="fresca-acuatica" data-flag="" data-genero="para-ella">
-          <a href="producto.html?id=ae-19" class="product-item__link">
-            <div class="product-item__media">
-              <img src="assets/catalogo/acuoso/forher/a3.webp" alt="Frasco Allpa Essence Nº19, Menta Glacial, grabado geométrico angular, tapa plateada, fondo cálido claro" width="600" height="750" loading="lazy">
-            </div>
-            <p class="product-item__familia">Fresca / Acuática</p>
-            <h2 class="product-item__name">Menta Glacial · Nº19</h2>
-            <p class="product-item__desc">Inspirada en fragancias frescas herbales.</p>
-            <p class="product-item__price">S/. 90</p>
-          </a>
-          <button class="add-to-cart btn btn--outline" data-id="ae-19" data-name="Menta Glacial Nº19" data-price="90" data-image="assets/catalogo/acuoso/forher/a3.webp">Añadir</button>
-        </li>
-
-        <li class="product-item reveal" data-familia="fresca-acuatica" data-flag="" data-genero="para-ella">
-          <a href="producto.html?id=ae-20" class="product-item__link">
-            <div class="product-item__media">
-              <img src="assets/catalogo/acuoso/forher/a4.webp" alt="2 frascos Allpa Essence Nº20, Cedro y Mar, uno con degradado azul y otro transparente con grabado lineal fino" width="600" height="750" loading="lazy">
-            </div>
-            <p class="product-item__familia">Fresca / Acuática</p>
-            <h2 class="product-item__name">Cedro y Mar · Nº20</h2>
-            <p class="product-item__desc">Inspirada en fragancias frescas amaderadas.</p>
-            <p class="product-item__price">S/. 75</p>
-          </a>
-          <button class="add-to-cart btn btn--outline" data-id="ae-20" data-name="Cedro y Mar Nº20" data-price="75" data-image="assets/catalogo/acuoso/forher/a4.webp">Añadir</button>
-        </li>
-
-      </ul>
+      <ul class="catalog-grid" id="catalog-grid" data-catalog-render></ul>
+      <p class="catalog-empty" id="catalog-empty" hidden>No encontramos fragancias con esa búsqueda. Prueba con otro nombre o quita algún filtro.</p>
+      <div class="catalog-more">
+        <button type="button" class="btn btn--outline" id="catalog-more" hidden>Ver más fragancias</button>
+      </div>
     </div>
 
   </main>
@@ -595,11 +340,11 @@
         <p class="site-footer__policies-title">Catálogo</p>
         <a href="catalogo.html">Todas las fragancias</a>
         <a href="catalogo.html#filtro-genero">Regalos</a>
-        <a href="catalogo.html?familia=amaderada">Amaderadas</a>
-        <a href="catalogo.html?familia=citrica">Cítricas</a>
+        <a href="catalogo.html?familia=amaderado">Amaderadas</a>
+        <a href="catalogo.html?familia=citrico">Cítricas</a>
         <a href="catalogo.html?familia=floral">Florales</a>
-        <a href="catalogo.html?familia=oriental-especiada">Orientales y especiadas</a>
-        <a href="catalogo.html?familia=fresca-acuatica">Frescas y acuáticas</a>
+        <a href="catalogo.html?familia=especiado">Orientales y especiadas</a>
+        <a href="catalogo.html?familia=fresco">Frescas y acuáticas</a>
       </nav>
 
       <nav class="site-footer__col" aria-label="La marca">

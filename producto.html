@@ -38,11 +38,11 @@
           <button type="button" class="nav-main__link nav-dropdown__toggle" id="btn-catalogo-nav" aria-haspopup="true" aria-expanded="false" aria-controls="catalogo-nav-menu" aria-current="page">Catálogo</button>
           <div class="nav-dropdown__menu" id="catalogo-nav-menu" hidden>
             <a href="catalogo.html">Todas</a>
-            <a href="catalogo.html?familia=amaderada">Amaderada</a>
-            <a href="catalogo.html?familia=citrica">Cítrica</a>
+            <a href="catalogo.html?familia=amaderado">Amaderada</a>
+            <a href="catalogo.html?familia=citrico">Cítrica</a>
             <a href="catalogo.html?familia=floral">Floral</a>
-            <a href="catalogo.html?familia=oriental-especiada">Oriental / Especiada</a>
-            <a href="catalogo.html?familia=fresca-acuatica">Fresca / Acuática</a>
+            <a href="catalogo.html?familia=especiado">Oriental / Especiada</a>
+            <a href="catalogo.html?familia=fresco">Fresca / Acuática</a>
           </div>
         </div>
         <a href="muestras.html" class="nav-main__link">Muestras</a>
@@ -220,7 +220,7 @@
          Plantilla unica: js resuelve el SKU por ?id= y reescribe los ids existentes (#product-img, #product-familia,
          #product-titulo, #product-desc, #product-precio, #nota-*, #spec-*, #btn-add-to-cart) sin cambiar la estructura.
          Este markup es el ESTADO POR DEFECTO (ae-01). Todo slot con [hidden] se rellena solo si hay dato real. ===== -->
-    <section class="product-detail" aria-labelledby="product-titulo" data-default-id="ae-01">
+    <section class="product-detail" aria-labelledby="product-titulo" data-default-id="ae-001">
       <div class="container product-detail__layout">
 
         <div class="product-detail__media">
@@ -309,7 +309,7 @@
               <input class="qty-stepper__input" id="product-qty" type="number" min="1" max="99" value="1" inputmode="numeric" aria-label="Cantidad">
               <button type="button" class="qty-stepper__btn" data-qty-inc aria-label="Añadir una unidad">+</button>
             </div>
-            <button class="add-to-cart btn btn--primary btn--lg" id="btn-add-to-cart" data-id="ae-01" data-name="Cedro Real Nº01" data-price="75" data-image="assets/catalogo/amaderado/forher/w1.webp">Añadir al carrito</button>
+            <button class="add-to-cart btn btn--primary btn--lg" id="btn-add-to-cart" data-id="ae-001" data-name="Cedro Real Nº01" data-price="75" data-image="assets/catalogo/amaderado/forher/w1.webp">Añadir al carrito</button>
           </div>
 
           <!-- Datos de perfumeria en acordeon nativo (<details>, sin JS). Los ids de notas/specs se conservan:
@@ -498,11 +498,11 @@
         <p class="site-footer__policies-title">Catálogo</p>
         <a href="catalogo.html">Todas las fragancias</a>
         <a href="catalogo.html#filtro-genero">Regalos</a>
-        <a href="catalogo.html?familia=amaderada">Amaderadas</a>
-        <a href="catalogo.html?familia=citrica">Cítricas</a>
+        <a href="catalogo.html?familia=amaderado">Amaderadas</a>
+        <a href="catalogo.html?familia=citrico">Cítricas</a>
         <a href="catalogo.html?familia=floral">Florales</a>
-        <a href="catalogo.html?familia=oriental-especiada">Orientales y especiadas</a>
-        <a href="catalogo.html?familia=fresca-acuatica">Frescas y acuáticas</a>
+        <a href="catalogo.html?familia=especiado">Orientales y especiadas</a>
+        <a href="catalogo.html?familia=fresco">Frescas y acuáticas</a>
       </nav>
 
       <nav class="site-footer__col" aria-label="La marca">

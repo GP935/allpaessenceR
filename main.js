@@ -5,6 +5,7 @@
 // real se monta cuando existan, mismo patrón que AP-J2 de AP Beauty.
 
 import { cartStore } from './scripts/cart.js';
+import { OFFER, getOfferEnd, computeCartTotals } from './scripts/offer.js';
 
 const priceFormatter = new Intl.NumberFormat('es-PE', { style: 'currency', currency: 'PEN' });
 
@@ -154,43 +155,6 @@ function renderCartLines(listEl, items) {
     node.querySelector('.cart-line__qval').textContent = String(item.qty);
     listEl.appendChild(node);
   });
-}
-
-/* --------------------------------------------------------------------------
-   AE-R3 · Oferta "3 por S/ 99" (antes S/ 150, 50 ml) — decisión de Paul 2026-11-15.
-   Escrito por front en esta copia por autorización de Paul. SUPUESTOS a confirmar:
-   (1) aplica a cualquier combinación de 3 fragancias de tamaño completo (ids ae-NN),
-       NO a muestras (-muestra) ni skincare (sk-NN);
-   (2) en cada grupo de 3 entran las unidades más caras (mejor ahorro para el cliente);
-   (3) la oferta solo existe mientras corra la cuenta atrás ([data-countdown-end]).
-   Cálculo SOLO de presentación en este mockup: el cobro real lo validará el backend.
-   -------------------------------------------------------------------------- */
-const OFFER = { qty: 3, price: 99, was: 150 };
-
-function getOfferEnd() {
-  const el = document.querySelector('[data-countdown-end]');
-  return el ? Date.parse(el.dataset.countdownEnd) : NaN;
-}
-
-function isOfferActive() {
-  const end = getOfferEnd();
-  return Number.isFinite(end) && Date.now() < end;
-}
-
-function isOfferEligible(item) {
-  return /^ae-\d+$/.test(item.id);
-}
-
-function computeCartTotals(items) {
-  const subtotal = items.reduce((sum, i) => sum + i.price * i.qty, 0);
-  const prices = [];
-  items.filter(isOfferEligible).forEach((i) => { for (let n = 0; n < i.qty; n += 1) prices.push(i.price); });
-  prices.sort((a, b) => b - a);
-  const active = isOfferActive();
-  const groups = active ? Math.floor(prices.length / OFFER.qty) : 0;
-  const bundled = prices.slice(0, groups * OFFER.qty).reduce((s, p) => s + p, 0);
-  const discount = Math.max(0, bundled - groups * OFFER.price);
-  return { subtotal, discount, total: subtotal - discount, eligible: prices.length, groups, active };
 }
 
 let productosCache = null;
@@ -419,79 +383,143 @@ function initCarousels() {
 }
 
 /* --------------------------------------------------------------------------
-   Catálogo — filtro por familia olfativa (catalogo.html). Los pills son <a>
-   reales (funcionan sin JS); con JS interceptamos el click para filtrar sin
-   recargar y mantener la URL compartible vía pushState.
+   Búsqueda: cada fragancia tiene un nombre propio (p.nombre) y una referencia oculta
+   (p.ref, la fragancia por la que el cliente llega con la cabeza). El cliente busca por
+   cualquiera de las dos; la referencia NUNCA se pinta en pantalla. Sinónimos: man/men/
+   hombre, woman/women/mujer y siglas de casas habituales (CH, YSL…).
    -------------------------------------------------------------------------- */
-function initCatalogFilter() {
+const SEARCH_ALIAS = {
+  man: 'men', hombre: 'men', homme: 'men', uomo: 'men', male: 'men', masculino: 'men',
+  woman: 'women', mujer: 'women', femme: 'women', donna: 'women', female: 'women', femenino: 'women',
+  ch: 'carolina herrera', ysl: 'yves saint laurent', jpg: 'jean paul gaultier', dg: 'dolce gabbana',
+  pr: 'paco rabanne', lv: 'louis vuitton', mb: 'mont blanc', cdn: 'club de nuit',
+};
+function searchTokens(s) {
+  const out = [];
+  normalizeText(s).replace(/[^a-z0-9 ]/g, ' ').split(/\s+/).filter(Boolean).forEach((t) => {
+    (SEARCH_ALIAS[t] || t).split(' ').forEach((w) => out.push(w));
+  });
+  return out;
+}
+function buildSearchIndex(productos) {
+  productos.forEach((p) => {
+    p._tok = searchTokens(`${p.nombre} ${p.ref || ''} ${(p.familiasLabel || []).join(' ')}`);
+  });
+}
+function matchesSearch(p, qTokens) {
+  if (!qTokens.length) return true;
+  const hay = p._tok || [];
+  return qTokens.every((q) => hay.some((t) => t.startsWith(q)));
+}
+
+function buildCatalogItem(p) {
+  const li = document.createElement('li');
+  li.className = 'product-item';
+  li.dataset.id = p.id;
+  const href = `producto.html?id=${encodeURIComponent(p.id)}`;
+  const badge = p.flag === 'bestseller' ? 'Bestseller' : p.flag === 'trending' ? 'Trending' : p.nuevo ? 'Nuevo' : '';
+  li.innerHTML = `
+    <a href="${href}" class="product-item__link">
+      ${badge ? '<span class="product-item__badge"></span>' : ''}
+      <div class="product-item__media"><img width="600" height="600" loading="lazy"></div>
+      <p class="product-item__familia"></p>
+      <h2 class="product-item__name"></h2>
+      <p class="product-item__desc"></p>
+      <p class="product-item__price"></p>
+    </a>
+    <button type="button" class="add-to-cart btn btn--outline">Añadir</button>`;
+  if (badge) li.querySelector('.product-item__badge').textContent = badge;
+  const img = li.querySelector('img');
+  img.src = p.imagen; img.alt = p.alt;
+  li.querySelector('.product-item__familia').textContent = (p.familiasLabel || [p.familiaLabel]).slice(0, 2).join(' · ');
+  li.querySelector('.product-item__name').textContent = p.nombre;
+  li.querySelector('.product-item__desc').textContent = p.desc;
+  li.querySelector('.product-item__price').textContent = p.precioDisplay;
+  const btn = li.querySelector('.add-to-cart');
+  btn.dataset.id = p.id; btn.dataset.name = p.nombre; btn.dataset.price = String(p.precio); btn.dataset.image = p.imagen;
+  return li;
+}
+
+async function initCatalogFilter() {
   const grid = document.getElementById('catalog-grid');
-  if (!grid) return;
+  if (!grid || !grid.hasAttribute('data-catalog-render')) return;
+  const productos = await loadProductosOnce();
+  buildSearchIndex(productos);
+  const PAGE = 24;
   const familiaPills = document.querySelectorAll('.familia-pill');
   const generoPills = document.querySelectorAll('.genero-pill');
-  const items = grid.querySelectorAll('.product-item');
-
-  const applyFilter = (familia, genero) => {
-    const q = normalizeText(new URLSearchParams(window.location.search).get('q') || '').trim();
-    items.forEach((item) => {
-      const matchesFamilia = !familia || item.dataset.familia === familia;
-      const matchesGenero = !genero || item.dataset.genero === genero;
-      const matchesQ = !q || normalizeText(`${item.textContent} ${item.dataset.familia}`).includes(q);
-      item.hidden = !(matchesFamilia && matchesGenero && matchesQ);
-    });
-    const countEl = document.getElementById('catalog-count');
-    if (countEl) {
-      const n = [...items].filter((i) => !i.hidden).length;
-      countEl.textContent = n === 1 ? '1 fragancia' : `${n} fragancias`;
-    }
-    familiaPills.forEach((pill) => {
-      pill.classList.toggle('is-active', (pill.dataset.familia || '') === familia);
-    });
-    generoPills.forEach((pill) => {
-      pill.classList.toggle('is-active', (pill.dataset.genero || '') === genero);
-    });
-  };
-
-  // AE-R4: ordenar (Destacados = orden original; Más nuevos = Nº más alto primero; precio por data-price del botón)
   const sortSel = document.getElementById('catalog-sort');
-  items.forEach((item, idx) => { item.dataset.order = String(idx); });
-  const idNum = (item) => parseInt((item.querySelector('.add-to-cart')?.dataset.id || '').replace(/\D/g, ''), 10) || 0;
-  const priceOf = (item) => Number(item.querySelector('.add-to-cart')?.dataset.price) || 0;
-  const applySort = () => {
+  const searchInput = document.getElementById('catalog-search');
+  const moreBtn = document.getElementById('catalog-more');
+  const emptyEl = document.getElementById('catalog-empty');
+  const countEl = document.getElementById('catalog-count');
+  const state = { familia: '', genero: '', q: '', shown: PAGE };
+
+  const sorted = (list) => {
     const v = sortSel ? sortSel.value : 'destacados';
-    const arr = [...items];
-    if (v === 'nuevos') arr.sort((a, b) => idNum(b) - idNum(a));
-    else if (v === 'precio-asc') arr.sort((a, b) => priceOf(a) - priceOf(b) || Number(a.dataset.order) - Number(b.dataset.order));
-    else if (v === 'precio-desc') arr.sort((a, b) => priceOf(b) - priceOf(a) || Number(a.dataset.order) - Number(b.dataset.order));
-    else arr.sort((a, b) => Number(a.dataset.order) - Number(b.dataset.order));
-    arr.forEach((item) => grid.appendChild(item));
+    const arr = list.map((p, i) => [p, i]);
+    const rank = (p) => (p.flag === 'bestseller' ? 0 : p.flag === 'trending' ? 1 : p.nuevo ? 2 : 3);
+    if (v === 'nuevos') arr.sort((a, b) => (Number(b[0].nuevo) - Number(a[0].nuevo)) || b[0].id.localeCompare(a[0].id));
+    else if (v === 'precio-asc') arr.sort((a, b) => a[0].precio - b[0].precio || a[1] - b[1]);
+    else if (v === 'precio-desc') arr.sort((a, b) => b[0].precio - a[0].precio || a[1] - b[1]);
+    else arr.sort((a, b) => rank(a[0]) - rank(b[0]) || a[1] - b[1]);
+    return arr.map((x) => x[0]);
   };
-  sortSel?.addEventListener('change', applySort);
 
-  const readAndApply = () => {
+  const render = () => {
+    const qTokens = searchTokens(state.q);
+    const list = sorted(productos.filter((p) =>
+      (!state.familia || (p.familias || [p.familia]).includes(state.familia)) &&
+      (!state.genero || p.genero === state.genero) &&
+      matchesSearch(p, qTokens)));
+    grid.replaceChildren(...list.slice(0, state.shown).map(buildCatalogItem));
+    applyStockTags(grid);
+    if (countEl) countEl.textContent = list.length === 1 ? '1 fragancia' : `${list.length} fragancias`;
+    if (emptyEl) emptyEl.hidden = list.length > 0;
+    if (moreBtn) moreBtn.hidden = list.length <= state.shown;
+    familiaPills.forEach((pill) => pill.classList.toggle('is-active', (pill.dataset.familia || '') === state.familia));
+    generoPills.forEach((pill) => pill.classList.toggle('is-active', (pill.dataset.genero || '') === state.genero));
+  };
+
+  const readUrl = () => {
     const params = new URLSearchParams(window.location.search);
-    applyFilter(params.get('familia') || '', params.get('genero') || '');
+    state.familia = params.get('familia') || '';
+    state.genero = params.get('genero') || '';
+    state.q = params.get('q') || '';
+    state.shown = PAGE;
+    if (searchInput) searchInput.value = state.q;
+    render();
+  };
+  const pushUrl = () => {
+    const params = new URLSearchParams();
+    if (state.familia) params.set('familia', state.familia);
+    if (state.genero) params.set('genero', state.genero);
+    if (state.q) params.set('q', state.q);
+    const query = params.toString();
+    window.history.pushState({}, '', query ? `catalogo.html?${query}` : 'catalogo.html');
   };
 
-  readAndApply();
-
-  // Combina AND: al clickear un pill se conserva el otro filtro ya activo en la URL en
-  // vez de navegar al href literal del pill (que solo trae su propio querystring).
   const wirePill = (pill, key) => {
     pill.addEventListener('click', (e) => {
       e.preventDefault();
-      const params = new URLSearchParams(window.location.search);
-      const value = pill.dataset[key] || '';
-      if (value) params.set(key, value);
-      else params.delete(key);
-      const query = params.toString();
-      window.history.pushState({}, '', query ? `catalogo.html?${query}` : 'catalogo.html');
-      applyFilter(params.get('familia') || '', params.get('genero') || '');
+      state[key] = pill.dataset[key] || '';
+      state.shown = PAGE;
+      pushUrl();
+      render();
     });
   };
   familiaPills.forEach((pill) => wirePill(pill, 'familia'));
   generoPills.forEach((pill) => wirePill(pill, 'genero'));
-
-  window.addEventListener('popstate', readAndApply);
+  sortSel?.addEventListener('change', () => { state.shown = PAGE; render(); });
+  moreBtn?.addEventListener('click', () => { state.shown += PAGE; render(); });
+  let t;
+  searchInput?.addEventListener('input', () => {
+    clearTimeout(t);
+    t = setTimeout(() => { state.q = searchInput.value.trim(); state.shown = PAGE; pushUrl(); render(); }, 150);
+  });
+  document.getElementById('catalog-search-form')?.addEventListener('submit', (e) => e.preventDefault());
+  window.addEventListener('popstate', readUrl);
+  readUrl();
 }
 
 /* --------------------------------------------------------------------------
@@ -530,11 +558,26 @@ async function initProductPage() {
   if (buyBarImg) buyBarImg.src = producto.imagen;
   setText('product-familia', producto.familiaLabel);
   setText('product-desc', producto.desc);
-  setText('nota-salida', producto.notas.salida);
-  setText('nota-corazon', producto.notas.corazon);
-  setText('nota-fondo', producto.notas.fondo);
-  setText('spec-duracion', producto.duracion);
-  setText('spec-intensidad', producto.intensidad);
+  if (producto.notas) {
+    setText('nota-salida', producto.notas.salida);
+    setText('nota-corazon', producto.notas.corazon);
+    setText('nota-fondo', producto.notas.fondo);
+  } else {
+    // Sin pirámide olfativa todavía: se muestran las familias olfativas reales de la hoja de valores.
+    const dl = document.querySelector('.product-detail__notas');
+    if (dl) {
+      dl.replaceChildren();
+      const row = document.createElement('div');
+      row.className = 'product-detail__nota';
+      const dt = document.createElement('dt'); dt.textContent = 'Familias olfativas';
+      const dd = document.createElement('dd'); dd.textContent = (producto.familiasLabel || [producto.familiaLabel]).join(' · ');
+      row.append(dt, dd);
+      dl.appendChild(row);
+    }
+  }
+  if (producto.duracion) setText('spec-duracion', producto.duracion);
+  else document.getElementById('spec-duracion')?.closest('details')?.setAttribute('hidden', '');
+  if (producto.intensidad) setText('spec-intensidad', producto.intensidad);
 
   const addBtn = document.getElementById('btn-add-to-cart');
 
@@ -635,7 +678,7 @@ function initProductExtras(producto, productos) {
   const grid = document.getElementById('related-grid');
   const tpl = document.getElementById('related-card-tpl');
   if (grid && tpl) {
-    const rel = productos.filter((p) => p.familia === producto.familia && p.id !== producto.id).slice(0, 4);
+    const rel = productos.filter((p) => p.familia === producto.familia && p.genero === producto.genero && p.id !== producto.id).slice(0, 4);
     rel.forEach((p) => {
       const node = tpl.content.firstElementChild.cloneNode(true);
       node.querySelector('.related-card__link').href = `producto.html?id=${encodeURIComponent(p.id)}`;
@@ -850,7 +893,7 @@ async function initHomePage() {
     // Sugerencias del buscador (nombres propios, nunca marcas)
     const list = document.getElementById('home-search-list');
     if (list) {
-      productos.forEach((p) => { const o = document.createElement('option'); o.value = p.nombre.replace(/\s*·\s*Nº\d+$/, ''); list.appendChild(o); });
+      productos.forEach((p) => { const o = document.createElement('option'); o.value = p.nombre; list.appendChild(o); });
     }
   }
   initProductReviews(null);
@@ -968,32 +1011,69 @@ function initScrollReveals() {
 }
 
 /* --------------------------------------------------------------------------
-   Utility bar — rotación de los 3 mensajes (copy deck AE-F7). CSS ya oculta
-   los inactivos (AE-C10); acá solo movemos .is-active en loop.
+   Utility bar — rotación de los mensajes (copy deck AE-F7). CSS oculta los
+   inactivos (AE-C10); acá movemos .is-active. Controles opcionales por hook
+   (los pone front): [data-utility-prev], [data-utility-next], [data-utility-pause]
+   (aria-pressed). Auto-rotación se detiene con prefers-reduced-motion, hover/foco
+   sobre la barra o pausa manual (WCAG 2.2.2). Mensaje activo anunciado con aria-live.
    -------------------------------------------------------------------------- */
 function initUtilityBarRotation() {
-  const messages = document.querySelectorAll('[data-utility-msg]');
+  const messages = [...document.querySelectorAll('[data-utility-msg]')];
   if (messages.length < 2) return;
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const box = document.getElementById('utility-message');
+  const bar = box ? box.closest('.utility-bar') : null;
+  const btnPrev = document.querySelector('[data-utility-prev]');
+  const btnNext = document.querySelector('[data-utility-next]');
+  const btnPause = document.querySelector('[data-utility-pause]');
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  let index = Math.max(0, [...messages].findIndex((el) => el.classList.contains('is-active')));
-  setInterval(() => {
+  if (box) box.setAttribute('aria-live', 'polite');
+
+  let index = Math.max(0, messages.findIndex((el) => el.classList.contains('is-active')));
+  let paused = reduced;
+  let hovering = false;
+
+  function show(i) {
     messages[index].classList.remove('is-active');
-    index = (index + 1) % messages.length;
+    index = (i + messages.length) % messages.length;
     messages[index].classList.add('is-active');
+  }
+
+  if (btnPause) {
+    btnPause.setAttribute('aria-pressed', String(paused));
+    btnPause.addEventListener('click', () => {
+      paused = !paused;
+      btnPause.setAttribute('aria-pressed', String(paused));
+    });
+  }
+  if (btnPrev) btnPrev.addEventListener('click', () => show(index - 1));
+  if (btnNext) btnNext.addEventListener('click', () => show(index + 1));
+
+  if (bar) {
+    bar.addEventListener('mouseenter', () => { hovering = true; });
+    bar.addEventListener('mouseleave', () => { hovering = false; });
+    bar.addEventListener('focusin', () => { hovering = true; });
+    bar.addEventListener('focusout', () => { hovering = false; });
+  }
+
+  if (reduced) return;
+  setInterval(() => {
+    if (paused || hovering || document.hidden) return;
+    show(index + 1);
   }, 4500);
 }
 
 /* --------------------------------------------------------------------------
    AE-R1 · Cuenta atrás del banner de campaña. La fecha de fin vive solo en
-   data-countdown-end de #promo-banner. Escrito por front en esta copia por
+   scripts/offer.js (OFFER.end). Escrito por front en esta copia por
    autorización de Paul (2026-11-15). Hora del cliente (mockup, sin backend).
    -------------------------------------------------------------------------- */
 function initPromoCountdown() {
-  // AE-R3: sirve a TODOS los [data-countdown-end] (banner + drawer). La fecha manda la del primero.
+  // Fuente única: scripts/offer.js. Se estampa en todos los [data-countdown-end] (el valor del HTML es solo fallback sin JS).
   const els = [...document.querySelectorAll('[data-countdown-end]')];
   if (!els.length) return;
-  const end = Date.parse(els[0].dataset.countdownEnd);
+  els.forEach((el) => { el.dataset.countdownEnd = OFFER.end; el.setAttribute('datetime', OFFER.end); });
+  const end = getOfferEnd();
   const pad = (n) => String(n).padStart(2, '0');
   const sets = els.map((el) => ({
     d: el.querySelector('[data-cd="d"]'), h: el.querySelector('[data-cd="h"]'),

@@ -59,11 +59,11 @@
           <button type="button" class="nav-main__link nav-dropdown__toggle" id="btn-catalogo-nav" aria-haspopup="true" aria-expanded="false" aria-controls="catalogo-nav-menu">Catálogo</button>
           <div class="nav-dropdown__menu" id="catalogo-nav-menu" hidden>
             <a href="catalogo.html">Todas</a>
-            <a href="catalogo.html?familia=amaderada">Amaderada</a>
-            <a href="catalogo.html?familia=citrica">Cítrica</a>
+            <a href="catalogo.html?familia=amaderado">Amaderada</a>
+            <a href="catalogo.html?familia=citrico">Cítrica</a>
             <a href="catalogo.html?familia=floral">Floral</a>
-            <a href="catalogo.html?familia=oriental-especiada">Oriental / Especiada</a>
-            <a href="catalogo.html?familia=fresca-acuatica">Fresca / Acuática</a>
+            <a href="catalogo.html?familia=especiado">Oriental / Especiada</a>
+            <a href="catalogo.html?familia=fresco">Fresca / Acuática</a>
           </div>
         </div>
         <a href="muestras.html" class="nav-main__link">Muestras</a>
@@ -310,10 +310,10 @@
     <section class="home-search" aria-labelledby="home-search-titulo">
       <div class="container home-search__inner">
         <h2 id="home-search-titulo" class="home-search__title">Encuentra tu fragancia</h2>
-        <p class="home-search__sub">Busca por nombre o por familia olfativa: amaderada, cítrica, floral, oriental o fresca.</p>
+        <p class="home-search__sub">Busca por nombre, por familia olfativa o por la fragancia que tienes en mente.</p>
         <form class="home-search__form" role="search" action="catalogo.html" method="get">
           <label for="home-search-input" class="sr-only">Buscar fragancia</label>
-          <input class="home-search__input" id="home-search-input" type="search" name="q" placeholder="Ej.: cedro, jazmín, cítrica…" autocomplete="off" list="home-search-list">
+          <input class="home-search__input" id="home-search-input" type="search" name="q" placeholder="Ej.: dulce, floral, aromática…" autocomplete="off" list="home-search-list">
           <datalist id="home-search-list"></datalist>
           <button type="submit" class="btn btn--primary home-search__btn">Buscar</button>
         </form>
@@ -360,7 +360,7 @@
           <div class="carousel__viewport">
             <ul class="carousel__track trending__grid" id="trending-track">
 
-              <li class="carousel__slide product-card" data-familia="citrica" data-flag="trending">
+              <li class="carousel__slide product-card" data-familia="citrico" data-flag="trending">
                 <span class="product-card__badge product-card__badge--trending">Trending</span>
                 <div class="product-card__media">
                   <img src="assets/section-class-trending/1.webp" alt="Frasco Allpa Essence Nº02, Bergamota Viva, familia cítrica" width="600" height="750" loading="lazy">
@@ -371,7 +371,7 @@
                 <button class="add-to-cart btn btn--outline" data-id="ae-02" data-name="Bergamota Viva Nº02" data-price="75" data-image="assets/section-class-trending/1.webp">Añadir</button>
               </li>
 
-              <li class="carousel__slide product-card" data-familia="oriental-especiada" data-flag="trending">
+              <li class="carousel__slide product-card" data-familia="especiado" data-flag="trending">
                 <span class="product-card__badge product-card__badge--trending">Trending</span>
                 <div class="product-card__media">
                   <img src="assets/section-class-trending/2.webp" alt="Frasco Allpa Essence Nº04, Oud Íntimo, familia oriental/especiada" width="600" height="750" loading="lazy">
@@ -382,7 +382,7 @@
                 <button class="add-to-cart btn btn--outline" data-id="ae-04" data-name="Oud Íntimo Nº04" data-price="90" data-image="assets/section-class-trending/2.webp">Añadir</button>
               </li>
 
-              <li class="carousel__slide product-card" data-familia="amaderada" data-flag="trending">
+              <li class="carousel__slide product-card" data-familia="amaderado" data-flag="trending">
                 <span class="product-card__badge product-card__badge--trending">Trending</span>
                 <div class="product-card__media">
                   <img src="assets/section-class-trending/3.webp" alt="Frasco Allpa Essence Nº06, Roble Nocturno, familia amaderada" width="600" height="750" loading="lazy">
@@ -434,7 +434,7 @@
         <p class="eyebrow">RECIÉN LLEGADOS</p>
         <h2 id="nuevos-titulo">Nuevos ingresos · primavera 2026</h2>
         <ul class="nuevos__grid" id="nuevos-grid">
-          <li class="carousel__slide product-card" data-familia="amaderada">
+          <li class="carousel__slide product-card" data-familia="amaderado">
             <span class="product-card__badge">Nuevo</span>
             <a class="product-card__link" href="producto.html?id=ae-10">
               <div class="product-card__media"><img src="assets/catalogo/amaderado/forhim/w3.webp" alt="[ALT_PENDIENTE — frasco Allpa Essence Nº10, familia amaderada]" width="600" height="750" loading="lazy"></div>
@@ -445,7 +445,7 @@
             <p class="product-card__price">S/. 75</p>
             <button type="button" class="add-to-cart btn btn--outline" data-id="ae-10" data-name="Ámbar Seco · Nº10" data-price="75" data-image="assets/catalogo/amaderado/forhim/w3.webp">Añadir</button>
           </li>
-          <li class="carousel__slide product-card" data-familia="amaderada">
+          <li class="carousel__slide product-card" data-familia="amaderado">
             <span class="product-card__badge">Nuevo</span>
             <a class="product-card__link" href="producto.html?id=ae-11">
               <div class="product-card__media"><img src="assets/catalogo/amaderado/forhim/w4.webp" alt="[ALT_PENDIENTE — frasco Allpa Essence Nº11, familia amaderada]" width="600" height="750" loading="lazy"></div>
@@ -456,7 +456,7 @@
             <p class="product-card__price">S/. 50</p>
             <button type="button" class="add-to-cart btn btn--outline" data-id="ae-11" data-name="Vetiver Salvaje · Nº11" data-price="50" data-image="assets/catalogo/amaderado/forhim/w4.webp">Añadir</button>
           </li>
-          <li class="carousel__slide product-card" data-familia="citrica">
+          <li class="carousel__slide product-card" data-familia="citrico">
             <span class="product-card__badge">Nuevo</span>
             <a class="product-card__link" href="producto.html?id=ae-12">
               <div class="product-card__media"><img src="assets/catalogo/citrico/forhim/c3.webp" alt="[ALT_PENDIENTE — frasco Allpa Essence Nº12, familia cítrica]" width="600" height="750" loading="lazy"></div>
@@ -467,7 +467,7 @@
             <p class="product-card__price">S/. 75</p>
             <button type="button" class="add-to-cart btn btn--outline" data-id="ae-12" data-name="Mandarina Dorada · Nº12" data-price="75" data-image="assets/catalogo/citrico/forhim/c3.webp">Añadir</button>
           </li>
-          <li class="carousel__slide product-card" data-familia="citrica">
+          <li class="carousel__slide product-card" data-familia="citrico">
             <span class="product-card__badge">Nuevo</span>
             <a class="product-card__link" href="producto.html?id=ae-13">
               <div class="product-card__media"><img src="assets/catalogo/citrico/forhim/c4.webp" alt="[ALT_PENDIENTE — frasco Allpa Essence Nº13, familia cítrica]" width="600" height="750" loading="lazy"></div>
@@ -500,7 +500,7 @@
             <p class="product-card__price">S/. 50</p>
             <button type="button" class="add-to-cart btn btn--outline" data-id="ae-15" data-name="Rosa Oscura · Nº15" data-price="50" data-image="assets/catalogo/floral/forhim/f4.webp">Añadir</button>
           </li>
-          <li class="carousel__slide product-card" data-familia="oriental-especiada">
+          <li class="carousel__slide product-card" data-familia="especiado">
             <span class="product-card__badge">Nuevo</span>
             <a class="product-card__link" href="producto.html?id=ae-16">
               <div class="product-card__media"><img src="assets/catalogo/oriental/forhim/o3.webp" alt="[ALT_PENDIENTE — frasco Allpa Essence Nº16, familia oriental/especiada]" width="600" height="750" loading="lazy"></div>
@@ -511,7 +511,7 @@
             <p class="product-card__price">S/. 50</p>
             <button type="button" class="add-to-cart btn btn--outline" data-id="ae-16" data-name="Sándalo Rojo · Nº16" data-price="50" data-image="assets/catalogo/oriental/forhim/o3.webp">Añadir</button>
           </li>
-          <li class="carousel__slide product-card" data-familia="oriental-especiada">
+          <li class="carousel__slide product-card" data-familia="especiado">
             <span class="product-card__badge">Nuevo</span>
             <a class="product-card__link" href="producto.html?id=ae-17">
               <div class="product-card__media"><img src="assets/catalogo/oriental/forhim/o4.webp" alt="[ALT_PENDIENTE — frasco Allpa Essence Nº17, familia oriental/especiada]" width="600" height="750" loading="lazy"></div>
@@ -831,11 +831,11 @@
         <p class="site-footer__policies-title">Catálogo</p>
         <a href="catalogo.html">Todas las fragancias</a>
         <a href="catalogo.html#filtro-genero">Regalos</a>
-        <a href="catalogo.html?familia=amaderada">Amaderadas</a>
-        <a href="catalogo.html?familia=citrica">Cítricas</a>
+        <a href="catalogo.html?familia=amaderado">Amaderadas</a>
+        <a href="catalogo.html?familia=citrico">Cítricas</a>
         <a href="catalogo.html?familia=floral">Florales</a>
-        <a href="catalogo.html?familia=oriental-especiada">Orientales y especiadas</a>
-        <a href="catalogo.html?familia=fresca-acuatica">Frescas y acuáticas</a>
+        <a href="catalogo.html?familia=especiado">Orientales y especiadas</a>
+        <a href="catalogo.html?familia=fresco">Frescas y acuáticas</a>
       </nav>
 
       <nav class="site-footer__col" aria-label="La marca">
