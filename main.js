@@ -581,12 +581,12 @@ async function initProductPage() {
 
   const addBtn = document.getElementById('btn-add-to-cart');
 
-  const tamanos = producto.tamanos || [{ ml: 50, precio: producto.precio }];
+  const tamanos = producto.tamanos || [{ ml: 30, precio: producto.precio }];
   const renderTamano = (size) => {
     const isMuestra = size === 'muestra';
-    const t = tamanos.find((x) => String(x.ml) === size) || tamanos.find((x) => x.ml === 50) || tamanos[0];
-    // 50 ml conserva el id base (es el formato de la oferta); los otros tamaños llevan sufijo y no entran en la oferta.
-    const id = isMuestra ? `${producto.id}-muestra` : (t.ml === 50 ? producto.id : `${producto.id}-${t.ml}ml`);
+    const t = tamanos.find((x) => String(x.ml) === size) || tamanos.find((x) => x.ml === 30) || tamanos[0];
+    // 30 ml conserva el id base (es el único formato de la oferta 3 por S/ 99); 50 y 100 ml llevan sufijo y no entran.
+    const id = isMuestra ? `${producto.id}-muestra` : (t.ml === 30 ? producto.id : `${producto.id}-${t.ml}ml`);
     const label = isMuestra ? 'Muestra' : `${t.ml} ml`;
     const price = isMuestra ? producto.precioMuestra : t.precio;
     setText('product-titulo', isMuestra ? `${producto.nombre} — Muestra` : producto.nombre);
@@ -602,14 +602,14 @@ async function initProductPage() {
     setText('buy-bar-price', document.getElementById('product-precio')?.textContent || '');
   };
 
-  renderTamano(initialIsMuestra ? 'muestra' : '50');
+  renderTamano(initialIsMuestra ? 'muestra' : '30');
   initProductExtras(producto, productos);
 
   // Copy deck AE-F7: el radio "Elige tu tamaño" reemplaza el link "Probar en muestra
   // antes" (#link-muestra) que ya no existe en el DOM — recalcula precio/id/nombre sin
   // recargar, mismo dato que antes leía de ?variant=muestra en la URL.
   const sizeOptions = document.querySelectorAll('[data-size-option]');
-  const initialSize = initialIsMuestra ? 'muestra' : '50';
+  const initialSize = initialIsMuestra ? 'muestra' : '30';
   sizeOptions.forEach((input) => {
     input.checked = input.value === initialSize;
     input.addEventListener('change', () => {
