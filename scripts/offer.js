@@ -6,7 +6,7 @@
 export const OFFER = {
   qty: 3,
   price: 99,
-  was: 150,
+  was: 195,
   end: '2026-11-18T23:59:59-05:00',
 };
 

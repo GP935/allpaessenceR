@@ -211,7 +211,7 @@ function renderCartOffer(items, totals) {
           node.querySelector('.cart-upsell__name').textContent = p.nombre;
           node.querySelector('.cart-upsell__price').textContent = p.precioDisplay;
           const btn = node.querySelector('.add-to-cart');
-          btn.dataset.id = p.id; btn.dataset.name = p.nombre; btn.dataset.price = String(p.precio); btn.dataset.image = p.imagen;
+          btn.dataset.id = p.id; btn.dataset.name = p.nombreCarrito || p.nombre; btn.dataset.price = String(p.precio); btn.dataset.image = p.imagen;
           list.appendChild(node);
         });
         upsell.hidden = picks.length === 0;
@@ -436,7 +436,7 @@ function buildCatalogItem(p) {
   li.querySelector('.product-item__desc').textContent = p.desc;
   li.querySelector('.product-item__price').textContent = p.precioDisplay;
   const btn = li.querySelector('.add-to-cart');
-  btn.dataset.id = p.id; btn.dataset.name = p.nombre; btn.dataset.price = String(p.precio); btn.dataset.image = p.imagen;
+  btn.dataset.id = p.id; btn.dataset.name = p.nombreCarrito || p.nombre; btn.dataset.price = String(p.precio); btn.dataset.image = p.imagen;
   return li;
 }
 
@@ -581,13 +581,20 @@ async function initProductPage() {
 
   const addBtn = document.getElementById('btn-add-to-cart');
 
-  const renderTamano = (isMuestra) => {
+  const tamanos = producto.tamanos || [{ ml: 50, precio: producto.precio }];
+  const renderTamano = (size) => {
+    const isMuestra = size === 'muestra';
+    const t = tamanos.find((x) => String(x.ml) === size) || tamanos.find((x) => x.ml === 50) || tamanos[0];
+    // 50 ml conserva el id base (es el formato de la oferta); los otros tamaños llevan sufijo y no entran en la oferta.
+    const id = isMuestra ? `${producto.id}-muestra` : (t.ml === 50 ? producto.id : `${producto.id}-${t.ml}ml`);
+    const label = isMuestra ? 'Muestra' : `${t.ml} ml`;
+    const price = isMuestra ? producto.precioMuestra : t.precio;
     setText('product-titulo', isMuestra ? `${producto.nombre} — Muestra` : producto.nombre);
-    setText('product-precio', isMuestra ? producto.precioMuestraDisplay : producto.precioDisplay);
+    setText('product-precio', isMuestra ? producto.precioMuestraDisplay : `S/ ${t.precio} · ${label}`);
     if (addBtn) {
-      addBtn.dataset.id = isMuestra ? `${producto.id}-muestra` : producto.id;
-      addBtn.dataset.name = isMuestra ? `${producto.nombre} — Muestra` : producto.nombre;
-      addBtn.dataset.price = String(isMuestra ? producto.precioMuestra : producto.precio);
+      addBtn.dataset.id = id;
+      addBtn.dataset.name = `${producto.nombre} · ${label}`;
+      addBtn.dataset.price = String(price);
       addBtn.dataset.image = producto.imagen;
     }
     // AE-R2: la barra sticky refleja nombre/precio vigentes (mismo texto que la ficha)
@@ -595,18 +602,18 @@ async function initProductPage() {
     setText('buy-bar-price', document.getElementById('product-precio')?.textContent || '');
   };
 
-  renderTamano(initialIsMuestra);
+  renderTamano(initialIsMuestra ? 'muestra' : '50');
   initProductExtras(producto, productos);
 
   // Copy deck AE-F7: el radio "Elige tu tamaño" reemplaza el link "Probar en muestra
   // antes" (#link-muestra) que ya no existe en el DOM — recalcula precio/id/nombre sin
   // recargar, mismo dato que antes leía de ?variant=muestra en la URL.
   const sizeOptions = document.querySelectorAll('[data-size-option]');
-  const initialSize = initialIsMuestra ? 'muestra' : 'completo';
+  const initialSize = initialIsMuestra ? 'muestra' : '50';
   sizeOptions.forEach((input) => {
     input.checked = input.value === initialSize;
     input.addEventListener('change', () => {
-      if (input.checked) renderTamano(input.value === 'muestra');
+      if (input.checked) renderTamano(input.value);
     });
   });
 }
@@ -781,7 +788,7 @@ function buildHomeCard(p, badgeText) {
   const badge = node.querySelector('.product-card__badge');
   if (badgeText) { badge.textContent = badgeText; badge.hidden = false; }
   const btn = node.querySelector('.add-to-cart');
-  btn.dataset.id = p.id; btn.dataset.name = p.nombre; btn.dataset.price = String(p.precio); btn.dataset.image = p.imagen;
+  btn.dataset.id = p.id; btn.dataset.name = p.nombreCarrito || p.nombre; btn.dataset.price = String(p.precio); btn.dataset.image = p.imagen;
   return node;
 }
 

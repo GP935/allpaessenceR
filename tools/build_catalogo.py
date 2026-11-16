@@ -20,7 +20,8 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT_IMG = os.path.join(ROOT, "assets", "catalogo", "f")
 os.makedirs(OUT_IMG, exist_ok=True)
 PRIORIDAD = {"catalogo": 0, "batch_3": 1, "batch_2": 2, "raiz": 3}
-PRECIO = 75  # placeholder
+PRECIO = 65  # 50 ml; tamaños reales de Paul: 30 ml S/ 45, 50 ml S/ 65, 100 ml S/ 95
+TAMANOS = [{"ml": 30, "precio": 45}, {"ml": 50, "precio": 65}, {"ml": 100, "precio": 95}]
 
 
 def strip(s):
@@ -148,7 +149,7 @@ for i, r in enumerate(elegidas, 1):
         "imagen": f"assets/catalogo/f/{pid}.webp",
         "genero": gen,
         "precio": PRECIO, "precioMuestra": 0,
-        "precioDisplay": f"S/ {PRECIO}", "precioMuestraDisplay": "[PRECIO_MUESTRA]",
+        "precioDisplay": f"S/ {PRECIO} · 50 ml", "tamanos": TAMANOS, "nombreCarrito": f"{nombre} · 50 ml", "precioMuestraDisplay": "[PRECIO_MUESTRA]",
         "flag": "", "nuevo": False,
         "notas": None, "duracion": None, "intensidad": None,
         "clasificacion": r["confianza"],
