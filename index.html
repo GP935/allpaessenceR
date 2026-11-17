@@ -594,45 +594,32 @@
         </ul>
       </div>
     </section>
-    <!-- ===== AE-R4 · "DEL LABORATORIO A TU CASA" + REELS WRAPPER (referencia: 3 piezas verticales tipo video bajo el título).
-         Subtítulo de Paul: "Esencias concentradas con dedicación". Cada .reel es un vídeo vertical 9:16: poner el archivo en
-         data-reel-src="assets/reels/N.mp4" y js muestra el botón de reproducir (sin src, queda el placeholder). Si Paul prefiere
-         incrustar Reels/TikTok (iframe), se sustituye el <video> dentro de .reel__frame. Mantiene las CTAs del brief v4. ===== -->
+    <!-- ===== AE-R4 · "DEL LABORATORIO A TU CASA" + REELS (3 vídeos verticales). Decisión de Paul 2026-11-17: se reproducen
+         SOLOS, mudos, en bucle y NO interactuables: sin botón de reproducir, sin controles, sin pausa al clic (<figure inert>
+         + aria-hidden: son decorativos). Archivos en assets/section-class-lab-navy/: *-web.mp4 (sin audio, optimizados;
+         los .mp4 originales siguen ahí, el 3.mp4 pesa 11 MB) + póster .webp. Falta: css (pointer-events:none, 9:16 con
+         object-fit:cover — 3.mp4 es 3:4) y js (initReels ya ignora estos .reel porque no tienen botón; opcional pausar fuera
+         de pantalla). Subtítulo de Paul: "Esencias concentradas con dedicación". ===== -->
     <section class="lab section--navy" aria-labelledby="journal-titulo">
       <div class="container">
         <p class="eyebrow">DETRÁS DE CADA FRASCO</p>
         <h2 id="journal-titulo">Del laboratorio a tu casa</h2>
         <p class="lab__sub">Esencias concentradas con dedicación</p>
         <div class="reels" data-reels>
-          <figure class="reel">
+          <figure class="reel" inert>
             <div class="reel__frame">
-              <video class="reel__video" muted loop playsinline preload="none" poster="assets/section-class-journal/1.webp" data-reel-src=""></video>
-              <button type="button" class="reel__play" aria-label="Reproducir video 1" hidden>
-                <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
-              </button>
-              <span class="reel__pending">[REEL_1_PENDIENTE]</span>
+              <video class="reel__video" src="assets/section-class-lab-navy/1-web.mp4" poster="assets/section-class-lab-navy/1.webp" autoplay muted loop playsinline preload="metadata" disablepictureinpicture disableremoteplayback aria-hidden="true" tabindex="-1"></video>
             </div>
-            <figcaption class="reel__caption">[REEL_TITULO_PENDIENTE]</figcaption>
           </figure>
-          <figure class="reel">
+          <figure class="reel" inert>
             <div class="reel__frame">
-              <video class="reel__video" muted loop playsinline preload="none" poster="assets/section-class-journal/2.webp" data-reel-src=""></video>
-              <button type="button" class="reel__play" aria-label="Reproducir video 2" hidden>
-                <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
-              </button>
-              <span class="reel__pending">[REEL_2_PENDIENTE]</span>
+              <video class="reel__video" src="assets/section-class-lab-navy/2-web.mp4" poster="assets/section-class-lab-navy/2.webp" autoplay muted loop playsinline preload="metadata" disablepictureinpicture disableremoteplayback aria-hidden="true" tabindex="-1"></video>
             </div>
-            <figcaption class="reel__caption">[REEL_TITULO_PENDIENTE]</figcaption>
           </figure>
-          <figure class="reel">
+          <figure class="reel" inert>
             <div class="reel__frame">
-              <video class="reel__video" muted loop playsinline preload="none" poster="assets/muestras/1.webp" data-reel-src=""></video>
-              <button type="button" class="reel__play" aria-label="Reproducir video 3" hidden>
-                <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
-              </button>
-              <span class="reel__pending">[REEL_3_PENDIENTE]</span>
+              <video class="reel__video" src="assets/section-class-lab-navy/3-web.mp4" poster="assets/section-class-lab-navy/3.webp" autoplay muted loop playsinline preload="metadata" disablepictureinpicture disableremoteplayback aria-hidden="true" tabindex="-1"></video>
             </div>
-            <figcaption class="reel__caption">[REEL_TITULO_PENDIENTE]</figcaption>
           </figure>
         </div>
       </div>
@@ -678,61 +665,69 @@
       </div>
     </section>
 
-    <!-- ===== AE-R4 · RESEÑAS AL FINAL DE LA PÁGINA (la referencia repite un 2º bloque de reseñas hacia el final: carrusel con foto,
-         "Leer más reseñas", "Escribir una reseña"). Mismo componente .review-card; js lo rellena desde data/resenas.json
-         (offset 3 = las siguientes a las del bloque "Hablan por nosotros"). "Leer más reseñas" → resenas.html (todas).
-         Cifras = PLACEHOLDER (data-placeholder-cifra). "Escribir una reseña": destino pendiente de Paul. ===== -->
-    <section class="reviews reviews--wall section--navy" aria-labelledby="reseñas-final-titulo">
+    <!-- ===== AE-R5 · MURO ANECDÓTICO (decisión de Paul 2026-11-17): reemplaza el 2º bloque de reseñas por fotos reales de
+         clientes con su compra, de la época del stand en el centro comercial. Enfoque anecdótico, no de reseña: sin
+         estrellas ni cifras. Ya NO lleva data-reviews-list (js no debe rellenarlo). Botones "Ver reseñas" y
+         "Escribir reseña" siempre visibles. Fotos (5) en assets/section-class-reviews-wall/
+         (los .jpg originales de 5 MB siguen ahí; el HTML usa los .webp). Carrusel = componente genérico .carousel (main.js lo engancha solo). Estilos: .memory-wall* pendientes de css (ver inbox/css.md). ===== -->
+    <section class="memory-wall reviews--wall section--navy" aria-labelledby="reseñas-final-titulo">
       <div class="container">
         <div class="reviews__head">
           <div>
-            <h2 id="reseñas-final-titulo" class="reviews__title">Reseñas de nuestros clientes</h2>
-            <div class="reviews__score reviews__score--sm">
-              <span class="reviews__score-num" data-rating-num data-placeholder-cifra>4,8</span>
-              <span class="reviews__score-stars" aria-hidden="true">★★★★★</span>
-              <p class="reviews__summary" data-rating-summary data-placeholder-cifra>Basado en +1.200 reseñas</p>
-            </div>
+            <h2 id="reseñas-final-titulo" class="reviews__title">Desde tiempos de pandemia con la mejor atención</h2>
+            <p class="memory-wall__lead">Agradecemos a todos por el gran apoyo que nos ha traído hasta lo que somos a día de hoy.</p>
           </div>
           <div class="reviews__actions">
-            <a href="resenas.html" class="btn btn--outline">Leer más reseñas</a>
-            <a href="RESENA_FORMULARIO_PENDIENTE" data-cta-pendiente="RESENA_FORMULARIO" class="btn btn--ghost">Escribir una reseña</a>
+            <a href="resenas.html" class="btn btn--outline">Ver reseñas</a>
+            <a href="RESENA_FORMULARIO_PENDIENTE" data-cta-pendiente="RESENA_FORMULARIO" class="btn btn--ghost">Escribir reseña</a>
           </div>
         </div>
-        <ul class="reviews__list" data-reviews-list data-reviews-offset="3" data-reviews-count="3">
-          <li>
-            <article class="review-card review-card--placeholder">
-              <div class="review-card__photo" data-review-photo>[FOTO_CLIENTE_PENDIENTE]</div>
-              <p class="review-card__stars" data-stars="" aria-label="[ESTRELLAS] de 5 estrellas"><span aria-hidden="true">☆☆☆☆☆</span></p>
-              <p class="review-card__text">[RESEÑA_TEXTO]</p>
-              <p class="review-card__meta"><span class="review-card__author">[RESEÑA_AUTOR]</span> <span class="review-card__verified" hidden>Compra verificada</span> <span class="review-card__product">[RESEÑA_PRODUCTO]</span> <time class="review-card__date" datetime="">[RESEÑA_FECHA]</time></p>
-            </article>
+        <div class="carousel memory-wall__carousel" data-carousel="memory-wall">
+          <div class="carousel__viewport">
+        <ul class="carousel__track memory-wall__list">
+          <li class="carousel__slide memory-wall__item">
+            <figure class="memory-wall__figure">
+              <img src="assets/section-class-reviews-wall/1.webp" alt="Clienta sonriendo con su bolsa Allpa Essence frente al stand del centro comercial" width="676" height="1200" loading="lazy">
+            </figure>
           </li>
-          <li>
-            <article class="review-card review-card--placeholder">
-              <div class="review-card__photo" data-review-photo>[FOTO_CLIENTE_PENDIENTE]</div>
-              <p class="review-card__stars" data-stars="" aria-label="[ESTRELLAS] de 5 estrellas"><span aria-hidden="true">☆☆☆☆☆</span></p>
-              <p class="review-card__text">[RESEÑA_TEXTO]</p>
-              <p class="review-card__meta"><span class="review-card__author">[RESEÑA_AUTOR]</span> <span class="review-card__verified" hidden>Compra verificada</span> <span class="review-card__product">[RESEÑA_PRODUCTO]</span> <time class="review-card__date" datetime="">[RESEÑA_FECHA]</time></p>
-            </article>
+          <li class="carousel__slide memory-wall__item">
+            <figure class="memory-wall__figure">
+              <img src="assets/section-class-reviews-wall/2.webp" alt="Clienta con mascarilla y bolsa rosa Allpa Essence junto al stand de madera" width="1200" height="676" loading="lazy">
+            </figure>
           </li>
-          <li>
-            <article class="review-card review-card--placeholder">
-              <div class="review-card__photo" data-review-photo>[FOTO_CLIENTE_PENDIENTE]</div>
-              <p class="review-card__stars" data-stars="" aria-label="[ESTRELLAS] de 5 estrellas"><span aria-hidden="true">☆☆☆☆☆</span></p>
-              <p class="review-card__text">[RESEÑA_TEXTO]</p>
-              <p class="review-card__meta"><span class="review-card__author">[RESEÑA_AUTOR]</span> <span class="review-card__verified" hidden>Compra verificada</span> <span class="review-card__product">[RESEÑA_PRODUCTO]</span> <time class="review-card__date" datetime="">[RESEÑA_FECHA]</time></p>
-            </article>
+          <li class="carousel__slide memory-wall__item">
+            <figure class="memory-wall__figure">
+              <img src="assets/section-class-reviews-wall/3.webp" alt="Clienta con mascarilla y su compra frente al stand Allpa Essence" width="676" height="1200" loading="lazy">
+            </figure>
+          </li>
+          <li class="carousel__slide memory-wall__item">
+            <figure class="memory-wall__figure">
+              <img src="assets/section-class-reviews-wall/4.webp" alt="Pareja de clientes con mascarilla y bolsas de regalo frente al stand Allpa Essence" width="676" height="1200" loading="lazy">
+            </figure>
+          </li>
+          <li class="carousel__slide memory-wall__item">
+            <figure class="memory-wall__figure">
+              <img src="assets/section-class-reviews-wall/5.webp" alt="Cliente con gorra mostrando su bolsa Allpa Essence frente a los perfumes del stand" width="676" height="1200" loading="lazy">
+            </figure>
           </li>
         </ul>
+          </div>
+          <button type="button" class="carousel__arrow carousel__arrow--prev" data-carousel-prev aria-label="Foto anterior" hidden>
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+          </button>
+          <button type="button" class="carousel__arrow carousel__arrow--next" data-carousel-next aria-label="Foto siguiente" hidden>
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+        </div>
       </div>
     </section>
     <!-- ===== AE-R6 · REDES (mismo patrón que AP Beauty: @usuario + botones "Síguenos en…" + rejilla de posts que enlaza al perfil).
-         Usuario/URLs PENDIENTES de Paul (data-cta-pendiente). Fotos de la rejilla = TEMPORALES (catálogo); sustituir por los posts reales.
+         Usuario oficial confirmado por Paul 2026-11-17: @allpaessence (URLs reales ya puestas). Fotos de la rejilla = TEMPORALES (catálogo); sustituir por los posts reales.
          TikTok primero: el live es el canal principal. ===== -->
     <section class="insta" aria-labelledby="insta-titulo">
       <div class="container">
         <p class="eyebrow">SÍGUENOS</p>
-        <h2 class="insta-handle" id="insta-titulo">@[USUARIO_PENDIENTE]</h2>
+        <h2 class="insta-handle" id="insta-titulo">@allpaessence</h2>
         <p class="insta-text">Lives, lanzamientos y fragancias en acción. Entra y cuéntanos cuál es la tuya.</p>
         <div class="insta-links">
           <a href="https://www.tiktok.com/@allpaessence.oficial" class="insta-link" target="_blank" rel="noopener noreferrer">Síguenos en TikTok</a>
