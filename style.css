@@ -812,6 +812,9 @@ section.principio .eyebrow,
 .marquee__group li { padding: 12px 28px; white-space: nowrap; font: 600 .74rem/1 var(--font-body); letter-spacing: .16em; text-transform: uppercase; }
 .marquee__group li::after { content: "✦"; margin-left: 56px; color: var(--color-silver-text); }
 .marquee__group li[hidden] { display: none; }
+/* Móvil: un max-width:100% global capaba track/grupo al viewport y aplastaba los textos. */
+.marquee__track, .marquee__group, .marquee__group li { max-width: none; }
+.marquee__group li { flex: none; }
 @keyframes marquee-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 .marquee:hover .marquee__track { animation-play-state: paused; }
 @media (prefers-reduced-motion: reduce) { .marquee { overflow-x: auto; } .marquee__track { animation: none; } .marquee__group[aria-hidden="true"] { display: none; } }
@@ -871,7 +874,7 @@ body.has-buy-bar .whatsapp-float { bottom: 98px; }
 .rating-bar__stars { color: var(--color-ink); }
 
 .new-arrival { overflow: hidden; background: var(--color-navy); border-block: 1px solid var(--color-navy); }
-.new-arrival__track { display: flex; width: max-content; animation: marquee-scroll 60s linear infinite reverse; }
+.new-arrival__track { display: flex; width: max-content; max-width: none; animation: marquee-scroll 60s linear infinite reverse; }
 .new-arrival__group { display: flex; flex: none; margin: 0; max-width: none; width: max-content; }
 .new-arrival__group span {
   padding: 14px 34px; white-space: nowrap; font: 800 clamp(2.2rem, 6vw, 4.2rem)/1 var(--font-display);
