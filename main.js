@@ -865,6 +865,8 @@ function initPendingLinks() {
     if (link) e.preventDefault();
   });
 }
+// Prioridad en la pestana "Para ella" del home (ids de data/productos.json). Editable.
+const INICIO_ELLA = ['ae-210', 'ae-219', 'ae-237', 'ae-289', 'ae-310', 'ae-181', 'ae-258', 'ae-175'];
 async function initHomePage() {
   if (document.body.dataset.page === 'resenas') { initProductReviews(null); return; }
   if (document.body.dataset.page !== 'home' && document.body.dataset.page !== 'index' && !document.getElementById('trending-track')) return;
@@ -875,7 +877,12 @@ async function initHomePage() {
     const tabs = document.querySelectorAll('[data-tabs="favoritos"] [data-tab]');
     const pick = (tab) => {
       if (tab === 'favoritos') return productos.filter((p) => p.flag === 'bestseller' || p.flag === 'trending').slice(0, 4);
-      return productos.filter((p) => p.genero === tab).slice(0, 4);
+      const lista = productos.filter((p) => p.genero === tab);
+      if (tab !== 'para-ella') return lista.slice(0, 4);
+      // "Para ella": primero las fichas elegidas por Paul con el frasco transparente del color de la esencia
+      // (imagenes nuevas, mas femeninas); el resto sigue el orden del catalogo.
+      const idx = (p) => { const i = INICIO_ELLA.indexOf(p.id); return i === -1 ? 99 : i; };
+      return lista.map((p, i) => [p, i]).sort((a, b) => (idx(a[0]) - idx(b[0])) || a[1] - b[1]).map((x) => x[0]).slice(0, 4);
     };
     const renderTab = (tab) => {
       if (!track) return;
