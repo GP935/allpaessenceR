@@ -304,3 +304,14 @@ Tareas AE-R* **aún no registradas** en `_sistema/pipeline.md` ni en los inbox. 
 - **Eliminados:** bloque "promesa" y banner partido.
 - **Nuevos:** banner tipográfico "Nuevos ingresos" + "Recién llegados" (8 con etiqueta NUEVO, botón "Ver todos los nuevos") · "Hablan por nosotros" (nota + nº de reseñas placeholder + tarjetas para las reseñas en texto) · trust grid debajo (Clientes reales / Envío / Pago seguro / Cambios y devoluciones, adaptado) · "Del laboratorio a tu casa" con subtítulo "Esencias concentradas con dedicación" y **reels wrapper** (3 vídeos verticales 9:16; poner `data-reel-src` en cada `<video>`).
 - **Orden final del home:** valoración → hero → buscador → marquee → favoritos → nuevos ingresos → hablan por nosotros → trust grid → laboratorio/reels → familias → skincare → por qué Allpa → muestras → aviso legal.
+---
+
+## Datos de contacto y redes (confirmados 2026-11-17)
+
+| Canal | Dato | URL usada en HTML |
+|-------|------|-------------------|
+| Instagram | @allpaessence | https://www.instagram.com/allpaessence/ |
+| WhatsApp | 929 033 871 | https://wa.me/51929033871 |
+| TikTok | allpaessence.oficial | https://www.tiktok.com/@allpaessence.oficial |
+
+Aplicado por front en los 9 HTML (footer, botón flotante, contacto): se retiraron los `*_PENDIENTE` y `data-cta-pendiente` de estos tres canales. Siguen pendientes EMAIL, YOUTUBE y el resto de placeholders.

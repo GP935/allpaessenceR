@@ -1,11 +1,12 @@
 // main.js — Allpa Essence (AE-J1). Contrato completo: header/menú móvil, dropdown de
 // catálogo, carrito (drawer + página), carrusel genérico ×3, filtro de catálogo por
 // familia, plantilla de producto por ?id=, estado de confirmación por ?estado=.
-// Checkout: sin credenciales de Mercado Pago todavía (ver allpaessence.txt) — el Brick
-// real se monta cuando existan, mismo patrón que AP-J2 de AP Beauty.
+// Checkout: Mercado Pago Card Payment Brick (mismo patrón que AP-J2 de AP Beauty), activado
+// por el interruptor del backend (GET /api/market).
 
 import { cartStore } from './scripts/cart.js';
 import { OFFER, getOfferEnd, computeCartTotals } from './scripts/offer.js';
+import { loadStock, availableFor, stockLabel, isLowEnoughToShow, baseId } from './scripts/stock.js';
 
 const priceFormatter = new Intl.NumberFormat('es-PE', { style: 'currency', currency: 'PEN' });
 
@@ -209,9 +210,9 @@ function renderCartOffer(items, totals) {
           const im = node.querySelector('.cart-upsell__img');
           im.src = p.imagen; im.alt = p.alt;
           node.querySelector('.cart-upsell__name').textContent = p.nombre;
-          node.querySelector('.cart-upsell__price').textContent = p.precioDisplay;
+          node.querySelector('.cart-upsell__price').textContent = displayPrice(p);
           const btn = node.querySelector('.add-to-cart');
-          btn.dataset.id = p.id; btn.dataset.name = p.nombreCarrito || p.nombre; btn.dataset.price = String(p.precio); btn.dataset.image = p.imagen;
+          btn.dataset.id = p.id; btn.dataset.name = p.nombreCarrito || p.nombre; btn.dataset.price = String(basePrice(p)); btn.dataset.image = p.imagen;
           list.appendChild(node);
         });
         upsell.hidden = picks.length === 0;
@@ -255,6 +256,7 @@ function initCartRendering() {
       if (drawerTotal) drawerTotal.textContent = total;
       renderCartOffer(items, totals);
     }
+    applyCartCaps();
 
     if (pageList) {
       renderCartLines(pageList, items);
@@ -283,9 +285,23 @@ function initCartActions() {
   document.addEventListener('click', (e) => {
     const addBtn = e.target.closest('.add-to-cart');
     if (addBtn) {
+      if (addBtn.disabled || addBtn.dataset.agotado) return;
       // AE-R2: en la ficha el botón principal respeta el selector de cantidad (1-99)
       const qtyInput = addBtn.id === 'btn-add-to-cart' ? document.getElementById('product-qty') : null;
-      const times = qtyInput ? Math.min(99, Math.max(1, parseInt(qtyInput.value, 10) || 1)) : 1;
+      let times = qtyInput ? Math.min(99, Math.max(1, parseInt(qtyInput.value, 10) || 1)) : 1;
+      // Tope por stock (AE-J5): descuenta lo que ya hay en el carrito; el rechazo no depende del botón.
+      const avail = availableFor(addBtn.dataset.id);
+      if (avail !== undefined) {
+        const inCart = (cartStore.getItems().find((i) => i.id === addBtn.dataset.id) || { qty: 0 }).qty;
+        times = Math.min(times, Math.max(0, avail - inCart));
+      }
+      if (times <= 0) {
+        const prev = addBtn.textContent;
+        addBtn.textContent = 'Máximo disponible';
+        setTimeout(() => { if (addBtn.textContent === 'Máximo disponible') addBtn.textContent = prev; }, 1800);
+        openCartDrawer();
+        return;
+      }
       for (let i = 0; i < times; i += 1) {
         cartStore.addItem({
           id: addBtn.dataset.id,
@@ -301,7 +317,13 @@ function initCartActions() {
     const qtyBtn = e.target.closest('.qty-btn');
     if (qtyBtn) {
       const line = qtyBtn.closest('.cart-line');
-      if (line) cartStore.updateQty(line.dataset.id, qtyBtn.dataset.action === 'inc' ? 1 : -1);
+      if (line) {
+        const inc = qtyBtn.dataset.action === 'inc';
+        const avail = availableFor(line.dataset.id);
+        const cur = (cartStore.getItems().find((i) => i.id === line.dataset.id) || { qty: 0 }).qty;
+        if (inc && avail !== undefined && cur >= avail) return;
+        cartStore.updateQty(line.dataset.id, inc ? 1 : -1);
+      }
       return;
     }
 
@@ -314,14 +336,11 @@ function initCartActions() {
 }
 
 /* --------------------------------------------------------------------------
-   Carrusel genérico (handoff front AE-F4) — reutilizado por trending/nuevo/
-   familias. Flechas: prev/next miden un slide+gap y hacen scrollBy. Contador
-   (solo familia-carousel, AE-C17 — reemplaza los dots que había antes):
-   IntersectionObserver detecta el slide visible y actualiza el numerador
-   "n/total"; ya no hay click-to-jump por punto, la navegación queda solo en
-   las flechas. Trending/nuevo llegan con flechas [hidden] desde el HTML
-   (mockup sin overflow en desktop) — un ResizeObserver las revela solo si el
-   track realmente desborda el viewport.
+   Carrusel genérico (handoff front AE-F4) — hoy solo lo usa trending/favoritos.
+   Flechas: prev/next miden un slide+gap y hacen scrollBy. Llegan [hidden] desde el
+   HTML (mockup sin overflow en desktop) — un ResizeObserver las revela solo si el
+   track realmente desborda el viewport. (Contador y modo peek del carrusel de
+   familias retirados en AE-J7, tras AE-R7.)
    -------------------------------------------------------------------------- */
 function setUpCarousel(root) {
   const viewport = root.querySelector('.carousel__viewport');
@@ -329,8 +348,6 @@ function setUpCarousel(root) {
   if (!viewport || !track) return;
   const prevBtn = root.querySelector('[data-carousel-prev]');
   const nextBtn = root.querySelector('[data-carousel-next]');
-  const counter = root.querySelector('[data-carousel-counter]');
-  const isPeek = root.classList.contains('carousel--peek');
 
   const scrollByStep = (dir) => {
     const slide = track.querySelector('.carousel__slide');
@@ -347,27 +364,7 @@ function setUpCarousel(root) {
   prevBtn?.addEventListener('click', () => scrollByStep(-1));
   nextBtn?.addEventListener('click', () => scrollByStep(1));
 
-  const slides = track.querySelectorAll('.carousel__slide');
-
-  if (counter) {
-    const currentEl = counter.querySelector('[data-carousel-counter-current]');
-    const totalEl = counter.querySelector('[data-carousel-counter-total]');
-    if (totalEl) totalEl.textContent = String(slides.length);
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (!entry.isIntersecting) return;
-          const index = Array.from(slides).indexOf(entry.target);
-          if (index === -1 || !currentEl) return;
-          currentEl.textContent = String(index + 1);
-        });
-      },
-      { root: viewport, threshold: 0.6 }
-    );
-    slides.forEach((slide) => observer.observe(slide));
-  }
-
-  if (!isPeek && (prevBtn || nextBtn)) {
+  if (prevBtn || nextBtn) {
     const updateArrows = () => {
       const overflow = track.scrollWidth > viewport.clientWidth + 2;
       if (prevBtn) prevBtn.hidden = !overflow;
@@ -376,6 +373,39 @@ function setUpCarousel(root) {
     updateArrows();
     new ResizeObserver(updateArrows).observe(viewport);
   }
+
+  if (AUTOPLAY_CAROUSELS.has(root.dataset.carousel)) setUpCarouselAutoplay(root, viewport, track);
+}
+
+// Carruseles con autoavance (AE-R5: muro anecdótico). Opt-in por nombre de data-carousel.
+const AUTOPLAY_CAROUSELS = new Set(['memory-wall']);
+const AUTOPLAY_MS = 4500;
+
+function setUpCarouselAutoplay(root, viewport, track) {
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+  let paused = false;
+  const pause = () => { paused = true; };
+  const resume = () => { paused = false; };
+
+  root.addEventListener('mouseenter', pause);
+  root.addEventListener('mouseleave', resume);
+  root.addEventListener('focusin', pause);
+  root.addEventListener('focusout', resume);
+  root.addEventListener('touchstart', pause, { passive: true });
+  root.addEventListener('touchend', () => setTimeout(resume, AUTOPLAY_MS), { passive: true });
+
+  setInterval(() => {
+    if (paused || reduce.matches || document.hidden) return;
+    if (track.scrollWidth <= viewport.clientWidth + 2) return;
+    const rect = root.getBoundingClientRect();
+    if (rect.bottom < 0 || rect.top > window.innerHeight) return;
+    const slide = track.querySelector('.carousel__slide');
+    if (!slide) return;
+    const gap = parseFloat(getComputedStyle(track).columnGap || '0') || 0;
+    const atEnd = viewport.scrollLeft + viewport.clientWidth >= track.scrollWidth - 4;
+    // Mover solo scrollLeft del viewport: nunca scrollIntoView (movería la página).
+    viewport.scrollTo({ left: atEnd ? 0 : viewport.scrollLeft + slide.getBoundingClientRect().width + gap, behavior: 'auto' });
+  }, AUTOPLAY_MS);
 }
 
 function initCarousels() {
@@ -403,13 +433,73 @@ function searchTokens(s) {
 }
 function buildSearchIndex(productos) {
   productos.forEach((p) => {
-    p._tok = searchTokens(`${p.nombre} ${p.ref || ''} ${(p.familiasLabel || []).join(' ')}`);
+    p._nameTok = searchTokens(p.nombre);
+    p._tok = p._nameTok.concat(searchTokens(`${p.ref || ''} ${(p.familiasLabel || []).join(' ')}`));
   });
 }
-function matchesSearch(p, qTokens) {
-  if (!qTokens.length) return true;
-  const hay = p._tok || [];
-  return qTokens.every((q) => hay.some((t) => t.startsWith(q)));
+// Distancia de Levenshtein acotada (corta en cuanto supera max).
+function editDistance(a, b, max) {
+  if (Math.abs(a.length - b.length) > max) return max + 1;
+  let prev = Array.from({ length: b.length + 1 }, (_, i) => i);
+  for (let i = 1; i <= a.length; i += 1) {
+    const cur = [i];
+    let rowMin = i;
+    for (let j = 1; j <= b.length; j += 1) {
+      cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+      if (cur[j] < rowMin) rowMin = cur[j];
+    }
+    if (rowMin > max) return max + 1;
+    prev = cur;
+  }
+  return prev[b.length];
+}
+// Puntaje por token de la consulta: palabra exacta > prefijo > typo tolerado; el nombre propio pesa más que la ref.
+function tokenScore(q, p, fuzzy) {
+  let best = 0;
+  const check = (tokens, w) => {
+    for (const t of tokens) {
+      let sc = 0;
+      if (t === q) sc = 3;
+      else if (t.startsWith(q)) sc = 2;
+      else if (fuzzy && q.length >= 4) {
+        const max = q.length >= 7 ? 2 : 1;
+        if (editDistance(q, t.slice(0, q.length + 1), max) <= max || editDistance(q, t, max) <= max) sc = 1;
+      }
+      if (sc * w > best) best = sc * w;
+    }
+  };
+  check(p._nameTok || [], 2);
+  check(p._tok || [], 1);
+  return best;
+}
+// Devuelve null si no coincide, o el puntaje total (AND entre tokens).
+function searchScore(p, qTokens, fuzzy) {
+  let total = 0;
+  for (const q of qTokens) {
+    const sc = tokenScore(q, p, fuzzy);
+    if (!sc) return null;
+    total += sc;
+  }
+  return total;
+}
+function searchProducts(productos, qTokens) {
+  if (!qTokens.length) return productos.map((p) => ({ p, score: 0 }));
+  let hits = [];
+  for (const fuzzy of [false, true]) {
+    hits = [];
+    productos.forEach((p) => { const score = searchScore(p, qTokens, fuzzy); if (score !== null) hits.push({ p, score }); });
+    if (hits.length) break;
+  }
+  return hits;
+}
+
+// Única fuente de precio: productos.json -> tamanos[30 ml]. precio/precioDisplay del JSON se ignoran para pintar.
+function basePrice(p) {
+  const t = (p.tamanos || []).find((x) => x.ml === 30) || (p.tamanos || [])[0];
+  return t ? t.precio : p.precio;
+}
+function displayPrice(p) {
+  return `S/ ${basePrice(p)} · 30 ml`;
 }
 
 function buildCatalogItem(p) {
@@ -434,9 +524,9 @@ function buildCatalogItem(p) {
   li.querySelector('.product-item__familia').textContent = (p.familiasLabel || [p.familiaLabel]).slice(0, 2).join(' · ');
   li.querySelector('.product-item__name').textContent = p.nombre;
   li.querySelector('.product-item__desc').textContent = p.desc;
-  li.querySelector('.product-item__price').textContent = p.precioDisplay;
+  li.querySelector('.product-item__price').textContent = displayPrice(p);
   const btn = li.querySelector('.add-to-cart');
-  btn.dataset.id = p.id; btn.dataset.name = p.nombreCarrito || p.nombre; btn.dataset.price = String(p.precio); btn.dataset.image = p.imagen;
+  btn.dataset.id = p.id; btn.dataset.name = p.nombreCarrito || p.nombre; btn.dataset.price = String(basePrice(p)); btn.dataset.image = p.imagen;
   return li;
 }
 
@@ -455,24 +545,37 @@ async function initCatalogFilter() {
   const countEl = document.getElementById('catalog-count');
   const state = { familia: '', genero: '', q: '', shown: PAGE };
 
-  const sorted = (list) => {
+  const sorted = (hits) => {
     const v = sortSel ? sortSel.value : 'destacados';
-    const arr = list.map((p, i) => [p, i]);
+    const arr = hits.map((h, i) => [h.p, i, h.score]);
     const rank = (p) => (p.flag === 'bestseller' ? 0 : p.flag === 'trending' ? 1 : p.nuevo ? 2 : 3);
     if (v === 'nuevos') arr.sort((a, b) => (Number(b[0].nuevo) - Number(a[0].nuevo)) || b[0].id.localeCompare(a[0].id));
-    else if (v === 'precio-asc') arr.sort((a, b) => a[0].precio - b[0].precio || a[1] - b[1]);
-    else if (v === 'precio-desc') arr.sort((a, b) => b[0].precio - a[0].precio || a[1] - b[1]);
-    else arr.sort((a, b) => rank(a[0]) - rank(b[0]) || a[1] - b[1]);
+    else if (v === 'precio-asc') arr.sort((a, b) => basePrice(a[0]) - basePrice(b[0]) || a[1] - b[1]);
+    else if (v === 'precio-desc') arr.sort((a, b) => basePrice(b[0]) - basePrice(a[0]) || a[1] - b[1]);
+    else arr.sort((a, b) => (b[2] - a[2]) || rank(a[0]) - rank(b[0]) || a[1] - b[1]);
     return arr.map((x) => x[0]);
   };
 
+  // Render incremental: si solo crece "Ver más", se añaden las tarjetas nuevas sin repintar las existentes.
+  let lastKey = null;
+  let renderedCount = 0;
   const render = () => {
     const qTokens = searchTokens(state.q);
-    const list = sorted(productos.filter((p) =>
+    const base = productos.filter((p) =>
       (!state.familia || (p.familias || [p.familia]).includes(state.familia)) &&
-      (!state.genero || p.genero === state.genero) &&
-      matchesSearch(p, qTokens)));
-    grid.replaceChildren(...list.slice(0, state.shown).map(buildCatalogItem));
+      (!state.genero || p.genero === state.genero));
+    const list = sorted(searchProducts(base, qTokens));
+    const key = `${state.familia}|${state.genero}|${qTokens.join(' ')}|${sortSel ? sortSel.value : ''}`;
+    const slice = list.slice(0, state.shown);
+    if (key === lastKey && slice.length >= renderedCount) {
+      const frag = document.createDocumentFragment();
+      slice.slice(renderedCount).forEach((p) => frag.appendChild(buildCatalogItem(p)));
+      grid.appendChild(frag);
+    } else {
+      grid.replaceChildren(...slice.map(buildCatalogItem));
+    }
+    lastKey = key;
+    renderedCount = slice.length;
     applyStockTags(grid);
     if (countEl) countEl.textContent = list.length === 1 ? '1 fragancia' : `${list.length} fragancias`;
     if (emptyEl) emptyEl.hidden = list.length > 0;
@@ -600,6 +703,7 @@ async function initProductPage() {
     // AE-R2: la barra sticky refleja nombre/precio vigentes (mismo texto que la ficha)
     setText('buy-bar-name', document.getElementById('product-titulo')?.textContent || '');
     setText('buy-bar-price', document.getElementById('product-precio')?.textContent || '');
+    refreshProductStock();
   };
 
   renderTamano(initialIsMuestra ? 'muestra' : '30');
@@ -640,7 +744,7 @@ function initProductExtras(producto, productos) {
 
   // Cantidad
   const qty = document.getElementById('product-qty');
-  const clampQty = () => { qty.value = String(Math.min(99, Math.max(1, parseInt(qty.value, 10) || 1))); };
+  const clampQty = () => { qty.value = String(Math.min(Number(qty.max) || 99, Math.max(1, parseInt(qty.value, 10) || 1))); };
   if (qty) {
     document.querySelector('[data-qty-dec]')?.addEventListener('click', () => { qty.value = String((parseInt(qty.value, 10) || 1) - 1); clampQty(); });
     document.querySelector('[data-qty-inc]')?.addEventListener('click', () => { qty.value = String((parseInt(qty.value, 10) || 1) + 1); clampQty(); });
@@ -693,7 +797,7 @@ function initProductExtras(producto, productos) {
       im.src = p.imagen; im.alt = p.alt;
       node.querySelector('.related-card__familia').textContent = p.familiaLabel;
       node.querySelector('.related-card__name').textContent = p.nombre;
-      node.querySelector('.related-card__price').textContent = p.precioDisplay;
+      node.querySelector('.related-card__price').textContent = displayPrice(p);
       grid.appendChild(node);
     });
     if (rel.length) document.querySelector('.related')?.removeAttribute('hidden');
@@ -726,26 +830,131 @@ function fillReviewList(list, tpl, source) {
   });
 }
 
+let reviewsCache = null;
+async function loadReviewsOnce() {
+  if (reviewsCache) return reviewsCache;
+  try {
+    const res = await fetch('data/resenas.json', { cache: 'no-cache' });
+    const json = res.ok ? await res.json() : [];
+    reviewsCache = Array.isArray(json) ? json : [];
+  } catch {
+    reviewsCache = [];
+  }
+  return reviewsCache;
+}
+
+// Valoración por tarjeta: media de las reseñas que citan el id en `productos` (SKU base). Sin reseñas, queda oculta.
+async function applyCardRatings(root = document) {
+  const items = await loadReviewsOnce();
+  if (!items.length) return;
+  root.querySelectorAll('[data-card-rating]').forEach((el) => {
+    const id = el.closest('.product-card')?.querySelector('.add-to-cart')?.dataset.id;
+    if (!id) return;
+    const own = items.filter((r) => Array.isArray(r.productos) && r.productos.includes(baseId(id)) && Number(r.estrellas) > 0);
+    if (!own.length) return;
+    const avg = own.reduce((s, r) => s + Number(r.estrellas), 0) / own.length;
+    el.textContent = `★ ${avg.toFixed(1).replace('.', ',')} (${own.length})`;
+    el.hidden = false;
+  });
+}
+
+// Carrusel con flechas para las listas de reseñas del home/ficha. Las flechas solo aparecen si la lista desborda.
+function setUpReviewCarousel(list) {
+  if (list.dataset.carousel) return;
+  list.dataset.carousel = '1';
+  list.classList.add('reviews__list--carousel');
+  const nav = document.createElement('div');
+  nav.className = 'reviews__nav';
+  nav.hidden = true;
+  nav.innerHTML = '<button type="button" class="reviews__nav-btn" data-dir="-1" aria-label="Reseñas anteriores">‹</button><button type="button" class="reviews__nav-btn" data-dir="1" aria-label="Reseñas siguientes">›</button>';
+  list.after(nav);
+  const step = () => (list.firstElementChild ? list.firstElementChild.getBoundingClientRect().width + 20 : list.clientWidth);
+  nav.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-dir]');
+    if (b) list.scrollBy({ left: Number(b.dataset.dir) * step(), behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+  });
+  const update = () => {
+    nav.hidden = list.scrollWidth <= list.clientWidth + 4;
+    const [prev, next] = nav.querySelectorAll('button');
+    prev.disabled = list.scrollLeft <= 2;
+    next.disabled = list.scrollLeft + list.clientWidth >= list.scrollWidth - 2;
+  };
+  list.addEventListener('scroll', update, { passive: true });
+  if ('ResizeObserver' in window) new ResizeObserver(update).observe(list);
+  window.addEventListener('resize', update);
+  update();
+}
+
+// Página de todas las reseñas: filtro por estrellas + "Cargar más".
+function setUpReviewsAll(list, tpl, items) {
+  const PAGE = 9;
+  const sorted = items.slice().sort((a, b) => String(b.fecha || '').localeCompare(String(a.fecha || '')));
+  const state = { stars: 0, shown: PAGE };
+  const counts = [0, 0, 0, 0, 0, 0];
+  sorted.forEach((r) => { const s = Math.min(5, Math.max(0, Number(r.estrellas) || 0)); counts[s] += 1; });
+
+  const bar = document.createElement('div');
+  bar.className = 'reviews-filter';
+  bar.setAttribute('role', 'group');
+  bar.setAttribute('aria-label', 'Filtrar reseñas por estrellas');
+  const mk = (stars, label) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'reviews-filter__btn';
+    b.dataset.stars = String(stars);
+    b.textContent = label;
+    return b;
+  };
+  bar.appendChild(mk(0, `Todas (${sorted.length})`));
+  for (let s = 5; s >= 1; s -= 1) if (counts[s]) bar.appendChild(mk(s, `${s} ★ (${counts[s]})`));
+  const status = document.createElement('p');
+  status.className = 'reviews-filter__status';
+  status.setAttribute('role', 'status');
+  const more = document.createElement('button');
+  more.type = 'button';
+  more.className = 'btn btn--outline reviews-more';
+  more.textContent = 'Cargar más reseñas';
+  list.before(bar, status);
+  list.after(more);
+
+  const render = () => {
+    const filtered = state.stars ? sorted.filter((r) => Math.round(Number(r.estrellas) || 0) === state.stars) : sorted;
+    fillReviewList(list, tpl, filtered.slice(0, state.shown));
+    more.hidden = filtered.length <= state.shown;
+    status.textContent = `Mostrando ${Math.min(state.shown, filtered.length)} de ${filtered.length} reseñas`;
+    bar.querySelectorAll('[data-stars]').forEach((b) => {
+      const on = Number(b.dataset.stars) === state.stars;
+      b.classList.toggle('is-active', on);
+      b.setAttribute('aria-pressed', String(on));
+    });
+  };
+  bar.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-stars]');
+    if (!b) return;
+    state.stars = Number(b.dataset.stars);
+    state.shown = PAGE;
+    render();
+  });
+  more.addEventListener('click', () => { state.shown += PAGE; render(); });
+  render();
+}
+
 async function initProductReviews(producto) {
   const lists = [...document.querySelectorAll('#reviews-list, [data-reviews-list], [data-reviews-all]')];
   const tpl = document.getElementById('review-card-tpl');
   if (!lists.length || !tpl) return;
-  let items;
-  try {
-    const res = await fetch('data/resenas.json');
-    if (!res.ok) return;
-    items = await res.json();
-  } catch { return; }
-  if (!Array.isArray(items) || !items.length) return;
+  const items = await loadReviewsOnce();
+  if (!items.length) return;
 
   const own = producto ? items.filter((r) => !r.productos || r.productos.includes(producto.id)) : items;
   const pool = own.length ? own : items;
   lists.forEach((list) => {
-    if (list.hasAttribute('data-reviews-all')) { fillReviewList(list, tpl, items); return; }
+    if (list.hasAttribute('data-reviews-all')) { setUpReviewsAll(list, tpl, items); return; }
     const offset = parseInt(list.dataset.reviewsOffset, 10) || 0;
     const count = parseInt(list.dataset.reviewsCount, 10) || 6;
     const slice = pool.slice(offset, offset + count);
     fillReviewList(list, tpl, slice.length ? slice : pool.slice(0, count));
+    setUpReviewCarousel(list);
   });
 
   // Valoración global (solo con datos reales)
@@ -763,8 +972,28 @@ async function initProductReviews(producto) {
     });
     const bar = document.querySelector('[data-rating-bar]');
     if (bar) { bar.querySelector('[data-rating-bar-text]').textContent = `${avgText}/5 · Basado en ${rated.length} opiniones`; bar.hidden = false; }
-    document.querySelectorAll('[data-placeholder-cifra]').forEach((el) => el.removeAttribute('data-placeholder-cifra'));
+    // Solo se desmarcan las cifras de valoración: stock/"viendo"/pedidos siguen siendo de muestra hasta tener dato real.
+    document.querySelectorAll('[data-rating-num], [data-rating-summary], [data-rating-bar-text]').forEach((el) => el.removeAttribute('data-placeholder-cifra'));
   }
+  applyCardRatings();
+}
+
+// Métricas reales de la tienda (data/metricas.json: { "pedidosEntregados": N }). Sin dato, la cifra sigue siendo de muestra.
+async function initMetrics() {
+  const els = document.querySelectorAll('[data-metric]');
+  if (!els.length) return;
+  let data;
+  try {
+    const res = await fetch('data/metricas.json', { cache: 'no-store' });
+    if (!res.ok) return;
+    data = await res.json();
+  } catch { return; }
+  els.forEach((el) => {
+    const v = Number(data[el.dataset.metric]);
+    if (!Number.isFinite(v) || v <= 0) return;
+    el.textContent = `+${new Intl.NumberFormat('es-PE').format(v)}`;
+    el.removeAttribute('data-placeholder-cifra');
+  });
 }
 /* --------------------------------------------------------------------------
    AE-R4 · Home reestructurado (index.html). Escrito por front en esta copia por
@@ -784,11 +1013,11 @@ function buildHomeCard(p, badgeText) {
   node.querySelector('.product-card__familia').textContent = p.familiaLabel;
   const nameLink = node.querySelector('.product-card__name a');
   nameLink.href = href; nameLink.textContent = p.nombre;
-  node.querySelector('.product-card__price').textContent = p.precioDisplay;
+  node.querySelector('.product-card__price').textContent = displayPrice(p);
   const badge = node.querySelector('.product-card__badge');
   if (badgeText) { badge.textContent = badgeText; badge.hidden = false; }
   const btn = node.querySelector('.add-to-cart');
-  btn.dataset.id = p.id; btn.dataset.name = p.nombreCarrito || p.nombre; btn.dataset.price = String(p.precio); btn.dataset.image = p.imagen;
+  btn.dataset.id = p.id; btn.dataset.name = p.nombreCarrito || p.nombre; btn.dataset.price = String(basePrice(p)); btn.dataset.image = p.imagen;
   return node;
 }
 
@@ -799,65 +1028,122 @@ function buildHomeCard(p, badgeText) {
    las cifras son de MUESTRA (se marcan data-placeholder-cifra): NO publicar así; con datos
    reales poner placeholder:false y el stock real por SKU. Si el JSON falla, no se muestra nada.
    -------------------------------------------------------------------------- */
-let urgenciaCache = null;
-async function loadUrgenciaOnce() {
-  if (urgenciaCache !== null) return urgenciaCache;
-  try {
-    const res = await fetch('data/urgencia.json');
-    urgenciaCache = res.ok ? await res.json() : false;
-  } catch {
-    urgenciaCache = false;
-  }
-  return urgenciaCache;
+function soldOutButton(btn) {
+  if (!btn || btn.dataset.agotado) return;
+  btn.dataset.agotado = '1';
+  btn.dataset.labelOriginal = btn.textContent;
+  btn.disabled = true;
+  btn.setAttribute('aria-disabled', 'true');
+  btn.textContent = 'Agotado';
 }
-
-function stockLabel(n, data) {
-  if (n <= 0) return 'Agotado';
-  if (n <= (data.umbralUltimas ?? 5)) return n === 1 ? 'Última unidad' : `Últimas unidades · quedan ${n}`;
-  return `Quedan ${n} unidades`;
+function restoreButton(btn) {
+  if (!btn || !btn.dataset.agotado) return;
+  delete btn.dataset.agotado;
+  btn.disabled = false;
+  btn.removeAttribute('aria-disabled');
+  btn.textContent = btn.dataset.labelOriginal || 'Añadir';
 }
 
 async function applyStockTags(root = document) {
-  const data = await loadUrgenciaOnce();
-  if (!data || !data.stock) return;
-  const visible = data.umbralVisible ?? 10;
-  root.querySelectorAll('.product-card, .product-item').forEach((card) => {
-    if (card.querySelector('.stock-tag')) return;
+  const data = await loadStock();
+  if (!data || data.source === 'none') return;
+  root.querySelectorAll('.product-card, .product-item, .cart-upsell__item, .related-card').forEach((card) => {
     const btn = card.querySelector('.add-to-cart');
     const id = btn?.dataset.id;
-    const n = id ? data.stock[id] : undefined;
-    if (!btn || typeof n !== 'number' || n > visible) return;
+    const n = id ? availableFor(id) : undefined;
+    if (!btn || n === undefined) return;
+    if (n <= 0) soldOutButton(btn);
+    if (card.querySelector('.stock-tag')) return;
+    if (n > 0 && !isLowEnoughToShow(n)) return;
     const tag = document.createElement('p');
-    tag.className = `stock-tag${n <= (data.umbralUltimas ?? 5) ? ' stock-tag--low' : ''}`;
-    tag.textContent = stockLabel(n, data);
+    tag.className = `stock-tag${n <= data.meta.umbralUltimas ? ' stock-tag--low' : ''}`;
+    tag.textContent = stockLabel(n);
     if (data.placeholder) tag.setAttribute('data-placeholder-cifra', '');
     btn.before(tag);
   });
 }
 
-async function initUrgency() {
-  await applyStockTags();
-  // Ficha: slots de stock y "personas viendo"
+/* Ficha: stock del tamaño elegido, tope del selector de cantidad y estado "Agotado".
+   Se llama desde renderTamano (cada cambio de tamaño). "Personas viendo": SOLO con cifras de muestra
+   (placeholder); con datos reales se oculta — no hay contador real y inventarlo infringe la Ley 29571.
+   Se fija una vez por carga (no se actualiza en vivo). */
+async function refreshProductStock() {
+  const addBtn = document.getElementById('btn-add-to-cart');
+  if (!addBtn) return;
+  const data = await loadStock();
+  const id = addBtn.dataset.id;
+  const n = data.source === 'none' ? undefined : availableFor(id);
   const stockSlot = document.querySelector('[data-stock-slot]');
   const viewersSlot = document.querySelector('[data-viewers-slot]');
-  if (!stockSlot && !viewersSlot) return;
-  const data = await loadUrgenciaOnce();
-  if (!data) return;
-  const id = new URLSearchParams(window.location.search).get('id') || document.querySelector('.product-detail')?.dataset.defaultId;
-  const n = id && data.stock ? data.stock[id] : undefined;
-  if (stockSlot && typeof n === 'number' && n <= (data.umbralVisible ?? 10)) {
-    stockSlot.textContent = stockLabel(n, data);
-    stockSlot.hidden = false;
-    if (data.placeholder) stockSlot.setAttribute('data-placeholder-cifra', '');
+  const qty = document.getElementById('product-qty');
+  const buyBtn = document.getElementById('buy-bar-btn');
+
+  if (stockSlot) {
+    const show = n !== undefined && (n <= 0 || isLowEnoughToShow(n));
+    stockSlot.hidden = !show;
+    if (show) {
+      stockSlot.textContent = stockLabel(n);
+      stockSlot.toggleAttribute('data-placeholder-cifra', !!data.placeholder);
+    }
   }
-  if (viewersSlot && data.viewers) {
-    const { min, max } = data.viewers;
-    const v = Math.floor(min + Math.random() * (max - min + 1));
-    viewersSlot.textContent = `${v} personas viendo este producto`;
+  if (viewersSlot && data.meta.viewers && data.placeholder && n !== 0) {
+    if (!viewersSlot.dataset.v) {
+      const { min, max } = data.meta.viewers;
+      viewersSlot.dataset.v = String(Math.floor(min + Math.random() * (max - min + 1)));
+    }
+    viewersSlot.textContent = `${viewersSlot.dataset.v} personas viendo este producto`;
+    viewersSlot.setAttribute('data-placeholder-cifra', '');
     viewersSlot.hidden = false;
-    if (data.placeholder) viewersSlot.setAttribute('data-placeholder-cifra', '');
+  } else if (viewersSlot) {
+    viewersSlot.hidden = true;
   }
+  if (qty) {
+    qty.max = String(n === undefined ? 99 : Math.min(99, Math.max(1, n)));
+    if (Number(qty.value) > Number(qty.max)) qty.value = qty.max;
+  }
+  [addBtn, buyBtn].forEach((b) => { if (!b) return; if (n === 0) soldOutButton(b); else restoreButton(b); });
 }
+
+async function initUrgency() {
+  await applyStockTags();
+}
+
+/* Carrito: tope por stock. Desactiva "+" al llegar al tope y ajusta (una vez por carga) las líneas que
+   superan el stock actual (p. ej. el stock bajó desde que se añadió). */
+let cartClamped = false;
+async function applyCartCaps() {
+  const data = await loadStock();
+  if (!data || data.source === 'none') return;
+  if (!cartClamped) {
+    cartClamped = true;
+    let changed = false;
+    cartStore.getItems().slice().forEach((it) => {
+      const n = availableFor(it.id);
+      if (n !== undefined && it.qty > n) { cartStore.updateQty(it.id, n - it.qty); changed = true; }
+    });
+    if (changed) return; // el notify de cartStore repinta y vuelve a entrar aquí
+  }
+  document.querySelectorAll('.cart-line').forEach((line) => {
+    const n = availableFor(line.dataset.id);
+    const item = cartStore.getItems().find((i) => i.id === line.dataset.id);
+    const inc = line.querySelector('.qty-btn[data-action="inc"]');
+    if (!inc || n === undefined || !item) return;
+    const atCap = item.qty >= n;
+    inc.disabled = atCap;
+    inc.title = atCap ? `Máximo disponible: ${n}` : '';
+  });
+}
+
+/* Conflicto de stock del backend (409 { code:'sin_stock', stock:[{sku,pedido,disponible}] }): refresca el
+   stock, ajusta el carrito al disponible y devuelve el texto para mostrar. Lo llamará initCheckout cuando
+   exista el endpoint (hoy no hay backend en esta copia). */
+async function handleStockConflict(payload) {
+  cartClamped = false;
+  await loadStock(true);
+  await applyCartCaps();
+  return (payload && payload.error) || 'Algunas fragancias ya no tienen stock suficiente. Ajustamos tu carrito.';
+}
+
 /* Destinos aún sin confirmar (data-cta-pendiente): no navegar a un 404 mientras no exista la URL real. */
 function initPendingLinks() {
   document.addEventListener('click', (e) => {
@@ -865,7 +1151,7 @@ function initPendingLinks() {
     if (link) e.preventDefault();
   });
 }
-// Prioridad en la pestana "Para ella" del home (ids de data/productos.json). Editable.
+// Prioridad en la pestaña "Para ella" del home (ids de data/productos.json). Editable.
 const INICIO_ELLA = ['ae-210', 'ae-219', 'ae-237', 'ae-289', 'ae-310', 'ae-181', 'ae-258', 'ae-175'];
 async function initHomePage() {
   if (document.body.dataset.page === 'resenas') { initProductReviews(null); return; }
@@ -880,7 +1166,7 @@ async function initHomePage() {
       const lista = productos.filter((p) => p.genero === tab);
       if (tab !== 'para-ella') return lista.slice(0, 4);
       // "Para ella": primero las fichas elegidas por Paul con el frasco transparente del color de la esencia
-      // (imagenes nuevas, mas femeninas); el resto sigue el orden del catalogo.
+      // (imágenes nuevas, más femeninas); el resto sigue el orden del catálogo.
       const idx = (p) => { const i = INICIO_ELLA.indexOf(p.id); return i === -1 ? 99 : i; };
       return lista.map((p, i) => [p, i]).sort((a, b) => (idx(a[0]) - idx(b[0])) || a[1] - b[1]).map((x) => x[0]).slice(0, 4);
     };
@@ -888,6 +1174,7 @@ async function initHomePage() {
       if (!track) return;
       track.replaceChildren(...pick(tab).map((p) => buildHomeCard(p, p.flag === 'bestseller' ? 'Bestseller' : p.flag === 'trending' ? 'Trending' : '')));
       applyStockTags(track);
+      applyCardRatings(track);
       tabs.forEach((b) => { const on = b.dataset.tab === tab; b.classList.toggle('is-active', on); b.setAttribute('aria-selected', String(on)); });
     };
     if (track && tabs.length) {
@@ -901,6 +1188,7 @@ async function initHomePage() {
     if (nuevosGrid && nuevos.length) {
       nuevosGrid.replaceChildren(...nuevos.map((p) => buildHomeCard(p, 'Nuevo')));
       applyStockTags(nuevosGrid);
+      applyCardRatings(nuevosGrid);
       document.querySelector('.nuevos')?.removeAttribute('hidden');
     }
 
@@ -943,6 +1231,22 @@ function initReels() {
     });
     video.addEventListener('click', () => btn.click());
   });
+
+  const pauseOffscreen = () => {
+    reels.forEach((reel) => {
+      if (!reel.classList.contains('is-playing')) return;
+      const r = reel.getBoundingClientRect();
+      const visible = Math.min(r.bottom, window.innerHeight) - Math.max(r.top, 0);
+      if (document.hidden || visible < r.height * 0.3) stopAll(null);
+    });
+  };
+  let ticking = false;
+  window.addEventListener('scroll', () => {
+    if (ticking) return;
+    ticking = true;
+    setTimeout(() => { ticking = false; pauseOffscreen(); }, 150);
+  }, { passive: true });
+  document.addEventListener('visibilitychange', pauseOffscreen);
 }
 /* --------------------------------------------------------------------------
    Catálogo — búsqueda ?q= (desde el buscador del home). Normaliza acentos.
@@ -950,15 +1254,511 @@ function initReels() {
 const normalizeText = (s) => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 
 /* --------------------------------------------------------------------------
-   Checkout (carrito.html) — sin credenciales Mercado Pago todavía (ver
-   "Pendiente de Paul" en allpaessence.txt). El Brick real (mismo patrón
-   AP-J2 de AP Beauty) se monta acá cuando existan; mientras tanto, feedback
-   inline en vez de redirigir a un checkout que no existe.
+   Checkout (carrito.html) — Mercado Pago Card Payment Brick, mismo patrón que
+   AP Beauty (AP-J2 / AB-J15..J21). GET /api/market decide: con `mercadopago` se
+   monta [dirección de envío] → [Brick] → [aviso de error]; con `none` (o si el
+   backend no responde) el botón mantiene el aviso "pago en configuración".
+   El importe SIEMPRE lo fija el servidor (create-order): el Brick solo lo muestra.
+   Los nodos los crea JS (carrito.html no trae markup de checkout); estilos en
+   style.css (`.mp-*`, `.is-hidden-mp`).
    -------------------------------------------------------------------------- */
-function initCheckout() {
-  const btn = document.getElementById('btn-checkout');
-  if (!btn) return;
+const MP_PUBLIC_KEY = 'APP_USR-2a92421a-445e-4c40-8786-000697f584fe';
+const SHIPPING_DRAFT_KEY = 'ae_shipping_draft';
 
+function loadMercadoPagoSdk() {
+  if (window.MercadoPago) return Promise.resolve();
+  const existing = document.getElementById('mp-sdk');
+  if (existing) {
+    return new Promise((resolve, reject) => {
+      existing.addEventListener('load', resolve, { once: true });
+      existing.addEventListener('error', reject, { once: true });
+    });
+  }
+  return new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    script.id = 'mp-sdk';
+    script.src = 'https://sdk.mercadopago.com/js/v2';
+    script.addEventListener('load', resolve, { once: true });
+    script.addEventListener('error', reject, { once: true });
+    document.head.appendChild(script);
+  });
+}
+
+function showMpError(el, msg) {
+  if (!el) return;
+  el.textContent = msg;
+  el.hidden = false;
+}
+
+function buildShippingForm() {
+  const form = document.createElement('form');
+  form.id = 'mp-shipping';
+  form.className = 'mp-shipping';
+  form.setAttribute('aria-label', 'Datos de envío');
+  form.autocomplete = 'on';
+  form.addEventListener('submit', (e) => e.preventDefault()); // el que paga es el Brick
+  form.innerHTML = [
+    '<h3 class="mp-shipping__title">Datos de envío</h3>',
+    '<div class="mp-shipping__grid">',
+    '  <label class="mp-shipping__field mp-shipping__field--wide">',
+    '    <span>Nombre y apellidos</span>',
+    '    <input name="nombre" type="text" autocomplete="name" required maxlength="120" placeholder="Nombre y apellido">',
+    '  </label>',
+    '  <label class="mp-shipping__field">',
+    '    <span>Teléfono / celular</span>',
+    '    <input name="telefono" type="tel" inputmode="tel" enterkeyhint="next" autocomplete="tel" required maxlength="20">',
+    '  </label>',
+    '  <label class="mp-shipping__field">',
+    '    <span>Departamento</span>',
+    '    <input name="departamento" type="text" autocomplete="address-level1" required maxlength="60">',
+    '  </label>',
+    '  <label class="mp-shipping__field">',
+    '    <span>Provincia</span>',
+    '    <input name="provincia" type="text" autocomplete="address-level2" required maxlength="60">',
+    '  </label>',
+    '  <label class="mp-shipping__field">',
+    '    <span>Distrito</span>',
+    '    <input name="distrito" type="text" autocomplete="address-level3" required maxlength="60">',
+    '  </label>',
+    '  <label class="mp-shipping__field mp-shipping__field--wide">',
+    '    <span>Calle, avenida o jirón</span>',
+    '    <input name="calle" type="text" autocomplete="address-line1" required maxlength="140" placeholder="Solo la calle (ej. Av. Pardo)">',
+    '  </label>',
+    '  <label class="mp-shipping__field">',
+    '    <span>Número de casa / edificio</span>',
+    '    <input name="numero" type="text" inputmode="numeric" enterkeyhint="next" autocomplete="address-line2" required maxlength="20" placeholder="Ej. 123">',
+    '  </label>',
+    '  <label class="mp-shipping__field mp-shipping__field--wide">',
+    '    <span>Referencia, dpto./interior <em>(opcional)</em></span>',
+    '    <input name="referencia" type="text" maxlength="160">',
+    '  </label>',
+    '  <label class="mp-shipping__field">',
+    '    <span>Código postal <em>(opcional)</em></span>',
+    '    <input name="codigoPostal" type="text" inputmode="numeric" enterkeyhint="done" autocomplete="postal-code" maxlength="12">',
+    '  </label>',
+    '</div>',
+  ].join('\n');
+
+  // MP puntúa más riesgo a un comprador con nombre incompleto; el backend lo rechaza (400).
+  const nombre = form.elements.nombre;
+  const validarNombre = () => nombre.setCustomValidity(
+    nombre.value.trim().split(/\s+/).filter(Boolean).length >= 2 ? '' : 'Escribe tu nombre y apellido',
+  );
+  nombre.addEventListener('input', validarNombre);
+
+  // Borrador (solo datos de envío, NUNCA tarjeta): un rechazo o recarga no vacía el formulario.
+  try {
+    const draft = JSON.parse(sessionStorage.getItem(SHIPPING_DRAFT_KEY) || '{}');
+    Object.keys(draft).forEach((k) => {
+      if (form.elements[k] && typeof draft[k] === 'string') form.elements[k].value = draft[k];
+    });
+  } catch (_) { /* borrador corrupto: se ignora */ }
+  validarNombre();
+  form.addEventListener('input', () => {
+    const draft = {};
+    Array.from(form.elements).forEach((el) => { if (el.name) draft[el.name] = el.value; });
+    try { sessionStorage.setItem(SHIPPING_DRAFT_KEY, JSON.stringify(draft)); } catch (_) { /* cuota/privado */ }
+  });
+
+  Array.from(form.elements).forEach((el) => {
+    if (!el.name || el.tagName !== 'INPUT') return;
+    const err = document.createElement('p');
+    err.className = 'mp-shipping__error';
+    err.id = `mp-err-${el.name}`;
+    err.setAttribute('aria-live', 'polite');
+    err.hidden = true;
+    el.closest('label').appendChild(err);
+    el.addEventListener('input', () => { if (el.validity.valid) clearFieldError(el); });
+  });
+  return form;
+}
+
+function clearFieldError(input) {
+  input.removeAttribute('aria-invalid');
+  input.removeAttribute('aria-describedby');
+  const err = document.getElementById(`mp-err-${input.name}`);
+  if (err) { err.textContent = ''; err.hidden = true; }
+}
+
+// Marca el form como "intentado" (css pinta :invalid desde entonces), muestra el error por
+// campo y enfoca el primero inválido. Devuelve true si todo es válido.
+function validateShippingInline(form) {
+  form.classList.add('is-attempted');
+  let first = null;
+  Array.from(form.elements).forEach((el) => {
+    if (!el.name || el.tagName !== 'INPUT') return;
+    if (el.validity.valid) { clearFieldError(el); return; }
+    const err = document.getElementById(`mp-err-${el.name}`);
+    el.setAttribute('aria-invalid', 'true');
+    if (err) {
+      err.textContent = el.validationMessage || 'Revisa este campo';
+      err.hidden = false;
+      el.setAttribute('aria-describedby', err.id);
+    }
+    if (!first) first = el;
+  });
+  if (first) {
+    first.focus();
+    first.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  }
+  return !first;
+}
+
+// Forma que consume el backend (POST /api/mp/process-payment). El servidor revalida todo.
+function readShippingForm(form) {
+  const val = (n) => (form.elements[n]?.value || '').trim();
+  const street = val('calle');
+  const number = val('numero');
+  return {
+    name: val('nombre'),
+    phone: val('telefono'),
+    address: {
+      // "Amazonas 836" + "836" → "Amazonas 836", no "Amazonas 836 836"
+      line: number && street.split(/\s+/).pop().toLowerCase() === number.toLowerCase()
+        ? street
+        : [street, number].filter(Boolean).join(' '),
+      street,
+      number,
+      reference: val('referencia'),
+      district: val('distrito'),
+      province: val('provincia'),
+      department: val('departamento'),
+      zip: val('codigoPostal'),
+      country: 'PE',
+    },
+  };
+}
+
+// Mensajes por status_detail: MP recomienda explicar el motivo y qué hacer.
+function rejectionMessage(detail) {
+  const d = String(detail || '');
+  if (d === 'cc_rejected_high_risk') return 'No pudimos validar este pago. Prueba con otra tarjeta.';
+  if (d.startsWith('cc_rejected_bad_filled')) return 'Revisa los datos de la tarjeta (número, vencimiento o código) e inténtalo de nuevo.';
+  if (d === 'cc_rejected_insufficient_amount') return 'Saldo insuficiente. Prueba con otra tarjeta u otro medio de pago.';
+  if (d === 'cc_rejected_call_for_authorize') return 'Tu banco necesita autorizar este pago. Llámalo para autorizarlo o prueba con otra tarjeta.';
+  if (d === 'cc_rejected_card_disabled') return 'Tu tarjeta está inactiva. Actívala con tu banco o prueba con otra.';
+  if (d === 'cc_rejected_max_attempts') return 'Superaste el máximo de intentos. Prueba con otra tarjeta o inténtalo más tarde.';
+  if (d === 'cc_rejected_duplicated_payment') return 'Ya hiciste un pago igual hace un momento. Revisa tu correo antes de reintentar.';
+  return 'El pago fue rechazado. Prueba con otra tarjeta.';
+}
+
+function setProcessing(on) {
+  const summary = document.querySelector('.cart-summary');
+  if (!summary) return;
+  summary.classList.toggle('is-processing', on);
+  summary.setAttribute('aria-busy', on ? 'true' : 'false');
+  let st = summary.querySelector('.cart-summary__status');
+  if (on) {
+    if (!st) {
+      st = document.createElement('p');
+      st.className = 'cart-summary__status';
+      st.setAttribute('role', 'status');
+      st.textContent = 'Procesando tu pago…';
+      summary.querySelector('.mp-brick-error')?.insertAdjacentElement('beforebegin', st);
+    }
+    st.hidden = false;
+  } else if (st) {
+    st.hidden = true;
+  }
+}
+
+function clearCartAfterPayment() {
+  cartStore.getItems().map((i) => i.id).forEach((id) => cartStore.removeItem(id));
+  try { sessionStorage.removeItem(SHIPPING_DRAFT_KEY); } catch (_) { /* noop */ }
+}
+
+// Monta el Card Payment Brick. `orderId`/`amount` vienen de create-order: el Brick nunca decide el importe.
+// `onNewOrder` se invoca cuando hay que rehacer el pedido (4º intento tras rechazos).
+async function mountMercadoPagoBrick(container, errorEl, orderId, amount, shippingForm, onNewOrder) {
+  await loadMercadoPagoSdk();
+  const mp = new window.MercadoPago(MP_PUBLIC_KEY, { locale: 'es-PE' });
+  const bricksBuilder = mp.bricks();
+  let inFlight = false;
+
+  return bricksBuilder.create('cardPayment', container.id, {
+    initialization: { amount },
+    customization: {
+      visual: {
+        style: {
+          theme: 'default',
+          customVariables: {
+            textPrimaryColor: '#242422',
+            formBackgroundColor: '#FFFFFF',
+            inputBackgroundColor: '#FFFFFF',
+            baseColor: '#242422',
+            errorColor: '#C8102E',
+            outlinePrimaryColor: '#B8B8B8',
+            outlineSecondaryColor: '#B8B8B8',
+            borderRadiusMedium: '2px',
+          },
+        },
+      },
+    },
+    callbacks: {
+      onReady: () => {},
+      // La forma del argumento varía entre versiones del SDK: acepto `{ formData }` o plano.
+      onSubmit: (brickData) => new Promise((resolve, reject) => {
+        const formData = (brickData && brickData.formData) || brickData || {};
+
+        // El Brick solo valida SUS campos; los de envío se validan aquí. `reject()` mantiene el Brick activo.
+        if (shippingForm && !validateShippingInline(shippingForm)) {
+          reject();
+          showMpError(errorEl, 'Completa los datos de envío antes de pagar.');
+          return;
+        }
+        if (inFlight) { reject(); return; }
+        inFlight = true;
+        setProcessing(true);
+        errorEl.hidden = true;
+
+        // Solo orderId + tarjeta tokenizada + envío + Device ID. El importe lo resuelve el servidor desde
+        // el pedido. `device_id` lo puebla el SDK solo en `window.MP_DEVICE_SESSION_ID` (antifraude MP).
+        const payload = {
+          orderId,
+          token: formData.token,
+          issuer_id: formData.issuer_id,
+          payment_method_id: formData.payment_method_id,
+          payer: {
+            email: formData.payer?.email,
+            identification: formData.payer?.identification,
+          },
+          shipping: readShippingForm(shippingForm),
+          ...(window.MP_DEVICE_SESSION_ID ? { device_id: window.MP_DEVICE_SESSION_ID } : {}),
+        };
+        fetch('/api/mp/process-payment', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify(payload),
+        })
+          .then((res) => res.json().catch(() => ({})).then((data) => ({ ok: res.ok, status: res.status, data })))
+          .then(({ ok, status, data }) => {
+            inFlight = false;
+            setProcessing(false);
+            resolve(); // el Brick solo espera que la promesa termine
+            if (status === 400 && data.field === 'shipping.name') {
+              showMpError(errorEl, data.error || 'Escribe tu nombre y apellido');
+              shippingForm?.elements.nombre?.focus();
+              return;
+            }
+            if (status === 409) {
+              // Intentos agotados o pedido ya procesado: se prepara un pedido nuevo.
+              showMpError(errorEl, data.error || 'Preparamos un pago nuevo. Vuelve a introducir los datos de tu tarjeta.');
+              onNewOrder();
+              return;
+            }
+            if (!ok) { showMpError(errorEl, 'No se pudo procesar el pago. Inténtalo de nuevo.'); return; }
+            if (data.status === 'approved') {
+              clearCartAfterPayment();
+              window.location.href = 'confirmacion.html';
+            } else if (data.status === 'pending' && data.status_detail === 'pending_challenge' && data.three_ds_info?.external_resource_url) {
+              // 3DS 2.0: el banco pide verificar al cliente (Status Screen Brick). El resultado final lo fija
+              // el webhook; aquí solo se consulta /api/mp/order-status.
+              start3dsChallenge({ bricksBuilder, data, orderId, brickContainer: container, errorEl });
+            } else if (data.status === 'in_process' || data.status === 'pending') {
+              // Bancos peruanos: pago en revisión; el webhook confirma (nunca se marca pagado desde aquí).
+              clearCartAfterPayment();
+              window.location.href = 'confirmacion.html?estado=pendiente';
+            } else {
+              showMpError(errorEl, rejectionMessage(data.status_detail));
+            }
+          })
+          .catch(() => {
+            inFlight = false;
+            setProcessing(false);
+            reject();
+            showMpError(errorEl, 'No se pudo procesar el pago. Inténtalo de nuevo.');
+          });
+      }),
+      onError: (error) => {
+        console.error('Mercado Pago — error del Brick:', error);
+        showMpError(errorEl, 'No se pudo cargar el formulario de pago.');
+      },
+    },
+  });
+}
+
+// 3DS 2.0 (Checkout Bricks): `process-payment` devolvió `pending_challenge` + `three_ds_info`. Se oculta el
+// Brick de tarjeta, se monta el Status Screen Brick (muestra el desafío del banco; debe empezar en <30 s o MP
+// rechaza) y se consulta `order-status` hasta que el webhook fije `approved`/`rejected`. Si pasa el tiempo
+// máximo sin resultado → «pago en revisión». Nada se confirma desde el navegador.
+const THREEDS_POLL_MS = 4000;
+const THREEDS_MAX_MS = 180000;
+
+async function start3dsChallenge({ bricksBuilder, data, orderId, brickContainer, errorEl }) {
+  if (errorEl) errorEl.hidden = true;
+  brickContainer.hidden = true;
+  const host = document.createElement('div');
+  host.id = 'statusScreenBrick_container';
+  host.className = 'mp-3ds-container';
+  const note = document.createElement('p');
+  note.className = 'mp-3ds-note';
+  note.setAttribute('role', 'status');
+  note.textContent = 'Tu banco te pedirá verificar este pago. No cierres ni recargues la página.';
+  brickContainer.insertAdjacentElement('afterend', host);
+  host.insertAdjacentElement('beforebegin', note);
+
+  const volverAlBrick = () => {
+    host.remove();
+    note.remove();
+    brickContainer.hidden = false;
+  };
+
+  try {
+    await bricksBuilder.create('statusScreen', host.id, {
+      initialization: {
+        paymentId: String(data.id),
+        additionalInfo: {
+          externalResourceURL: data.three_ds_info.external_resource_url,
+          creq: data.three_ds_info.creq,
+        },
+      },
+      callbacks: {
+        onReady: () => {},
+        onError: (error) => console.error('Mercado Pago — error del Status Screen (3DS):', error),
+      },
+    });
+  } catch (err) {
+    console.error('Mercado Pago — no se pudo mostrar el desafío 3DS:', err);
+  }
+
+  const inicio = Date.now();
+  const timer = setInterval(async () => {
+    try {
+      const res = await fetch(`/api/mp/order-status/${encodeURIComponent(orderId)}`, { cache: 'no-store' });
+      const { estado } = await res.json();
+      if (estado === 'approved') {
+        clearInterval(timer);
+        clearCartAfterPayment();
+        window.location.href = 'confirmacion.html';
+        return;
+      }
+      if (estado === 'rejected') {
+        clearInterval(timer);
+        volverAlBrick();
+        showMpError(errorEl, 'Tu banco no pudo verificar el pago. Prueba con otra tarjeta.');
+        return;
+      }
+    } catch (_) { /* red intermitente: se reintenta en el siguiente ciclo */ }
+    if (Date.now() - inicio > THREEDS_MAX_MS) {
+      clearInterval(timer);
+      clearCartAfterPayment();
+      window.location.href = 'confirmacion.html?estado=pendiente';
+    }
+  }, THREEDS_POLL_MS);
+}
+
+// `Bricks.create` con credenciales rotas loguea el error y deja el contenedor vacío: se vigila que
+// aparezca el iframe para no dejar al cliente con la página de pago en blanco.
+function brickRendered(container, timeoutMs) {
+  return new Promise((resolve) => {
+    if (container.querySelector('iframe')) { resolve(true); return; }
+    const done = (val) => { obs.disconnect(); clearTimeout(timer); resolve(val); };
+    const obs = new MutationObserver(() => { if (container.querySelector('iframe')) done(true); });
+    obs.observe(container, { childList: true, subtree: true });
+    const timer = setTimeout(() => done(!!container.querySelector('iframe')), timeoutMs);
+  });
+}
+
+async function initPaymentGateway(btnCheckout) {
+  const summary = btnCheckout.closest('.cart-summary');
+  if (!summary) return;
+
+  // `.cart-summary__checkout` trae display:flex propio: no se usa `.hidden`, sino una clase CSS.
+  btnCheckout.classList.add('is-hidden-mp');
+
+  const shippingForm = buildShippingForm();
+  btnCheckout.insertAdjacentElement('afterend', shippingForm);
+  const container = document.createElement('div');
+  container.id = 'cardPaymentBrick_container';
+  container.className = 'mp-brick-container';
+  shippingForm.insertAdjacentElement('afterend', container);
+  const errorEl = document.createElement('p');
+  errorEl.className = 'mp-brick-error';
+  errorEl.setAttribute('role', 'alert');
+  errorEl.hidden = true;
+  container.insertAdjacentElement('afterend', errorEl);
+
+  let brick = null;
+  let generation = 0; // descarta respuestas de pedidos viejos si el carrito cambió mientras tanto
+
+  function unmountBrick() {
+    try { if (brick && brick.unmount) brick.unmount(); } catch (_) { /* ya desmontado */ }
+    brick = null;
+    container.textContent = '';
+  }
+
+  async function startCheckout() {
+    const mine = ++generation;
+    unmountBrick();
+    const items = cartStore.getItems().filter((i) => i.qty > 0).map((i) => ({ id: i.id, quantity: i.qty }));
+    if (items.length === 0) return;
+    try {
+      const orderRes = await fetch('/api/mp/create-order', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ items }),
+      });
+      const order = await orderRes.json().catch(() => ({}));
+      if (mine !== generation) return;
+      if (!orderRes.ok || !order.orderId) {
+        if (orderRes.status === 400) { showMpError(errorEl, order.error || 'Algún producto de tu carrito ya no está disponible.'); return; }
+        throw new Error(order.error || 'order_failed');
+      }
+      errorEl.hidden = true;
+
+      // El total del servidor manda: si difiere del que calculó el navegador (p. ej. terminó la oferta),
+      // se avisa y se actualiza el resumen para que el cliente pague exactamente lo que ve.
+      const clientTotal = computeCartTotals(cartStore.getItems()).total;
+      if (Math.abs(order.amount - clientTotal) > 0.009) {
+        showMpError(errorEl, `El total de tu pedido es ${formatPrice(order.amount)}.`);
+        setText('cart-page-total', formatPrice(order.amount));
+      }
+
+      mountMercadoPagoBrick(container, errorEl, order.orderId, order.amount, shippingForm, () => {
+        if (mine === generation) startCheckout();
+      })
+        .then((ctrl) => { if (mine === generation) brick = ctrl; else if (ctrl && ctrl.unmount) ctrl.unmount(); })
+        .catch((err) => console.error('Mercado Pago — el Brick no montó:', err));
+
+      if (!(await brickRendered(container, 8000)) && mine === generation) throw new Error('brick_no_render');
+    } catch (err) {
+      console.error('Mercado Pago — no se pudo iniciar el checkout:', err);
+      if (mine === generation) showMpError(errorEl, 'No se pudo cargar el formulario de pago. Recarga la página e inténtalo de nuevo.');
+    }
+  }
+
+  // El pedido del servidor es una foto del carrito: si el cliente cambia cantidades o quita algo,
+  // se rehace el pedido (y el Brick) para que lo que paga sea exactamente lo que ve.
+  const firma = () => cartStore.getItems().map((i) => `${i.id}:${i.qty}`).join('|');
+  let ultima = firma();
+  let timer = null;
+  cartStore.subscribe(() => {
+    const f = firma();
+    if (f === ultima) return;
+    ultima = f;
+    clearTimeout(timer);
+    timer = setTimeout(startCheckout, 400);
+  });
+
+  await startCheckout();
+}
+
+async function initCheckout() {
+  const btn = document.getElementById('btn-checkout');
+  if (!btn) return; // solo carrito.html
+
+  let gateway = 'none';
+  try {
+    const res = await fetch('/api/market', { cache: 'no-store' });
+    if (res.ok) gateway = (await res.json()).gateway;
+  } catch (_) { /* sin backend (mockup / local estático) */ }
+
+  if (gateway === 'mercadopago') {
+    await initPaymentGateway(btn);
+    return;
+  }
+
+  // Sin pasarela activa: feedback inline honesto en vez de un checkout que no existe.
   btn.addEventListener('click', () => {
     if (cartStore.getItems().length === 0) return;
     let note = btn.parentElement.querySelector('.checkout-note');
@@ -1154,6 +1954,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initHomePage();
   initReels();
   initUrgency();
+  initMetrics();
   initPendingLinks();
   initCheckout();
   initConfirmacionEstado();

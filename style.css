@@ -291,7 +291,7 @@ section.principio .eyebrow,
 
 /* --------------------------------------------------------------------------
    4c · AE-R1 Banner de campaña con cuenta atrás — REDISEÑO 2026-11-15 al formato
-   de https://elexirium.com/ (banda negra, marco de línea fina, eyebrow con
+   de una referencia externa (banda negra, marco de línea fina, eyebrow con
    rombos, titular grande + divisor vertical + cuenta atrás con unidades
    pequeñas + botón blanco). Escrito por front en esta copia por autorización
    de Paul; css lo afina (kerning, alturas, móvil). `[hidden]` lo pone js al
@@ -670,7 +670,7 @@ section.principio .eyebrow,
 .product-item__link { display: contents; color: inherit; text-decoration: none; }
 
 .product-item__media, .product-card__media {
-  position: relative; aspect-ratio: 4 / 5; overflow: hidden;
+  position: relative; aspect-ratio: 1 / 1; overflow: hidden;
   background: var(--color-bg);
 }
 .product-item__media img, .product-card__media img {
@@ -718,7 +718,7 @@ section.principio .eyebrow,
 
 /* --------------------------------------------------------------------------
    10a · AE-R4 Hero blanco (reestructuración, decisión de Paul 2026-11-15) —
-   composición de https://elexirium.com/ : titular, subtítulo, grupo "Para él"
+   composición de una referencia externa : titular, subtítulo, grupo "Para él"
    | pieza central | grupo "Para ella", microbeneficios. Escrito por front en
    esta copia por autorización de Paul; css puede reabsorberlo. Las reglas
    El `.hero*` antiguo (§10) fue borrado por css (2026-11-15).
@@ -783,7 +783,7 @@ section.principio .eyebrow,
 /* --------------------------------------------------------------------------
    10b · AE-R4 Home reestructurado (escrito por front en esta copia por
    autorización de Paul 2026-11-15; css puede reabsorberlo). Bloques nuevos
-   inspirados en https://elexirium.com/ : franja de valoración, buscador,
+   inspirados en una referencia externa : franja de valoración, buscador,
    marquee, pestañas, recién llegados, "del live a tu casa", reseñas, franja
    de confianza, "por qué Allpa", aviso legal y botón flotante de WhatsApp.
    Los nuevos bloques NO usan `.reveal` (no dependen de IntersectionObserver).
@@ -889,7 +889,7 @@ body.has-buy-bar .whatsapp-float { bottom: 98px; }
 
 .lab { background: var(--color-white); }
 .lab__sub { margin: 0 0 clamp(20px, 3vw, 34px); font: 500 clamp(.9rem, 1.6vw, 1.1rem)/1.4 var(--font-body); letter-spacing: .12em; text-transform: uppercase; color: var(--color-text-muted); }
-/* Móvil: galería horizontal con scroll-snap (como Elexirium), ~62% de ancho por
+/* Móvil: galería horizontal con scroll-snap (como la referencia), ~62% de ancho por
    vídeo para que asome el siguiente. ≥700px: rejilla de 3. */
 .reels {
   display: flex; gap: 12px; margin: 0 calc(var(--gutter) * -1) 30px; padding-inline: var(--gutter);
@@ -1117,6 +1117,16 @@ section.section--navy { background: var(--color-navy); color: var(--color-white)
   .rating-bar__link { display: inline-flex; align-items: center; min-height: 32px; }
 }
 .familia-pill.is-active { background: var(--color-ink); color: var(--color-white); }
+/* AE-R8: 11 pills de familia en móvil = una fila con scroll horizontal (sangra al borde) */
+@media (max-width: 768px) {
+  .catalog-pills {
+    flex-wrap: nowrap; overflow-x: auto; overscroll-behavior-x: contain;
+    margin-inline: calc(var(--gutter) * -1); padding: 2px var(--gutter) 6px;
+    max-width: none; scroll-snap-type: x proximity; scrollbar-width: none;
+  }
+  .catalog-pills::-webkit-scrollbar { display: none; }
+  .catalog-pills .familia-pill { flex: 0 0 auto; white-space: nowrap; scroll-snap-align: start; }
+}
 
 .catalog-grid, .muestras-catalogo ul {
   display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;
@@ -1197,7 +1207,7 @@ section.section--navy { background: var(--color-navy); color: var(--color-white)
   color: var(--color-text-muted);
 }
 .product-detail__size label {
-  position: relative;
+  position: relative; flex: 0 0 auto; white-space: nowrap;
   display: inline-flex; align-items: center;
   padding: 9px 18px;
   font: 600 .74rem/1 var(--font-body); letter-spacing: .04em;
@@ -1548,15 +1558,6 @@ body.has-buy-bar { padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px))
    ningún otro HTML del sitio que use estas clases (verificado por front con
    grep). Autocontenido, no dejó nada huérfano en otras secciones. */
 
-/* 24b · Home — journal, 2 CTAs (AE-F12). Antes 1 sola CTA suelta, ahora un
-   par envuelto en .journal__ctas — fila con wrap en vez de depender del
-   flujo inline por defecto de 2 `.btn` (inline-flex) contiguos. Sin
-   tratamiento visual "deshabilitado" para la 2ª CTA a propósito: mismo
-   criterio ya documentado por front para `data-cta-pendiente` en todo el
-   sitio (0 CSS especial en ningún otro punto) — `.btn--outline` ya la
-   distingue lo suficiente de `.btn--ghost`. */
-.journal__ctas { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 4px; }
-
 /* 24c · Footer — FAQ del alcohol (AE-F10). `<details>`/`<summary>` propio,
    reemplaza el triángulo nativo del navegador por un "+" que rota a "×"
    (45deg) al abrir — mismo lenguaje visual que el resto del sitio (afilado,
@@ -1638,5 +1639,131 @@ body.has-buy-bar { padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px))
 .catalog-empty { margin: 40px 0; text-align: center; color: var(--color-text-muted); }
 .catalog-empty[hidden], .catalog-more [hidden] { display: none; }
 .catalog-more { display: flex; justify-content: center; margin: 36px 0 56px; }
+.catalog-more .btn { min-width: min(100%, 280px); justify-content: center; }
 .acc[hidden] { display: none; }
 @media (max-width: 640px) { .catalog-toolbar__search { flex: 1 1 100%; max-width: none; order: 3; } }
+
+/* AE-J6 · Reseñas (escrito por js, css puede reabsorberlo): carrusel con flechas y filtro por estrellas. */
+.reviews__list--carousel { display: flex; gap: 20px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.reviews__list--carousel::-webkit-scrollbar { display: none; }
+.reviews__list--carousel > li { flex: 0 0 min(86%, 340px); scroll-snap-align: start; }
+.reviews__nav { display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px; }
+.reviews__nav[hidden] { display: none; }
+.reviews__nav-btn { width: 44px; height: 44px; border: 1px solid var(--color-border); border-radius: 50%; background: var(--color-white); color: var(--color-ink); font-size: 1.4rem; line-height: 1; cursor: pointer; }
+.reviews__nav-btn:disabled { opacity: .35; cursor: default; }
+.reviews-filter { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 12px; }
+.reviews-filter__btn { padding: 8px 14px; min-height: 40px; border: 1px solid var(--color-border); border-radius: 999px; background: var(--color-white); color: var(--color-ink); font: 600 .85rem/1 var(--font-body); cursor: pointer; }
+.reviews-filter__btn.is-active { background: var(--color-ink); color: var(--color-white); border-color: var(--color-ink); }
+.reviews-filter__status { margin: 0 0 16px; font: 500 .85rem/1.4 var(--font-body); color: var(--color-text-muted); }
+.reviews-more { display: block; margin: 24px auto 0; }
+.reviews-more[hidden] { display: none; }
+
+/* --------------------------------------------------------------------------
+   Checkout Mercado Pago (carrito.html) — portado de AP Beauty (AB-C28/C31/C32) con
+   los tokens de Allpa. Los nodos los crea `initCheckout()` en main.js:
+   [#mp-shipping] → [.mp-brick-container] → [.mp-brick-error]. Con pasarela activa el
+   botón "Finalizar compra" queda oculto con `.is-hidden-mp` (no `[hidden]`: la clase
+   `.cart-summary__checkout` define su propio display).
+   -------------------------------------------------------------------------- */
+.cart-summary__checkout.is-hidden-mp { display: none; }
+.mp-brick-error {
+  margin: 14px 0 0; padding: 12px 14px;
+  border-left: 3px solid #C8102E; border-radius: var(--radius-soft);
+  background: #FDE7EA; color: #8F0A20;
+  font: 600 .82rem/1.5 var(--font-body);
+}
+.mp-brick-error[hidden] { display: none; }
+.mp-shipping {
+  margin: 18px 0 0; padding: clamp(16px, 3vw, 20px);
+  background: var(--color-white); border: 1px solid var(--color-border); border-radius: var(--radius-soft);
+  container: mp-shipping / inline-size;
+}
+.mp-shipping__title { font: 700 1.05rem/1.2 var(--font-display); color: var(--color-ink); margin: 0 0 14px; }
+.mp-shipping__grid { display: grid; grid-template-columns: 1fr; gap: 14px; }
+.mp-shipping__field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.mp-shipping__field > span { font: 600 .78rem/1.3 var(--font-body); letter-spacing: .02em; color: var(--color-ink); }
+.mp-shipping__field > span em { font-style: normal; font-weight: 400; color: var(--color-text-muted); }
+.mp-shipping__field input {
+  width: 100%; min-height: 46px; padding: 11px 14px;
+  font: 400 16px/1.3 var(--font-body);   /* 16px: evita el zoom de iOS al enfocar */
+  color: var(--color-ink); background: var(--color-white);
+  border: 1px solid var(--color-silver-a); border-radius: var(--radius-soft);
+  transition: border-color .2s, box-shadow .2s;
+}
+.mp-shipping__field input::placeholder { color: var(--color-text-muted); opacity: .75; }
+.mp-shipping__field input:hover { border-color: var(--color-ink); }
+.mp-shipping__field input:focus-visible { outline: 2px solid var(--color-ink); outline-offset: 1px; border-color: var(--color-ink); }
+/* Error: solo tras el primer intento de pago (o marcado por js), nunca al cargar */
+.mp-shipping.is-attempted .mp-shipping__field input:invalid,
+.mp-shipping__field input[aria-invalid="true"] { border-color: #C8102E; background: #FFF7F8; }
+.mp-shipping.is-attempted .mp-shipping__field input:invalid:focus-visible,
+.mp-shipping__field input[aria-invalid="true"]:focus-visible { outline-color: #C8102E; }
+.mp-shipping__error { font: 600 .76rem/1.4 var(--font-body); color: #8F0A20; margin: 0; }
+.mp-shipping__error[hidden] { display: none; }
+.mp-brick-container {
+  margin-top: 14px; padding: clamp(12px, 2.5vw, 16px); background: var(--color-white);
+  border: 1px solid var(--color-border); border-radius: var(--radius-soft);
+}
+.mp-brick-container:empty { display: none; }
+.mp-3ds-note {
+  margin: 14px 0 0; padding: 12px 14px; border-left: 3px solid var(--color-ink);
+  border-radius: var(--radius-soft); background: var(--color-bg-alt, #f6f4f0);
+  font: 600 .82rem/1.5 var(--font-body); color: var(--color-ink);
+}
+.mp-3ds-container {
+  margin-top: 14px; padding: clamp(12px, 2.5vw, 16px); background: var(--color-white);
+  border: 1px solid var(--color-border); border-radius: var(--radius-soft); min-height: 220px;
+}
+.is-processing .mp-brick-container,
+.is-processing .mp-shipping { opacity: .6; pointer-events: none; }
+.is-processing, .is-processing * { cursor: progress; }
+.cart-summary__status {
+  display: flex; align-items: center; justify-content: center; gap: 10px; margin: 14px 0 0;
+  font: 600 .85rem/1.4 var(--font-body); color: var(--color-ink);
+}
+.cart-summary__status[hidden] { display: none; }
+/* Layout del form por ANCHO DEL CONTENEDOR (vive en `.cart-summary`, ~360px en desktop):
+   1 columna por defecto; desde 440px: depto|prov y calle|número emparejados; desde 560px, depto|prov|distrito. */
+@container mp-shipping (min-width: 440px) {
+  .mp-shipping__grid { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  .mp-shipping__field { grid-column: span 6; }
+  .mp-shipping__field:nth-child(3),
+  .mp-shipping__field:nth-child(4),
+  .mp-shipping__field:nth-child(6),
+  .mp-shipping__field:nth-child(7) { grid-column: span 3; }
+}
+@container mp-shipping (min-width: 560px) {
+  .mp-shipping__field:nth-child(3),
+  .mp-shipping__field:nth-child(4),
+  .mp-shipping__field:nth-child(5) { grid-column: span 2; }
+}
+@media (max-width: 420px) {
+  .cart-summary { padding: 18px 14px; }
+  .mp-shipping { padding: 14px 12px; }
+}
+
+/* ============================================================================
+   AE-R5 · Muro anecdótico (.memory-wall) — fotos de clientes del stand.
+   Móvil: una foto a la vez (slide 100%, autoavance de js). ≥768px: foto grande
+   2:3 a la izquierda (carrusel de 1 slide, columna acotada) y texto + botones a
+   la derecha (grid sobre .container; el HTML no cambia: carrusel y .reviews__head
+   son hermanos). Foto horizontal recortada por los lados (object-fit:cover).
+   ============================================================================ */
+.memory-wall__lead { margin: 10px 0 0; max-width: 46ch; font: 400 1rem/1.55 var(--font-body); color: var(--text-on-dark); }
+.memory-wall__carousel { margin-top: clamp(20px, 3vw, 32px); }
+.memory-wall__list { list-style: none; margin: 0; padding-inline: 0; gap: 0; }
+.memory-wall__item { flex: 0 0 100%; scroll-snap-align: start; }
+.memory-wall__figure { margin: 0; aspect-ratio: 4 / 5; overflow: hidden; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.22); border-radius: var(--radius-soft); box-shadow: 0 10px 30px rgba(0,0,0,.28); }
+.memory-wall__figure img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center 30%; }
+@media (max-width: 767px) { .memory-wall__carousel .carousel__arrow { display: none; } }
+@media (min-width: 768px) {
+  .memory-wall > .container { display: grid; grid-template-columns: minmax(0, 360px) minmax(0, 1fr); column-gap: clamp(32px, 6vw, 88px); align-items: center; }
+  .memory-wall__carousel { grid-column: 1; grid-row: 1; margin-top: 0; }
+  .memory-wall .reviews__head { grid-column: 2; grid-row: 1; flex-direction: column; align-items: flex-start; justify-content: center; gap: 28px; margin-bottom: 0; }
+  .memory-wall .reviews__title { font-size: clamp(1.8rem, 3vw, 2.6rem); max-width: 18ch; }
+  .memory-wall__carousel .carousel__viewport { overflow-x: auto; scroll-snap-type: x mandatory; }
+  .memory-wall__list { display: flex; padding-inline: 0; }
+  .memory-wall__figure { aspect-ratio: 2 / 3; }
+}
+@media (min-width: 1024px) { .memory-wall > .container { grid-template-columns: minmax(0, 440px) minmax(0, 1fr); } }
+@media (prefers-reduced-motion: reduce) { .memory-wall__carousel .carousel__viewport { scroll-behavior: auto; } }

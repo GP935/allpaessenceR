@@ -1,0 +1,4 @@
+{
+  "_nota": "Métricas reales de la tienda. pedidosEntregados: poner el número real (>0) para sustituir la cifra de muestra del home (data-metric). Mientras sea null se queda el placeholder.",
+  "pedidosEntregados": null
+}
