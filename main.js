@@ -1153,6 +1153,16 @@ function initPendingLinks() {
 }
 // Prioridad en la pestaña "Para ella" del home (ids de data/productos.json). Editable.
 const INICIO_ELLA = ['ae-210', 'ae-219', 'ae-237', 'ae-289', 'ae-310', 'ae-181', 'ae-258', 'ae-175'];
+const idxElla = (p) => { const i = INICIO_ELLA.indexOf(p.id); return i === -1 ? 99 : i; };
+// Mezcla ella/él de a uno, empezando por ella, hasta n tarjetas (Favoritos y Nuevos ingresos del home).
+function intercalar(ella, el, n) {
+  const out = [];
+  for (let i = 0; out.length < n && (i < ella.length || i < el.length); i++) {
+    if (ella[i]) out.push(ella[i]);
+    if (out.length < n && el[i]) out.push(el[i]);
+  }
+  return out;
+}
 async function initHomePage() {
   if (document.body.dataset.page === 'resenas') { initProductReviews(null); return; }
   if (document.body.dataset.page !== 'home' && document.body.dataset.page !== 'index' && !document.getElementById('trending-track')) return;
@@ -1162,12 +1172,16 @@ async function initHomePage() {
     const track = document.getElementById('trending-track');
     const tabs = document.querySelectorAll('[data-tabs="favoritos"] [data-tab]');
     const pick = (tab) => {
-      if (tab === 'favoritos') return productos.filter((p) => p.flag === 'bestseller' || p.flag === 'trending').slice(0, 4);
+      if (tab === 'favoritos') {
+        const fav = productos.filter((p) => p.flag === 'bestseller' || p.flag === 'trending');
+        const ella = fav.filter((p) => p.genero === 'para-ella').sort((x, y) => idxElla(x) - idxElla(y));
+        return intercalar(ella, fav.filter((p) => p.genero !== 'para-ella'), 4);
+      }
       const lista = productos.filter((p) => p.genero === tab);
       if (tab !== 'para-ella') return lista.slice(0, 4);
       // "Para ella": primero las fichas elegidas por Paul con el frasco transparente del color de la esencia
       // (imágenes nuevas, más femeninas); el resto sigue el orden del catálogo.
-      const idx = (p) => { const i = INICIO_ELLA.indexOf(p.id); return i === -1 ? 99 : i; };
+      const idx = idxElla;
       return lista.map((p, i) => [p, i]).sort((a, b) => (idx(a[0]) - idx(b[0])) || a[1] - b[1]).map((x) => x[0]).slice(0, 4);
     };
     const renderTab = (tab) => {
@@ -1184,7 +1198,8 @@ async function initHomePage() {
 
     // Recién llegados
     const nuevosGrid = document.getElementById('nuevos-grid');
-    const nuevos = productos.filter((p) => p.nuevo).slice(0, 8);
+    const nuevosTodos = productos.filter((p) => p.nuevo);
+    const nuevos = intercalar(nuevosTodos.filter((p) => p.genero === 'para-ella'), nuevosTodos.filter((p) => p.genero !== 'para-ella'), 8);
     if (nuevosGrid && nuevos.length) {
       nuevosGrid.replaceChildren(...nuevos.map((p) => buildHomeCard(p, 'Nuevo')));
       applyStockTags(nuevosGrid);
