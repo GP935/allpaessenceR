@@ -70,7 +70,7 @@ const pagar = (orderId, extra = {}) => post('/api/mp/process-payment', {
   payer: { email: 'clienta@example.com', identification: { type: 'DNI', number: '12345678' } },
   shipping: SHIPPING, device_id: 'armor.abc', ...extra,
 });
-const ofertaVigente = Date.now() < Date.parse('2026-11-18T23:59:59-05:00');
+const ofertaVigente = Date.now() < Date.parse('2026-11-30T23:59:59-05:00');
 
 { // 1 — precios del catálogo del servidor
   const a = await crear([{ id: 'ae-001', quantity: 1 }]);
@@ -82,8 +82,18 @@ const ofertaVigente = Date.now() < Date.parse('2026-11-18T23:59:59-05:00');
   const h = await post('/api/mp/create-order', { items: [{ id: 'ae-001', quantity: 1, price: 0.01, unit_price: 0.01 }], total: 1, amount: 1 });
   check(h.data.amount === 45, 'body hostil (price/total/amount) ignorado: sigue S/ 45');
 }
+{ // 1b — muestras: precio fijo del servidor, sin oferta
+  const m5 = await crear([{ id: 'ae-001-muestra-5ml', quantity: 2 }]);
+  check(m5.http === 200 && m5.data.amount === 30, 'muestra 5 ml ×2 = S/ 30');
+  const m10 = await crear([{ id: 'ae-001-muestra-10ml', quantity: 1 }]);
+  check(m10.data.amount === 25, 'muestra 10 ml = S/ 25');
+  const mix = await crear([{ id: 'ae-001', quantity: 2 }, { id: 'ae-002-muestra-5ml', quantity: 3 }]);
+  check(mix.data.amount === 90 + 45, '2 × 30 ml + 3 muestras 5 ml: las muestras no entran en la oferta 3×99');
+}
 { // 2 — rechazos de entrada
-  check((await crear([{ id: 'ae-001-muestra', quantity: 1 }])).http === 400, 'muestra sin precio definido → 400');
+  check((await crear([{ id: 'ae-001-muestra', quantity: 1 }])).http === 400, 'id viejo de muestra sin tamaño → 400');
+  check((await crear([{ id: 'ae-001-muestra-7ml', quantity: 1 }])).http === 400, 'muestra de tamaño inexistente → 400');
+  check((await crear([{ id: 'ae-9999-muestra-5ml', quantity: 1 }])).http === 400, 'muestra de producto inexistente → 400');
   check((await crear([{ id: 'ae-9999', quantity: 1 }])).http === 400, 'id inexistente → 400');
   check((await crear([{ id: 'ae-001', quantity: 0 }])).http === 400, 'cantidad 0 → 400');
   check((await crear([{ id: 'ae-001', quantity: 100 }])).http === 400, 'cantidad 100 → 400');
@@ -98,7 +108,7 @@ const ofertaVigente = Date.now() < Date.parse('2026-11-18T23:59:59-05:00');
 }
 { // 4 — paridad con scripts/offer.js (lo que ve el cliente == lo que cobra el servidor)
   const antes = Date.parse('2026-11-17T12:00:00-05:00');
-  const despues = Date.parse('2026-11-19T00:30:00-05:00');
+  const despues = Date.parse('2026-12-01T00:30:00-05:00');
   const catalogo = [['ae-001', 45, 30], ['ae-001-50ml', 65, 50], ['ae-001-100ml', 95, 100]];
   let comparados = 0;
   for (let i = 0; i < 300; i++) {

@@ -7,7 +7,8 @@ export const OFFER = {
   qty: 3,
   price: 99,
   was: 135,
-  end: '2026-11-18T23:59:59-05:00',
+  // Black Friday: vigente hasta el 30-nov 23:59:59 (Perú). NO se renueva sola: solo se cambia esta fecha (y server.js OFERTA.end + data-countdown-end) si la empresa decide extender.
+  end: '2026-11-30T23:59:59-05:00',
 };
 
 const ELIGIBLE_ID = /^ae-\d+$/;

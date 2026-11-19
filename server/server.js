@@ -39,19 +39,31 @@ if (GATEWAY === 'mercadopago' && !MP_WEBHOOK_SECRET) {
 
 // ─────────────────────────────────────────────────────────────
 // CATÁLOGO — fuente de verdad: data/productos.json (el mismo que pinta el sitio).
-// Ids de carrito: `ae-001` (30 ml), `ae-001-50ml`, `ae-001-100ml`. La muestra
-// (`ae-001-muestra`) no tiene precio definido todavía → se rechaza.
+// Ids de carrito: `ae-001` (30 ml), `ae-001-50ml`, `ae-001-100ml`, `ae-001-muestra-5ml`,
+// `ae-001-muestra-10ml`. Muestras: precio único por tamaño (MUESTRAS, decisión de Paul 2026-11-19;
+// duplicado en main.js), sin oferta. El id viejo `ae-001-muestra` se rechaza.
 // El precio sale de `tamanos[ml].precio` (soles) y se maneja en CÉNTIMOS enteros.
 // ─────────────────────────────────────────────────────────────
 const productos = JSON.parse(readFileSync(CATALOGO_FILE || resolve(AQUI, '..', 'data', 'productos.json'), 'utf8'));
 const CATALOGO = new Map(productos.map((p) => [p.id, p]));
-const ID_RE = /^(ae-\d{1,4})(?:-(50|100)ml)?$/;
+const MUESTRAS = { 5: 1500, 10: 2500 };
+const ID_RE = /^(ae-\d{1,4})(?:-(50|100)ml|-muestra-(5|10)ml)?$/;
 
 function resolverItem(rawId) {
   const m = ID_RE.exec(String(rawId || ''));
   if (!m) return null;
   const producto = CATALOGO.get(m[1]);
   if (!producto) return null;
+  if (m[3]) {
+    const mlM = Number(m[3]);
+    return {
+      id: `${producto.id}-muestra-${mlM}ml`,
+      ml: mlM,
+      title: `${producto.nombre} · Muestra ${mlM} ml`,
+      description: `${producto.nombre} muestra ${mlM} ml — ${producto.desc || 'Fragancia'}`,
+      price: MUESTRAS[mlM],
+    };
+  }
   const ml = m[2] ? Number(m[2]) : 30;
   const tam = (producto.tamanos || []).find((t) => t.ml === ml);
   const cents = tam ? Math.round(Number(tam.precio) * 100) : NaN;
@@ -71,7 +83,7 @@ function resolverItem(rawId) {
 // las unidades más caras primero, y solo hasta la fecha de fin. Un test compara
 // ambas implementaciones (`_test_checkout.mjs`). DEUDA: una única fuente de datos.
 // ─────────────────────────────────────────────────────────────
-const OFERTA = { qty: 3, price: 9900, end: Date.parse('2026-11-18T23:59:59-05:00') };
+const OFERTA = { qty: 3, price: 9900, end: Date.parse('2026-11-30T23:59:59-05:00') };
 
 export function calcularTotales(lineas, ahora = Date.now()) {
   const subtotal = lineas.reduce((s, l) => s + l.price * l.cantidad, 0);
