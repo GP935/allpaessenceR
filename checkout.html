@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Producto — Allpa Essence</title>
+  <title>Tu carrito — Allpa Essence</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="style.css">
   <link rel="icon" href="assets/ico/ico.png" type="image/png">
 </head>
-<body data-page="producto">
+<body data-page="carrito">
 
   <a class="skip-link" href="#main">Saltar al contenido</a>
 
@@ -30,7 +30,7 @@
 
       <nav class="nav-main nav-main--left" aria-label="Navegación principal">
         <div class="nav-dropdown">
-          <button type="button" class="nav-main__link nav-dropdown__toggle" id="btn-catalogo-nav" aria-haspopup="true" aria-expanded="false" aria-controls="catalogo-nav-menu" aria-current="page">Catálogo</button>
+          <button type="button" class="nav-main__link nav-dropdown__toggle" id="btn-catalogo-nav" aria-haspopup="true" aria-expanded="false" aria-controls="catalogo-nav-menu">Catálogo</button>
           <div class="nav-dropdown__menu" id="catalogo-nav-menu" hidden>
             <a href="catalogo.html">Todas</a>
             <a href="catalogo.html?familia=amaderado">Amaderada</a>
@@ -43,7 +43,7 @@
         <a href="muestras.html" class="nav-main__link">Muestras</a>
       </nav>
 
-      <a href="index.html" class="header-logo" aria-label="Allpa Essence — inicio">
+      <a href="inicio.html" class="header-logo" aria-label="Allpa Essence — inicio">
         <img class="header-logo__img" src="assets/ico/allpa_ico_header.webp" alt="" width="1408" height="1408">
       </a>
 
@@ -101,7 +101,7 @@
       <button class="menu-close" id="btn-menu-close" aria-label="Cerrar menú">✕</button>
     </div>
     <nav class="menu-primary" aria-label="Navegación principal">
-      <a href="index.html">Inicio</a>
+      <a href="inicio.html">Inicio</a>
       <a href="catalogo.html">Catálogo</a>
       <a href="muestras.html">Muestras</a>
       <a href="catalogo.html#filtro-genero">Regalos</a>
@@ -165,7 +165,7 @@
         <span id="cart-total">[PRECIO]</span>
       </div>
       <p class="cart-drawer__note">Envío e impuestos calculados al finalizar.</p>
-      <a href="carrito.html" class="btn btn--primary cart-drawer__checkout" id="cart-checkout">Ir a pagar</a>
+      <a href="checkout.html" class="btn btn--primary cart-drawer__checkout" id="cart-checkout">Ir a pagar</a>
     </div>
   </aside>
   <template id="cart-upsell-tpl">
@@ -178,6 +178,60 @@
       <button type="button" class="add-to-cart btn btn--outline btn--sm" data-id="" data-name="" data-price="" data-image="">Añadir</button>
     </li>
   </template>
+
+  <main id="main">
+
+    <section class="cart-page">
+      <div class="container">
+        <div class="cart-page__head">
+          <p class="eyebrow">REVISIÓN</p>
+          <h1>Tu carrito</h1>
+        </div>
+
+        <div class="cart-page__empty" id="cart-page-empty">
+          <svg class="cart-empty__icon" viewBox="0 0 24 24" width="56" height="56" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+          <p class="cart-empty__title">Tu carrito está vacío</p>
+          <p class="cart-empty__text">Elegí tu primera esencia.</p>
+          <a href="catalogo.html" class="btn btn--primary">Ver catálogo</a>
+        </div>
+
+        <div class="cart-page__layout" id="cart-page-layout" hidden>
+          <ul class="cart-page__items" id="cart-page-items"></ul>
+
+          <aside class="cart-summary" aria-label="Resumen del pedido">
+            <h2 class="cart-summary__title">Resumen</h2>
+            <div class="cart-summary__row">
+              <span>Subtotal</span>
+              <span id="cart-page-subtotal">[PRECIO]</span>
+            </div>
+            <div class="cart-summary__row cart-summary__row--saving" id="cart-page-discount-row" hidden>
+              <span>Oferta 3 por S/ 99</span>
+              <span id="cart-page-discount">−S/ 0</span>
+            </div>
+            <div class="cart-summary__row cart-summary__row--total">
+              <span>Total</span>
+              <span id="cart-page-total">[PRECIO]</span>
+            </div>
+            <p class="cart-summary__note">Envío e impuestos se calculan en el pago seguro.</p>
+            <p class="cart-summary__note">Al finalizar la compra aceptas los <a href="politicas.html#terminos">Términos y Condiciones</a>, las <a href="politicas.html#devoluciones">devoluciones y cambios</a> y la <a href="politicas.html#privacidad">Política de Privacidad</a>.</p>
+            <button class="btn btn--primary cart-summary__checkout" id="btn-checkout">Finalizar compra</button>
+            <a href="catalogo.html" class="cart-summary__continue">← Seguir comprando</a>
+            <ul class="cart-summary__trust">
+              <li>
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="1" y="6" width="15" height="12" rx="1"/><path d="M16 10h3l3 3v5h-6"/><circle cx="6" cy="18.5" r="1.8"/><circle cx="18.5" cy="18.5" r="1.8"/></svg>
+                Envío en 72 horas
+              </li>
+              <li class="cart-summary__secure">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                Pago 100% seguro
+              </li>
+            </ul>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+  </main>
 
   <template id="cart-line-tpl">
     <li class="cart-line" data-id="">
@@ -194,248 +248,6 @@
       <button class="cart-line__remove" data-action="remove" aria-label="Eliminar del carrito">✕</button>
     </li>
   </template>
-
-  <main id="main">
-
-    <section class="product-detail" aria-labelledby="product-titulo" data-default-id="ae-001">
-      <div class="container product-detail__layout">
-
-        <div class="product-detail__media">
-          <div class="product-detail__gallery">
-            <img class="product-detail__img" id="product-img" src="assets/catalogo/amaderado/forher/w1.webp" alt="Frasco Allpa Essence Nº01, Cedro Real, con caja de madera grabada al fondo, tapa plateada" width="900" height="1125" fetchpriority="high">
-          </div>
-          <ul class="product-detail__thumbs" aria-label="Fotos del producto">
-            <li>
-              <button type="button" class="product-detail__thumb is-active" data-gallery-thumb aria-label="Ver foto 1" aria-pressed="true">
-                <img id="thumb-1" src="assets/catalogo/amaderado/forher/w1.webp" alt="" width="96" height="120" loading="lazy">
-              </button>
-            </li>
-            <li><span class="product-detail__thumb product-detail__thumb--empty" data-gallery-slot>[FOTO_2_PENDIENTE]</span></li>
-            <li><span class="product-detail__thumb product-detail__thumb--empty" data-gallery-slot>[FOTO_3_PENDIENTE]</span></li>
-            <li><span class="product-detail__thumb product-detail__thumb--empty" data-gallery-slot>[FOTO_4_PENDIENTE]</span></li>
-          </ul>
-        </div>
-
-        <div class="product-detail__info">
-          <p class="product-detail__familia" id="product-familia">Amaderada</p>
-          <h1 id="product-titulo">Cedro Real · Nº01</h1>
-          <p class="product-detail__rating" data-rating-slot hidden>
-            <span class="product-detail__rating-stars" data-rating-stars aria-hidden="true">★★★★★</span>
-            <a href="#reviews-titulo" data-rating-text>[RESENAS_PENDIENTE]</a>
-          </p>
-          <p class="product-detail__desc" id="product-desc">Inspirada en fragancias amaderadas orientales.</p>
-
-          <div class="product-detail__price-row">
-            <p class="product-detail__price" id="product-precio">S/. 75</p>
-            <a class="product-detail__badge" href="catalogo.html" data-offer-badge>Oferta · 3 por S/ 99 en 30 ml</a>
-          </div>
-          <p class="product-detail__deadline" data-offer-block>
-            Oferta termina en
-            <time data-countdown-end="2026-11-30T23:59:59-05:00" datetime="2026-11-30T23:59:59-05:00"><span data-cd="d">--</span>d <span data-cd="h">--</span>h <span data-cd="m">--</span>m <span data-cd="s">--</span>s</time>
-          </p>
-
-          <div class="product-detail__urgency" aria-live="polite">
-            <p class="product-detail__viewers" data-viewers-slot hidden></p>
-            <p class="product-detail__stock" data-stock-slot hidden></p>
-          </div>
-
-          <p class="product-detail__delivery" id="product-delivery" data-delivery-min="2" data-delivery-max="4">
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="1" y="6" width="14" height="11" rx="1"/><path d="M15 9h4l3 3v5h-7"/><circle cx="6" cy="18" r="2"/><circle cx="18" cy="18" r="2"/></svg>
-            <span data-delivery-text>Envíos a todo el Perú · plazo [PLAZO_ENTREGA_PENDIENTE]</span>
-          </p>
-
-          <ul class="product-detail__benefits">
-            <li>
-              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 7l9-4 9 4v10l-9 4-9-4z"/><path d="M3 7l9 4 9-4M12 11v10"/></svg>
-              Envíos a todo el Perú
-            </li>
-            <li>
-              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M9 3h6M10 3v5l-5 9a3 3 0 0 0 3 4h8a3 3 0 0 0 3-4l-5-9V3"/></svg>
-              Prueba una muestra primero
-            </li>
-            <li>
-              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="1"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
-              Compra 100% segura
-            </li>
-          </ul>
-
-          <fieldset class="product-detail__size" id="product-size">
-            <legend>Elige tu tamaño</legend>
-            <label>
-              <input type="radio" name="tamano" value="30" data-size-option checked>
-              30 ml
-            </label>
-            <label>
-              <input type="radio" name="tamano" value="50" data-size-option>
-              50 ml
-            </label>
-            <label>
-              <input type="radio" name="tamano" value="100" data-size-option>
-              100 ml
-            </label>
-            <label>
-              <input type="radio" name="tamano" value="muestra" data-size-option>
-              Muestra
-            </label>
-          </fieldset>
-
-          <p class="product-detail__disclaimer" id="muestra-disclaimer" hidden>La muestra llega en un empaque completamente distinto al frasco original que ves en las fotos — el contenido es la misma esencia, solo cambia la presentación.</p>
-
-          <div class="product-detail__actions">
-            <div class="qty-stepper" data-qty-stepper>
-              <button type="button" class="qty-stepper__btn" data-qty-dec aria-label="Quitar una unidad">−</button>
-              <input class="qty-stepper__input" id="product-qty" type="number" min="1" max="99" value="1" inputmode="numeric" aria-label="Cantidad">
-              <button type="button" class="qty-stepper__btn" data-qty-inc aria-label="Añadir una unidad">+</button>
-            </div>
-            <button class="add-to-cart btn btn--primary btn--lg" id="btn-add-to-cart" data-id="ae-001" data-name="Cedro Real Nº01" data-price="75" data-image="assets/catalogo/amaderado/forher/w1.webp">Añadir al carrito</button>
-          </div>
-
-          <div class="product-detail__accordion">
-            <details class="acc" open>
-              <summary>Notas olfativas</summary>
-              <dl class="product-detail__notas">
-                <div class="product-detail__nota">
-                  <dt>Notas de salida</dt>
-                  <dd id="nota-salida">[NOTA_SALIDA_PENDIENTE]</dd>
-                </div>
-                <div class="product-detail__nota">
-                  <dt>Notas de corazón</dt>
-                  <dd id="nota-corazon">[NOTA_CORAZON_PENDIENTE]</dd>
-                </div>
-                <div class="product-detail__nota">
-                  <dt>Notas de fondo</dt>
-                  <dd id="nota-fondo">[NOTA_FONDO_PENDIENTE]</dd>
-                </div>
-              </dl>
-            </details>
-            <details class="acc">
-              <summary>Duración e intensidad</summary>
-              <dl class="product-detail__specs">
-                <div class="product-detail__spec">
-                  <dt>Duración estimada</dt>
-                  <dd id="spec-duracion">[DURACION_PENDIENTE]</dd>
-                </div>
-                <div class="product-detail__spec">
-                  <dt>Intensidad</dt>
-                  <dd id="spec-intensidad">[INTENSIDAD_PENDIENTE]</dd>
-                </div>
-              </dl>
-            </details>
-            <details class="acc">
-              <summary>Cuándo usarla</summary>
-              <p>[USO_ESTACION_OCASION_PENDIENTE]</p>
-            </details>
-            <details class="acc">
-              <summary>Elaboración y concentración</summary>
-              <p>[ELABORACION_CONCENTRACION_PENDIENTE]</p>
-            </details>
-            <details class="acc">
-              <summary>Envíos y cambios</summary>
-              <p>Enviamos a todo el Perú. Consulta los plazos en <a href="politicas.html#envios">Envíos</a> y las condiciones en <a href="politicas.html#devoluciones">Cambios y devoluciones</a>. ¿Dudas antes de comprar? Prueba primero la <a href="muestras.html">muestra</a>.</p>
-            </details>
-          </div>
-
-          <p class="product-detail__note">Notas, duración e intensidad son referenciales — la experiencia real varía según piel y clima.</p>
-        </div>
-
-      </div>
-    </section>
-
-    <section class="reviews" aria-labelledby="reviews-titulo">
-      <div class="container">
-        <h2 id="reviews-titulo" class="reviews__title">Lo que dicen quienes ya la usan</h2>
-        <p class="reviews__summary" data-rating-summary hidden></p>
-        <ul class="reviews__list" id="reviews-list">
-          <li>
-            <article class="review-card review-card--placeholder">
-              <div class="review-card__photo" data-review-photo>[FOTO_CLIENTE_PENDIENTE]</div>
-              <p class="review-card__stars" data-stars="" aria-label="[ESTRELLAS] de 5 estrellas"><span aria-hidden="true">☆☆☆☆☆</span></p>
-              <p class="review-card__text">[RESEÑA_TEXTO]</p>
-              <p class="review-card__meta">
-                <span class="review-card__author">[RESEÑA_AUTOR]</span>
-                <span class="review-card__verified" hidden>Compra verificada</span>
-                <span class="review-card__product">[RESEÑA_PRODUCTO]</span>
-                <time class="review-card__date" datetime="">[RESEÑA_FECHA]</time>
-              </p>
-            </article>
-          </li>
-          <li>
-            <article class="review-card review-card--placeholder">
-              <div class="review-card__photo" data-review-photo>[FOTO_CLIENTE_PENDIENTE]</div>
-              <p class="review-card__stars" data-stars="" aria-label="[ESTRELLAS] de 5 estrellas"><span aria-hidden="true">☆☆☆☆☆</span></p>
-              <p class="review-card__text">[RESEÑA_TEXTO]</p>
-              <p class="review-card__meta">
-                <span class="review-card__author">[RESEÑA_AUTOR]</span>
-                <span class="review-card__verified" hidden>Compra verificada</span>
-                <span class="review-card__product">[RESEÑA_PRODUCTO]</span>
-                <time class="review-card__date" datetime="">[RESEÑA_FECHA]</time>
-              </p>
-            </article>
-          </li>
-          <li>
-            <article class="review-card review-card--placeholder">
-              <div class="review-card__photo" data-review-photo>[FOTO_CLIENTE_PENDIENTE]</div>
-              <p class="review-card__stars" data-stars="" aria-label="[ESTRELLAS] de 5 estrellas"><span aria-hidden="true">☆☆☆☆☆</span></p>
-              <p class="review-card__text">[RESEÑA_TEXTO]</p>
-              <p class="review-card__meta">
-                <span class="review-card__author">[RESEÑA_AUTOR]</span>
-                <span class="review-card__verified" hidden>Compra verificada</span>
-                <span class="review-card__product">[RESEÑA_PRODUCTO]</span>
-                <time class="review-card__date" datetime="">[RESEÑA_FECHA]</time>
-              </p>
-            </article>
-          </li>
-        </ul>
-        <p class="section-more"><a href="resenas.html#escribir-resena" class="btn btn--outline" data-review-write>Escribir una reseña</a> <a href="resenas.html" class="btn btn--ghost">Ver todas las reseñas</a></p>
-      </div>
-    </section>
-
-    <section class="related" aria-labelledby="related-titulo" hidden>
-      <div class="container">
-        <h2 id="related-titulo" class="related__title">Otras fragancias de la misma familia</h2>
-        <ul class="related__grid" id="related-grid"></ul>
-      </div>
-    </section>
-
-  </main>
-
-  <template id="review-card-tpl">
-    <li>
-      <article class="review-card">
-        <div class="review-card__photo" data-review-photo></div>
-        <p class="review-card__stars" data-stars=""></p>
-        <p class="review-card__text"></p>
-        <p class="review-card__meta">
-          <span class="review-card__author"></span>
-          <span class="review-card__verified" hidden>Compra verificada</span>
-          <span class="review-card__product"></span>
-          <time class="review-card__date" datetime=""></time>
-        </p>
-      </article>
-    </li>
-  </template>
-
-  <template id="related-card-tpl">
-    <li class="related-card">
-      <a class="related-card__link" href="producto.html">
-        <img class="related-card__img" src="assets/ico/ico.png" alt="" width="300" height="375" loading="lazy">
-        <p class="related-card__familia"></p>
-        <p class="related-card__name"></p>
-        <p class="related-card__price"></p>
-      </a>
-    </li>
-  </template>
-
-  <div class="buy-bar" id="buy-bar" hidden aria-hidden="true">
-    <div class="container buy-bar__inner">
-      <img class="buy-bar__img" id="buy-bar-img" src="assets/catalogo/amaderado/forher/w1.webp" alt="" width="48" height="60">
-      <div class="buy-bar__info">
-        <p class="buy-bar__name" id="buy-bar-name">Cedro Real · Nº01</p>
-        <p class="buy-bar__price" id="buy-bar-price">S/. 75</p>
-      </div>
-      <button type="button" class="btn btn--primary buy-bar__btn" id="buy-bar-btn" tabindex="-1">Añadir al carrito</button>
-    </div>
-  </div>
 
   <footer class="site-footer">
     <div class="container site-footer__inner">

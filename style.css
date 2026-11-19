@@ -1562,7 +1562,7 @@ body.has-buy-bar { padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px))
    -------------------------------------------------------------------------- */
 
 /* AE-C28 (handoff front AE-F22, ver inbox/css.md): bloque "24a · Por qué
-   Allpa" borrado entero — la sección se eliminó de index.html, no queda
+   Allpa" borrado entero — la sección se eliminó de inicio.html, no queda
    ningún otro HTML del sitio que use estas clases (verificado por front con
    grep). Autocontenido, no dejó nada huérfano en otras secciones. */
 
@@ -1669,7 +1669,7 @@ body.has-buy-bar { padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px))
 .reviews-more[hidden] { display: none; }
 
 /* --------------------------------------------------------------------------
-   Checkout Mercado Pago (carrito.html) — portado de otro proyecto (ref. interna) con
+   Checkout Mercado Pago (checkout.html) — portado de otro proyecto (ref. interna) con
    los tokens de Allpa. Los nodos los crea `initCheckout()` en main.js:
    [#mp-shipping] → [.mp-brick-container] → [.mp-brick-error]. Con pasarela activa el
    botón "Finalizar compra" queda oculto con `.is-hidden-mp` (no `[hidden]`: la clase

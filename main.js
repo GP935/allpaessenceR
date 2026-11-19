@@ -140,7 +140,7 @@ function initCatalogDropdown() {
 
 /* --------------------------------------------------------------------------
    Carrito — render compartido entre drawer (todas las páginas) y página
-   completa carrito.html, ambos leen el mismo #cart-line-tpl.
+   completa checkout.html, ambos leen el mismo #cart-line-tpl.
    -------------------------------------------------------------------------- */
 function renderCartLines(listEl, items) {
   const tpl = document.getElementById('cart-line-tpl');
@@ -507,7 +507,7 @@ function buildCatalogItem(p) {
   const li = document.createElement('li');
   li.className = 'product-item';
   li.dataset.id = p.id;
-  const href = `producto.html?id=${encodeURIComponent(p.id)}`;
+  const href = `fragancia.html?id=${encodeURIComponent(p.id)}`;
   const badge = p.flag === 'bestseller' ? 'Bestseller' : p.flag === 'trending' ? 'Trending' : p.nuevo ? 'Nuevo' : '';
   li.innerHTML = `
     <a href="${href}" class="product-item__link">
@@ -627,7 +627,7 @@ async function initCatalogFilter() {
 }
 
 /* --------------------------------------------------------------------------
-   Ficha de producto — plantilla única por ?id= (producto.html). Fuente de
+   Ficha de producto — plantilla única por ?id= (fragancia.html). Fuente de
    datos: data/productos.json, mock claramente marcado (nombres/notas/precios
    [PENDIENTE] hasta que Paul confirme catálogo real) — mismo criterio
    mock→real que api.js de Powervein.
@@ -820,7 +820,7 @@ function initProductExtras(producto, productos) {
     const rel = productos.filter((p) => p.familia === producto.familia && p.genero === producto.genero && p.id !== producto.id).slice(0, 4);
     rel.forEach((p) => {
       const node = tpl.content.firstElementChild.cloneNode(true);
-      node.querySelector('.related-card__link').href = `producto.html?id=${encodeURIComponent(p.id)}`;
+      node.querySelector('.related-card__link').href = `fragancia.html?id=${encodeURIComponent(p.id)}`;
       const im = node.querySelector('.related-card__img');
       im.src = p.imagen; im.alt = p.alt;
       node.querySelector('.related-card__familia').textContent = p.familiaLabel;
@@ -1113,7 +1113,7 @@ async function initMetrics() {
   });
 }
 /* --------------------------------------------------------------------------
-   AE-R4 · Home reestructurado (index.html). Escrito por front en esta copia por
+   AE-R4 · Home reestructurado (inicio.html). Escrito por front en esta copia por
    autorización de Paul (2026-11-15). Pestañas de favoritos, "recién llegados",
    datalist del buscador, reseñas y franja de valoración. Los datos salen de
    data/productos.json (género real y flag "nuevo"). Sin datos, queda el HTML
@@ -1122,7 +1122,7 @@ async function initMetrics() {
 function buildHomeCard(p, badgeText) {
   const tpl = document.getElementById('home-card-tpl');
   const node = tpl.content.firstElementChild.cloneNode(true);
-  const href = `producto.html?id=${encodeURIComponent(p.id)}`;
+  const href = `fragancia.html?id=${encodeURIComponent(p.id)}`;
   node.dataset.familia = p.familia;
   node.querySelector('.product-card__link').href = href;
   const im = node.querySelector('.product-card__media img');
@@ -1386,12 +1386,12 @@ function initReels() {
 const normalizeText = (s) => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 
 /* --------------------------------------------------------------------------
-   Checkout (carrito.html) — Mercado Pago Card Payment Brick, mismo patrón que
+   Checkout (checkout.html) — Mercado Pago Card Payment Brick, mismo patrón que
    otro proyecto (ref. interna). GET /api/market decide: con `mercadopago` se
    monta [dirección de envío] → [Brick] → [aviso de error]; con `none` (o si el
    backend no responde) el botón mantiene el aviso "pago en configuración".
    El importe SIEMPRE lo fija el servidor (create-order): el Brick solo lo muestra.
-   Los nodos los crea JS (carrito.html no trae markup de checkout); estilos en
+   Los nodos los crea JS (checkout.html no trae markup de checkout); estilos en
    style.css (`.mp-*`, `.is-hidden-mp`).
    -------------------------------------------------------------------------- */
 const MP_PUBLIC_KEY = 'APP_USR-2a92421a-445e-4c40-8786-000697f584fe';
@@ -1877,7 +1877,7 @@ async function initPaymentGateway(btnCheckout) {
 
 async function initCheckout() {
   const btn = document.getElementById('btn-checkout');
-  if (!btn) return; // solo carrito.html
+  if (!btn) return; // solo checkout.html
 
   let gateway = 'none';
   try {
