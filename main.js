@@ -507,7 +507,7 @@ function buildCatalogItem(p) {
   const li = document.createElement('li');
   li.className = 'product-item';
   li.dataset.id = p.id;
-  const href = `fragancia.html?id=${encodeURIComponent(p.id)}`;
+  const href = `producto.html?id=${encodeURIComponent(p.id)}`;
   const badge = p.flag === 'bestseller' ? 'Bestseller' : p.flag === 'trending' ? 'Trending' : p.nuevo ? 'Nuevo' : '';
   li.innerHTML = `
     <a href="${href}" class="product-item__link">
@@ -627,7 +627,7 @@ async function initCatalogFilter() {
 }
 
 /* --------------------------------------------------------------------------
-   Ficha de producto — plantilla única por ?id= (fragancia.html). Fuente de
+   Ficha de producto — plantilla única por ?id= (producto.html). Fuente de
    datos: data/productos.json, mock claramente marcado (nombres/notas/precios
    [PENDIENTE] hasta que Paul confirme catálogo real) — mismo criterio
    mock→real que api.js de Powervein.
@@ -820,7 +820,7 @@ function initProductExtras(producto, productos) {
     const rel = productos.filter((p) => p.familia === producto.familia && p.genero === producto.genero && p.id !== producto.id).slice(0, 4);
     rel.forEach((p) => {
       const node = tpl.content.firstElementChild.cloneNode(true);
-      node.querySelector('.related-card__link').href = `fragancia.html?id=${encodeURIComponent(p.id)}`;
+      node.querySelector('.related-card__link').href = `producto.html?id=${encodeURIComponent(p.id)}`;
       const im = node.querySelector('.related-card__img');
       im.src = p.imagen; im.alt = p.alt;
       node.querySelector('.related-card__familia').textContent = p.familiaLabel;
@@ -1122,7 +1122,7 @@ async function initMetrics() {
 function buildHomeCard(p, badgeText) {
   const tpl = document.getElementById('home-card-tpl');
   const node = tpl.content.firstElementChild.cloneNode(true);
-  const href = `fragancia.html?id=${encodeURIComponent(p.id)}`;
+  const href = `producto.html?id=${encodeURIComponent(p.id)}`;
   node.dataset.familia = p.familia;
   node.querySelector('.product-card__link').href = href;
   const im = node.querySelector('.product-card__media img');
