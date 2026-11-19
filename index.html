@@ -5,42 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Allpa Essence — Sin etiquetas, solo esencia</title>
 
-  <!-- ===== DOMINIO SEO ===== -->
-  <!-- meta description, canonical, OG (1200x630), Twitter Card, JSON-LD (Organization + Product
-       por item, FAQPage si aplica) — agente SEO. Front no toca este bloque. -->
-  <!-- ===== FIN bloque SEO ===== -->
-
-  <!-- ===== DOMINIO CSS ===== -->
-  <!-- Elegir y enlazar aquí las 2 familias tipográficas: serif moderna de alto contraste para
-       titulares (coherente con el wordmark "Allpa" del logo ya aprobado) + sans-serif limpia y
-       neutra para cuerpo. Ver web/negocios/allpaessence.txt §tipografía — front no elige la
-       fuente exacta, solo deja el hueco. -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
   <link rel="icon" href="assets/ico/ico.png" type="image/png">
-  <!-- ===== FIN bloque CSS ===== -->
 </head>
 <body data-page="home">
 
   <a class="skip-link" href="#main">Saltar al contenido</a>
 
-  <!-- ===== HEADER v3 (corrección de brief 2026-08-19 §3, sobre la base v2) — contrato
-       compartido en las 8 páginas ===== -->
-  <!-- Contrato JS: #btn-menu (abre menú móvil) · #menu-panel · #menu-backdrop · #btn-menu-close
-       · #btn-cart (abre carrito) · #cart-drawer · #cart-backdrop · #btn-cart-close · #cart-count
-       · #btn-catalogo-nav/#catalogo-nav-menu (dropdown, aria-expanded + hidden) · #utility-message
-       (mensaje vivo/envío/seguridad — copy deck 2026-08-19, 3 mensajes rotativos, ver comentario
-       en el markup de abajo).
-       CORRECCIÓN v3: el brief retiró explícitamente el selector país/moneda ("sin selector de
-       país/moneda por ahora — operación inicial solo en Perú, soles; se agrega cuando se active
-       venta en España, no antes"). #market-select existía en v2 y se retira aquí — si ya hay
-       lógica JS de mercado escrita sobre ese id, queda muerta, ver inbox/js.md. -->
-  <!-- Copy deck 2026-08-19: 3 mensajes rotativos reales (ya no placeholder). HTML deja los 3
-       como hermanos de #utility-message, el primero visible por defecto (progressive
-       enhancement — sin JS se ve un mensaje fijo, no vacío). Rotación real es dominio js, ver
-       inbox/js.md; ocultar los inactivos por defecto es dominio css, ver inbox/css.md. -->
   <div class="utility-bar">
     <div class="container utility-bar__inner">
       <div class="utility-bar__message" id="utility-message">
@@ -74,18 +48,11 @@
       </a>
 
       <div class="site-header__actions">
-        <!-- Grupo derecho reestructurado (corrección de brief 2026-08-19 §3): Nuestra
-             historia/Contacto pasan del grupo izquierdo a este nav-main--right, con
-             separación extra (dominio css) antes de cuenta/carrito. -->
         <nav class="nav-main nav-main--right" aria-label="Navegación secundaria">
           <a href="historia.html" class="nav-main__link">Nuestra historia</a>
           <a href="contacto.html" class="nav-main__link">Contacto</a>
         </nav>
         <div class="site-header__icons">
-          <!-- CUENTA_PENDIENTE: el brief (§3) pide este ícono en el nav pero no define la página en
-               el mapa del sitio (§4) — sin login/cuenta.html todavía. Confirmar alcance con Paul
-               antes de cablear un destino real; por ahora apunta a contacto.html como fallback no
-               -roto en vez de un href="#" muerto. -->
           <a href="contacto.html" class="header-icon header-icon--account" aria-label="Mi cuenta" data-account-pendiente="true">
             <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.58-7 8-7s8 3 8 7"/></svg>
           </a>
@@ -101,12 +68,6 @@
     </div>
   </header>
 
-  <!-- ===== AE-R1 · BANNER DE CAMPANA CON CUENTA ATRAS (copiado de la mecánica de referencia, decision de Paul 2026-11-15).
-       Oferta: 3 por S/ 99 (antes S/ 135), presentacion 30 ml. Precio 30 ml = S/ 45 (3 x 45 = 135).
-       Fin: 2026-11-18 23:59:59 hora Peru (UTC-5), editable en data-countdown-end (UN solo lugar por pagina;
-       js debe leerlo y compartirlo con el drawer del carrito, ver inbox/js.md). Sin JS se ven los guiones y
-       el boton sigue funcionando. Al llegar a 0 js pone [hidden] en la seccion (css: .promo-banner[hidden]{display:none}).
-       Bloque IDENTICO en las paginas con utility-bar. No tocar a mano sin replicar. -->
   <section class="promo-banner" id="promo-banner" aria-label="Oferta por tiempo limitado">
     <div class="container">
       <div class="promo-banner__frame">
@@ -149,7 +110,6 @@
     </nav>
   </aside>
 
-  <!-- ===== CARRITO · DRAWER (contrato compartido, mismo patrón MP que AP Beauty — ver AP-J2 en pipeline.md) ===== -->
   <div class="cart-backdrop" id="cart-backdrop" hidden></div>
   <aside class="cart-drawer" id="cart-drawer" aria-label="Tu carrito" aria-hidden="true">
     <div class="cart-drawer__top">
@@ -157,9 +117,6 @@
       <button class="cart-close" id="btn-cart-close" aria-label="Cerrar carrito">✕</button>
     </div>
 
-    <!-- AE-R3 · Oferta vigente + progreso (BRIEFING §5.1/§5.3). Misma fecha de fin que #promo-banner (js la lee del
-         primer [data-countdown-end]; aqui se repite el atributo solo para que el HTML sea autonomo, mantener sincronizado).
-         Oferta: 3 por S/ 99 (antes S/ 135), 30 ml. js oculta [data-offer-block] al terminar la cuenta atras. -->
     <div class="cart-drawer__offer" id="cart-offer" data-offer-block>
       <p class="cart-drawer__offer-title"><strong>3 por S/ 99</strong> <s>antes S/ 135</s> <span>· 30 ml</span></p>
       <p class="cart-drawer__offer-timer">
@@ -189,7 +146,6 @@
 
     <ul class="cart-drawer__items" id="cart-items"></ul>
 
-    <!-- Completar la oferta: js sugiere hasta 2 fragancias que no estan en el carrito (desde data/productos.json) -->
     <div class="cart-upsell" id="cart-upsell" data-offer-block hidden>
       <p class="cart-upsell__title">Completa tu oferta</p>
       <ul class="cart-upsell__list" id="cart-upsell-list"></ul>
@@ -241,21 +197,11 @@
 
   <main id="main">
 
-    <!-- ===== AE-R4 · FRANJA DE VALORACIÓN (referencia: barra Judge.me bajo el banner). ACTIVA con CIFRAS PLACEHOLDER
-         (data-placeholder-cifra) por decisión de Paul para visualizar el conjunto. js la sobrescribe con la media y el
-         nº reales cuando data/resenas.json tenga reseñas. ANTES DE PUBLICAR hay que quitar/sustituir las cifras de muestra. ===== -->
     <p class="rating-bar" data-rating-bar>
       <span class="rating-bar__stars" aria-hidden="true">★★★★★</span>
       <span class="rating-bar__score" data-rating-bar-text data-placeholder-cifra>4,8/5 · Basado en +1.200 opiniones</span>
       <a href="#reseñas-titulo" class="rating-bar__link">Ver reseñas</a>
     </p>
-    <!-- ===== 1 · HERO — AE-R4 (reestructuración, decisión de Paul 2026-11-15): fondo BLANCO, sin foto plana de fondo.
-         Copia la composición del hero de una referencia externa (allí es UNA imagen ancha 3000×965 con el texto horneado
-         dentro; aquí el texto es HTML vivo —indexable y accesible— y solo las fotos son imagen):
-         titular centrado → subtítulo → [grupo "Para él" · pieza central · grupo "Para ella"] → microbeneficios.
-         FOTOS TEMPORALES: los 6 frascos y la pieza central usan fotos de catálogo CON fondo. El hero final necesita
-         PNG/WebP RECORTADOS sin fondo (ver BRIEFING_REESTRUCTURACION.md §3.3). Sin hotspots "+" (decisión del brief).
-         Prueba social: [data-trust-strip] oculto hasta que Paul entregue cifras reales. -->
     <section class="hero-split" aria-labelledby="hero-titulo">
       <div class="container hero-split__inner">
         <h1 id="hero-titulo" class="hero-split__title">Sin etiquetas, solo esencia</h1>
@@ -276,7 +222,7 @@
           <a class="hero-split__center" href="muestras.html">
             <img class="hero-split__feature" src="assets/section-class-hero/muestras.webp" alt="Estuche de muestras Allpa Essence con 30 viales de fragancia junto a la bolsa de la marca" width="768" height="1024" loading="eager" fetchpriority="high">
             <span class="hero-split__feature-caption">Prueba primero tu esencia</span>
-            <span class="hero-split__feature-sub">Pide una muestra antes del frasco completo</span>
+            <span class="hero-split__feature-sub">Muestras desde S/ 15</span>
           </a>
 
           <a class="hero-split__group hero-split__group--her" href="catalogo.html?genero=para-ella" aria-label="Ver fragancias para ella">
@@ -291,8 +237,6 @@
 
         </div>
 
-        <!-- Microbeneficios: solo afirmaciones que el sitio ya hace (utility-bar / ficha). Los de la referencia
-             ("alta concentración", "larga duración") NO se copian hasta que Paul los confirme (MICROBENEFICIOS_PENDIENTE). -->
         <ul class="hero-split__benefits">
           <li>Envíos a todo el Perú</li>
           <li>Compra 100% segura</li>
@@ -305,8 +249,6 @@
       </div>
     </section>
 
-    <!-- ===== AE-R4 · BUSCADOR DESTACADO (referencia: "Encuentra tu perfume favorito"). Busca por nombre o familia; NUNCA por
-         marca original (riesgo legal): el placeholder no sugiere marcas. Sin JS envía ?q= a catalogo.html. ===== -->
     <section class="home-search" aria-labelledby="home-search-titulo">
       <div class="container home-search__inner">
         <h2 id="home-search-titulo" class="home-search__title">Encuentra tu fragancia</h2>
@@ -320,8 +262,6 @@
       </div>
     </section>
 
-    <!-- ===== AE-R4 · MARQUEE (referencia: banda naranja en movimiento). Mensajes REALES del sitio; el de la oferta lleva
-         data-offer-block y desaparece al terminar la cuenta atrás. 2ª copia aria-hidden para el bucle continuo. ===== -->
     <div class="marquee" aria-label="Mensajes de Allpa Essence">
       <div class="marquee__track">
         <ul class="marquee__group">
@@ -341,10 +281,6 @@
       </div>
     </div>
 
-    <!-- ===== AE-R4 · FAVORITOS CON PESTAÑAS (referencia: "Más vendidos" con pestañas Más vendidos / Hombre / Mujer).
-         Pestañas = Favoritos del live / Para él / Para ella (género real desde data/productos.json). js renderiza 4
-         tarjetas por pestaña; las 4 estáticas de abajo son el FALLBACK sin JS. Valoración por tarjeta: slot oculto
-         hasta tener reseñas reales. ===== -->
     <section class="trending favoritos" aria-labelledby="trending-titulo">
       <div class="container">
         <p class="eyebrow">LOS MÁS ELEGIDOS</p>
@@ -418,7 +354,6 @@
       </div>
     </section>
 
-    <!-- ===== AE-R4 · BANNER TIPOGRÁFICO "NUEVOS INGRESOS" (referencia: "NEW ARRIVAL" repetido como separador) ===== -->
     <div class="new-arrival" aria-hidden="true">
       <div class="new-arrival__track">
         <p class="new-arrival__group"><span>Nuevos ingresos</span><span>Nuevos ingresos</span><span>Nuevos ingresos</span><span>Nuevos ingresos</span><span>Nuevos ingresos</span><span>Nuevos ingresos</span></p>
@@ -426,9 +361,6 @@
       </div>
     </div>
 
-    <!-- ===== AE-R4 · RECIÉN LLEGADOS (referencia: "Recién llegados otoño 2026", 8 novedades con etiqueta NUEVO + botón
-         "Ver todos los nuevos"). Reemplaza el bloque "promesa" (decisión de Paul). js pinta 8 de las fragancias con
-         "nuevo": true en data/productos.json (ae-10..ae-20). Cada tarjeta ya viene en el HTML (visible sin JS); js las vuelve a pintar desde el JSON. ===== -->
     <section class="nuevos" aria-labelledby="nuevos-titulo">
       <div class="container">
         <p class="eyebrow">RECIÉN LLEGADOS</p>
@@ -526,9 +458,6 @@
         <p class="section-more"><a href="catalogo.html" class="btn btn--outline">Ver todos los nuevos</a></p>
       </div>
     </section>
-    <!-- ===== AE-R4 · "HABLAN POR NOSOTROS" (referencia: media 4,83 sobre 1.869 reseñas + carrusel con foto). Reemplaza el
-         banner partido (decisión de Paul). Cifra = PLACEHOLDER (data-placeholder-cifra) hasta tener el nº real; js la
-         sobrescribe desde data/resenas.json. Tarjetas = placeholders para las reseñas en texto de Paul. ===== -->
     <section class="reviews home-reviews section--navy" aria-labelledby="reseñas-titulo">
       <div class="container">
         <h2 id="reseñas-titulo" class="reviews__title">Hablan por nosotros</h2>
@@ -563,11 +492,9 @@
             </article>
           </li>
         </ul>
-        <p class="section-more"><a href="resenas.html" class="btn btn--ghost">Ver todas las reseñas</a></p>
+        <p class="section-more"><a href="resenas.html" class="btn btn--ghost">Ver todas las reseñas</a> <a href="resenas.html#escribir-resena" class="btn btn--outline">Escribir una reseña</a></p>
       </div>
     </section>
-    <!-- ===== AE-R4 · TRUST GRID bajo las reseñas (referencia: Clientes reales / Envío 24-48h / Pago seguro / Devolución fácil),
-         ADAPTADO a Allpa. Cifra de pedidos = PLACEHOLDER (data-placeholder-cifra); plazos y política de cambios PENDIENTES. ===== -->
     <section class="trust-strip" aria-label="Por qué comprar con confianza">
       <div class="container">
         <ul class="trust-strip__grid">
@@ -594,12 +521,6 @@
         </ul>
       </div>
     </section>
-    <!-- ===== AE-R4 · "DEL LABORATORIO A TU CASA" + REELS (3 vídeos verticales). Decisión de Paul 2026-11-17: se reproducen
-         SOLOS, mudos, en bucle y NO interactuables: sin botón de reproducir, sin controles, sin pausa al clic (<figure inert>
-         + aria-hidden: son decorativos). Archivos en assets/section-class-lab-navy/: *-web.mp4 (sin audio, optimizados;
-         los .mp4 originales siguen ahí, el 3.mp4 pesa 11 MB) + póster .webp. Falta: css (pointer-events:none, 9:16 con
-         object-fit:cover — 3.mp4 es 3:4) y js (initReels ya ignora estos .reel porque no tienen botón; opcional pausar fuera
-         de pantalla). Subtítulo de Paul: "Esencias concentradas con dedicación". ===== -->
     <section class="lab section--navy" aria-labelledby="journal-titulo">
       <div class="container">
         <p class="eyebrow">DETRÁS DE CADA FRASCO</p>
@@ -624,8 +545,6 @@
         </div>
       </div>
     </section>
-    <!-- ===== AE-R4 · "¿POR QUÉ ELEGIR ALLPA?" (referencia: 6 tarjetas con icono). 3 valores de marca del brief +
-         3 de proceso. Copy ya existente del sitio; nada de cifras ni plazos inventados. ===== -->
     <section class="valores porque" aria-labelledby="valores-titulo">
       <div class="container">
         <p class="eyebrow">POR QUÉ ALLPA</p>
@@ -665,11 +584,6 @@
       </div>
     </section>
 
-    <!-- ===== AE-R5 · MURO ANECDÓTICO (decisión de Paul 2026-11-17): reemplaza el 2º bloque de reseñas por fotos reales de
-         clientes con su compra, de la época del stand en el centro comercial. Enfoque anecdótico, no de reseña: sin
-         estrellas ni cifras. Ya NO lleva data-reviews-list (js no debe rellenarlo). Botones "Ver reseñas" y
-         "Escribir reseña" siempre visibles. Fotos (5) en assets/section-class-reviews-wall/
-         (los .jpg originales de 5 MB siguen ahí; el HTML usa los .webp). Carrusel = componente genérico .carousel (main.js lo engancha solo). Estilos: .memory-wall* pendientes de css (ver inbox/css.md). ===== -->
     <section class="memory-wall reviews--wall section--navy" aria-labelledby="reseñas-final-titulo">
       <div class="container">
         <div class="reviews__head">
@@ -679,7 +593,7 @@
           </div>
           <div class="reviews__actions">
             <a href="resenas.html" class="btn btn--outline">Ver reseñas</a>
-            <a href="RESENA_FORMULARIO_PENDIENTE" data-cta-pendiente="RESENA_FORMULARIO" class="btn btn--ghost">Escribir reseña</a>
+            <a href="resenas.html#escribir-resena" class="btn btn--ghost">Escribir reseña</a>
           </div>
         </div>
         <div class="carousel memory-wall__carousel" data-carousel="memory-wall">
@@ -721,9 +635,6 @@
         </div>
       </div>
     </section>
-    <!-- ===== AE-R6 · REDES (mismo patrón que AP Beauty: @usuario + botones "Síguenos en…" + rejilla de posts que enlaza al perfil).
-         Usuario oficial confirmado por Paul 2026-11-17: @allpaessence (URLs reales ya puestas). Fotos de la rejilla = TEMPORALES (catálogo); sustituir por los posts reales.
-         TikTok primero: el live es el canal principal. ===== -->
     <section class="insta" aria-labelledby="insta-titulo">
       <div class="container">
         <p class="eyebrow">SÍGUENOS</p>
@@ -745,7 +656,6 @@
         </div>
       </div>
     </section>
-    <!-- ===== MUESTRAS — gancho de confianza sin descuento permanente (principio rector §0) ===== -->
     <section class="muestras-promo" aria-labelledby="muestras-promo-titulo">
       <div class="container muestras-promo__inner">
         <div class="muestras-promo__content reveal">
@@ -756,9 +666,6 @@
       </div>
     </section>
 
-
-    <!-- ===== AE-R4 · AVISO LEGAL DISCRETO (la referencia lo tiene al final de la home). Borrador de front: seo/legal debe validarlo
-         con el marco peruano (Ley 29571 / INDECOPI) antes de publicar. ===== -->
     <p class="legal-note container">Las fragancias Allpa Essence son composiciones propias y no tienen relación ni vinculación con marcas comerciales; cualquier similitud olfativa es solo una referencia de familia. Las ofertas no son acumulables. [AVISO_LEGAL_REVISAR_SEO]</p>
 
   </main>
@@ -792,8 +699,6 @@
       </article>
     </li>
   </template>
-  <!-- ===== 12 · FOOTER v2 (brief §5.12) — políticas visibles (no en link diminuto), WhatsApp
-       visible, sello de pago seguro. Contrato compartido en las 8 páginas. ===== -->
   <footer class="site-footer">
     <div class="container site-footer__inner">
       <div class="site-footer__brand">
@@ -846,10 +751,15 @@
 
       <nav class="site-footer__col" aria-label="Ayuda">
         <p class="site-footer__policies-title">Ayuda</p>
-        <a href="POLITICA_ENVIO_PENDIENTE" data-cta-pendiente="POLITICA_ENVIO">Envíos</a>
+        <a href="politicas.html#envios">Envíos</a>
         <a href="muestras.html">Muestras</a>
         <a href="PAGINA_FAQ_PENDIENTE" data-cta-pendiente="PAGINA_FAQ">Preguntas frecuentes</a>
-        <a href="POLITICA_CAMBIOS_PENDIENTE" data-cta-pendiente="POLITICA_CAMBIOS">Cambios y devoluciones</a>
+        <a href="politicas.html#devoluciones">Cambios y devoluciones</a>
+        <a href="politicas.html#terminos">Términos y condiciones</a>
+        <a href="politicas.html#privacidad">Privacidad</a>
+        <a href="politicas.html#cookies">Cookies</a>
+        <a href="#" data-ae-privacy>Configurar cookies</a>
+        <a href="RECLAMACIONES_PENDIENTE" data-cta-pendiente="LIBRO_RECLAMACIONES">Libro de Reclamaciones</a>
         <details class="footer-faq">
           <summary>¿Por qué mi perfume tiene alcohol?</summary>
           <p>Todo perfume lo lleva — es lo que libera y transporta el aroma, no un relleno. Lo que sí evitamos es bajar la concentración de esencia para ahorrar costo: la tuya es la que corresponde, no menos.</p>
@@ -879,7 +789,6 @@
     </div>
   </footer>
 
-  <!-- AE-R4 · Botón flotante de WhatsApp (la referencia lo tiene en todas las páginas). Destino PENDIENTE (número real de Paul). -->
   <a class="whatsapp-float" href="https://wa.me/51929033871" target="_blank" rel="noopener noreferrer" aria-label="Escríbenos por WhatsApp">
     <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.2-4.6-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.8 0-1.3.7-2 1-2.3.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.3 0 .5l-.3.4-.4.4c-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.3 2.4 1.5.3.1.5.1.6-.1l.9-1.1c.2-.3.4-.2.6-.1l1.9.9c.3.1.5.2.5.3.1.1.1.6-.1 1.2z"/></svg>
   </a>

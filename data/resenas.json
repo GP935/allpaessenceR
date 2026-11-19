@@ -1,1 +1,1202 @@
-[]
+[
+ {
+  "id": "C142",
+  "autor": "Nicolás R.",
+  "texto": "Segunda compra. Esta vez incluso llegó antes que la anterior.",
+  "estrellas": 5,
+  "fecha": "2026-11-19",
+  "foto": ""
+ },
+ {
+  "id": "C145",
+  "autor": "Verónica S.",
+  "texto": "Buena experiencia. Encontré lo que buscaba y no hubo ningún problema.",
+  "estrellas": 5,
+  "fecha": "2026-11-19",
+  "foto": ""
+ },
+ {
+  "id": "C122",
+  "autor": "David R.",
+  "texto": "Llegó antes de lo que esperaba y el embalaje estaba perfecto.",
+  "estrellas": 5,
+  "fecha": "2026-11-18",
+  "foto": ""
+ },
+ {
+  "id": "C125",
+  "autor": "Marta N.",
+  "texto": "Compré una fragancia descatalogada en otras tiendas y aquí la encontré.",
+  "estrellas": 5,
+  "fecha": "2026-11-18",
+  "foto": ""
+ },
+ {
+  "id": "C126",
+  "autor": "Rubén C.",
+  "texto": "Todo correcto. No he tenido que contactar con la tienda para nada.",
+  "estrellas": 5,
+  "fecha": "2026-11-18",
+  "foto": ""
+ },
+ {
+  "id": "C129",
+  "autor": "Isabel P.",
+  "texto": "Me ha gustado la experiencia. Seguramente volveré a comprar.",
+  "estrellas": 5,
+  "fecha": "2026-11-18",
+  "foto": ""
+ },
+ {
+  "id": "C130",
+  "autor": "Víctor J.",
+  "texto": "El producto corresponde con la referencia que pedí. Todo bien.",
+  "estrellas": 5,
+  "fecha": "2026-11-18",
+  "foto": ""
+ },
+ {
+  "id": "C133",
+  "autor": "Laura T.",
+  "texto": "Me llegó perfectamente. Era la primera vez que compraba y repetiría.",
+  "estrellas": 5,
+  "fecha": "2026-11-18",
+  "foto": ""
+ },
+ {
+  "id": "C137",
+  "autor": "Patricia S.",
+  "texto": "El perfume llegó perfectamente y el precinto estaba intacto.",
+  "estrellas": 5,
+  "fecha": "2026-11-18",
+  "foto": ""
+ },
+ {
+  "id": "C103",
+  "autor": "Lucía B.",
+  "texto": "Me gustó poder encontrar varias referencias que no estaban disponibles en otras tiendas.",
+  "estrellas": 5,
+  "fecha": "2026-11-17",
+  "foto": ""
+ },
+ {
+  "id": "C106",
+  "autor": "Daniel T.",
+  "texto": "Ya había comprado antes y he vuelto a repetir. No he tenido problemas.",
+  "estrellas": 5,
+  "fecha": "2026-11-17",
+  "foto": ""
+ },
+ {
+  "id": "C109",
+  "autor": "Paula R.",
+  "texto": "Era para regalar y me preocupaba que llegara tarde. Finalmente llegó dos días antes.",
+  "estrellas": 5,
+  "fecha": "2026-11-17",
+  "foto": ""
+ },
+ {
+  "id": "C111",
+  "autor": "Elena P.",
+  "texto": "He comprado varias veces online y esta tienda me ha dado una buena experiencia.",
+  "estrellas": 5,
+  "fecha": "2026-11-17",
+  "foto": ""
+ },
+ {
+  "id": "C113",
+  "autor": "Nuria C.",
+  "texto": "Buena compra. El perfume estaba bien protegido y llegó en perfecto estado.",
+  "estrellas": 5,
+  "fecha": "2026-11-17",
+  "foto": ""
+ },
+ {
+  "id": "C115",
+  "autor": "Raquel M.",
+  "texto": "Me ha gustado el precio y que no haya habido problemas con la entrega.",
+  "estrellas": 5,
+  "fecha": "2026-11-17",
+  "foto": ""
+ },
+ {
+  "id": "C117",
+  "autor": "Beatriz T.",
+  "texto": "Compré una fragancia para mí y otra para mi pareja. Ambas llegaron bien.",
+  "estrellas": 5,
+  "fecha": "2026-11-17",
+  "foto": ""
+ },
+ {
+  "id": "C099",
+  "autor": "Eva J.",
+  "texto": "Compré una colonia para mi padre. Llegó a tiempo y sin problemas.",
+  "estrellas": 5,
+  "fecha": "2026-11-16",
+  "foto": ""
+ },
+ {
+  "id": "C101",
+  "autor": "Carmen V.",
+  "texto": "El precio me pareció muy bueno y el producto llegó perfectamente.",
+  "estrellas": 5,
+  "fecha": "2026-11-16",
+  "foto": ""
+ },
+ {
+  "id": "C102",
+  "autor": "Adrián E.",
+  "texto": "Nada que objetar. Pedido correcto y entrega sin incidencias.",
+  "estrellas": 5,
+  "fecha": "2026-11-16",
+  "foto": ""
+ },
+ {
+  "id": "C091",
+  "autor": "Sara E.",
+  "texto": "Todo bien. El perfume llegó precintado y en su caja original.",
+  "estrellas": 5,
+  "fecha": "2026-11-14",
+  "foto": ""
+ },
+ {
+  "id": "C092",
+  "autor": "Jaime P.",
+  "texto": "Compré una fragancia que llevaba meses buscando. Muy contento de encontrarla aquí.",
+  "estrellas": 5,
+  "fecha": "2026-11-14",
+  "foto": ""
+ },
+ {
+  "id": "C090",
+  "autor": "Martina V.",
+  "texto": "No conocía la tienda, pero me ha dado confianza después de recibir el pedido.",
+  "estrellas": 5,
+  "fecha": "2026-11-13",
+  "foto": ""
+ },
+ {
+  "id": "C087",
+  "autor": "Joel D.",
+  "texto": "Buena experiencia, la verdad. No esperaba que llegara tan rápido.",
+  "estrellas": 5,
+  "fecha": "2026-11-07",
+  "foto": ""
+ },
+ {
+  "id": "C084",
+  "autor": "Jimena B.",
+  "texto": "Muy buena compra. El precio era bastante mejor que en el centro comercial.",
+  "estrellas": 5,
+  "fecha": "2026-10-26",
+  "foto": ""
+ },
+ {
+  "id": "C081",
+  "autor": "Rebeca P.",
+  "texto": "El paquete llegó a mi domicilio sin necesidad de hacer ninguna gestión adicional.",
+  "estrellas": 5,
+  "fecha": "2026-10-14",
+  "foto": ""
+ },
+ {
+  "id": "C078",
+  "autor": "Pedro A.",
+  "texto": "Muy buen servicio. Recibí exactamente lo que había comprado.",
+  "estrellas": 5,
+  "fecha": "2026-10-02",
+  "foto": ""
+ },
+ {
+  "id": "C075",
+  "autor": "Elisa R.",
+  "texto": "He encontrado un buen descuento respecto al precio habitual.",
+  "estrellas": 5,
+  "fecha": "2026-09-20",
+  "foto": ""
+ },
+ {
+  "id": "C074",
+  "autor": "Damián V.",
+  "texto": "El perfume llegó bien protegido y sin fugas. Era mi principal preocupación.",
+  "estrellas": 5,
+  "fecha": "2026-09-16",
+  "foto": ""
+ },
+ {
+  "id": "C073",
+  "autor": "Gloria M.",
+  "texto": "Pedido para uso personal. Todo ha ido bien, desde la compra hasta la entrega.",
+  "estrellas": 5,
+  "fecha": "2026-09-12",
+  "foto": ""
+ },
+ {
+  "id": "C069",
+  "autor": "Sonia E.",
+  "texto": "Ya he recomendado la tienda a un familiar porque mi experiencia ha sido buena.",
+  "estrellas": 5,
+  "fecha": "2026-08-27",
+  "foto": ""
+ },
+ {
+  "id": "C066",
+  "autor": "Bruno R.",
+  "texto": "Me sorprendió el precio. Volveré a consultar antes de comprar en otro sitio.",
+  "estrellas": 5,
+  "fecha": "2026-08-15",
+  "foto": ""
+ },
+ {
+  "id": "C065",
+  "autor": "Nerea T.",
+  "texto": "El perfume estaba disponible cuando en otras páginas aparecía agotado.",
+  "estrellas": 5,
+  "fecha": "2026-08-11",
+  "foto": ""
+ },
+ {
+  "id": "C063",
+  "autor": "Fátima L.",
+  "texto": "Compré por recomendación de una amiga y ha sido una buena decisión.",
+  "estrellas": 5,
+  "fecha": "2026-08-03",
+  "foto": ""
+ },
+ {
+  "id": "C061",
+  "autor": "Mercedes D.",
+  "texto": "La fragancia venía precintada y el embalaje exterior estaba bien.",
+  "estrellas": 5,
+  "fecha": "2026-07-26",
+  "foto": ""
+ },
+ {
+  "id": "C060",
+  "autor": "Arturo G.",
+  "texto": "Todo correcto. Lo importante es que llegó lo que pedí y a buen precio.",
+  "estrellas": 5,
+  "fecha": "2026-07-22",
+  "foto": ""
+ },
+ {
+  "id": "C057",
+  "autor": "Blanca C.",
+  "texto": "La web es fácil de utilizar y el pedido se hizo en pocos minutos.",
+  "estrellas": 5,
+  "fecha": "2026-07-10",
+  "foto": ""
+ },
+ {
+  "id": "C056",
+  "autor": "Ernesto P.",
+  "texto": "Compré dos perfumes diferentes y ambos llegaron correctamente.",
+  "estrellas": 5,
+  "fecha": "2026-07-06",
+  "foto": ""
+ },
+ {
+  "id": "C054",
+  "autor": "Ignacio R.",
+  "texto": "Muy buena compra. Encontré la fragancia a un precio bastante competitivo.",
+  "estrellas": 5,
+  "fecha": "2026-06-28",
+  "foto": ""
+ },
+ {
+  "id": "C052",
+  "autor": "Ricardo T.",
+  "texto": "Ya había comprado anteriormente y no he tenido problemas en ninguna de las dos ocasiones.",
+  "estrellas": 5,
+  "fecha": "2026-06-20",
+  "foto": ""
+ },
+ {
+  "id": "C051",
+  "autor": "Ainhoa M.",
+  "texto": "Llegó bien y en el tiempo previsto. La caja del perfume estaba perfecta.",
+  "estrellas": 5,
+  "fecha": "2026-06-16",
+  "foto": ""
+ },
+ {
+  "id": "C050",
+  "autor": "Pablo J.",
+  "texto": "El precio fue lo que me convenció y el servicio ha estado a la altura.",
+  "estrellas": 5,
+  "fecha": "2026-06-12",
+  "foto": ""
+ },
+ {
+  "id": "C049",
+  "autor": "Verónica B.",
+  "texto": "Me llegó exactamente la referencia que pedí. Buena experiencia.",
+  "estrellas": 5,
+  "fecha": "2026-06-08",
+  "foto": ""
+ },
+ {
+  "id": "C047",
+  "autor": "Celia F.",
+  "texto": "Llegó en el plazo indicado. No tuve que preocuparme por nada.",
+  "estrellas": 5,
+  "fecha": "2026-05-31",
+  "foto": ""
+ },
+ {
+  "id": "C046",
+  "autor": "Rodrigo D.",
+  "texto": "Buen precio y disponibilidad de productos que no encontraba en otros sitios.",
+  "estrellas": 5,
+  "fecha": "2026-05-27",
+  "foto": ""
+ },
+ {
+  "id": "C045",
+  "autor": "Julia M.",
+  "texto": "El frasco llegó bien protegido, que era lo que más me preocupaba.",
+  "estrellas": 5,
+  "fecha": "2026-05-23",
+  "foto": ""
+ },
+ {
+  "id": "C044",
+  "autor": "Emilio G.",
+  "texto": "Todo correcto desde la compra hasta la recepción. Ninguna incidencia.",
+  "estrellas": 5,
+  "fecha": "2026-05-19",
+  "foto": ""
+ },
+ {
+  "id": "C042",
+  "autor": "Héctor S.",
+  "texto": "Me parece una buena alternativa para comprar perfumes sin pagar tanto como en algunas cadenas.",
+  "estrellas": 5,
+  "fecha": "2026-05-11",
+  "foto": ""
+ },
+ {
+  "id": "C041",
+  "autor": "Claudia R.",
+  "texto": "Compré sin conocer demasiado la tienda. El pedido llegó bien y el producto coincide con lo anunciado.",
+  "estrellas": 5,
+  "fecha": "2026-05-07",
+  "foto": ""
+ },
+ {
+  "id": "C040",
+  "autor": "Francisco L.",
+  "texto": "Segunda compra y de nuevo todo correcto. Es una buena señal.",
+  "estrellas": 5,
+  "fecha": "2026-05-03",
+  "foto": ""
+ },
+ {
+  "id": "C036",
+  "autor": "Gonzalo M.",
+  "texto": "He comprado una fragancia que no encontraba fácilmente. Muy satisfecho con la compra.",
+  "estrellas": 5,
+  "fecha": "2026-04-17",
+  "foto": ""
+ },
+ {
+  "id": "C034",
+  "autor": "Jaime B.",
+  "texto": "Llegó antes de lo esperado. El producto estaba bien protegido y la caja sin marcas.",
+  "estrellas": 5,
+  "fecha": "2026-04-09",
+  "foto": ""
+ },
+ {
+  "id": "C033",
+  "autor": "Lorena H.",
+  "texto": "Me daba miedo comprar una fragancia cara por internet, pero la experiencia ha sido buena.",
+  "estrellas": 5,
+  "fecha": "2026-04-05",
+  "foto": ""
+ },
+ {
+  "id": "C032",
+  "autor": "Víctor P.",
+  "texto": "Pedido recibido correctamente. No tengo nada negativo que destacar.",
+  "estrellas": 5,
+  "fecha": "2026-04-01",
+  "foto": ""
+ },
+ {
+  "id": "C030",
+  "autor": "Manuel R.",
+  "texto": "El precio era bastante inferior al de la perfumería donde suelo comprar. Me ha compensado.",
+  "estrellas": 5,
+  "fecha": "2026-03-24",
+  "foto": ""
+ },
+ {
+  "id": "C029",
+  "autor": "Cristina A.",
+  "texto": "Todo según lo previsto. Volveré a mirar la web cuando necesite reponer perfume.",
+  "estrellas": 5,
+  "fecha": "2026-03-20",
+  "foto": ""
+ },
+ {
+  "id": "C027",
+  "autor": "Raquel D.",
+  "texto": "Me gustó que el paquete no tuviera golpes ni estuviera excesivamente manipulado.",
+  "estrellas": 5,
+  "fecha": "2026-03-12",
+  "foto": ""
+ },
+ {
+  "id": "C026",
+  "autor": "Alejandro S.",
+  "texto": "Encontré una oferta interesante y aproveché para comprar dos unidades. Llegaron juntas y en perfecto estado.",
+  "estrellas": 5,
+  "fecha": "2026-03-08",
+  "foto": ""
+ },
+ {
+  "id": "C025",
+  "autor": "Patricia O.",
+  "texto": "Buena relación calidad-precio. No tuve que contactar con atención al cliente porque todo salió bien.",
+  "estrellas": 5,
+  "fecha": "2026-03-04",
+  "foto": ""
+ },
+ {
+  "id": "C023",
+  "autor": "Isabel V.",
+  "texto": "Me llegó el producto original que esperaba, con su caja y precinto. Todo correcto.",
+  "estrellas": 5,
+  "fecha": "2026-02-24",
+  "foto": ""
+ },
+ {
+  "id": "C022",
+  "autor": "Rubén T.",
+  "texto": "No es la primera vez que compro online perfumes y esta ha sido de las experiencias más sencillas.",
+  "estrellas": 5,
+  "fecha": "2026-02-20",
+  "foto": ""
+ },
+ {
+  "id": "C021",
+  "autor": "Nuria G.",
+  "texto": "Compré un perfume para mi pareja y quedó encantada. El embalaje llegó impecable.",
+  "estrellas": 5,
+  "fecha": "2026-02-16",
+  "foto": ""
+ },
+ {
+  "id": "C019",
+  "autor": "Silvia P.",
+  "texto": "He comparado precios y merece bastante la pena. El pedido llegó sin incidencias.",
+  "estrellas": 5,
+  "fecha": "2026-02-08",
+  "foto": ""
+ },
+ {
+  "id": "C018",
+  "autor": "Daniel M.",
+  "texto": "Llegó en tres días. El producto venía protegido y sin ningún desperfecto.",
+  "estrellas": 5,
+  "fecha": "2026-02-04",
+  "foto": ""
+ },
+ {
+  "id": "C017",
+  "autor": "Beatriz L.",
+  "texto": "Primera experiencia positiva. Compré con algo de desconfianza por no conocer la tienda, pero todo correcto.",
+  "estrellas": 5,
+  "fecha": "2026-01-31",
+  "foto": ""
+ },
+ {
+  "id": "C015",
+  "autor": "Ana R.",
+  "texto": "El perfume llegó tal cual aparece en la descripción. Sin sorpresas.",
+  "estrellas": 5,
+  "fecha": "2026-01-23",
+  "foto": ""
+ },
+ {
+  "id": "C014",
+  "autor": "David N.",
+  "texto": "Muy bien presentado el paquete. Se nota que han tenido cuidado al preparar el pedido.",
+  "estrellas": 5,
+  "fecha": "2026-01-19",
+  "foto": ""
+ },
+ {
+  "id": "C013",
+  "autor": "Carmen F.",
+  "texto": "Compré aprovechando una oferta. No conocía la web y seguramente repetiré porque ha ido todo bien.",
+  "estrellas": 5,
+  "fecha": "2026-01-15",
+  "foto": ""
+ },
+ {
+  "id": "C011",
+  "autor": "Natalia B.",
+  "texto": "Sin problemas con el pedido. El frasco llegó protegido y era exactamente el que había comprado.",
+  "estrellas": 5,
+  "fecha": "2026-01-07",
+  "foto": ""
+ },
+ {
+  "id": "C010",
+  "autor": "Roberto H.",
+  "texto": "Encontré aquí una referencia que no veía disponible en otras perfumerías. Llegó correctamente.",
+  "estrellas": 5,
+  "fecha": "2026-01-03",
+  "foto": ""
+ },
+ {
+  "id": "C008",
+  "autor": "Sergio L.",
+  "texto": "Me sorprendió que llegara antes de Navidad teniendo en cuenta las fechas. Muy contento.",
+  "estrellas": 5,
+  "fecha": "2025-12-23",
+  "foto": ""
+ },
+ {
+  "id": "C007",
+  "autor": "Paula T.",
+  "texto": "Segundo pedido que hago. Esta vez compré dos perfumes y ambos llegaron perfectamente.",
+  "estrellas": 5,
+  "fecha": "2025-12-19",
+  "foto": ""
+ },
+ {
+  "id": "C005",
+  "autor": "Elena S.",
+  "texto": "Lo pedí para un regalo de cumpleaños y llegó justo a tiempo. Me ahorré bastante respecto a otras páginas.",
+  "estrellas": 5,
+  "fecha": "2025-12-11",
+  "foto": ""
+ },
+ {
+  "id": "C004",
+  "autor": "Carlos P.",
+  "texto": "Buen precio, envío rápido y sin complicaciones. Poco más que pedir.",
+  "estrellas": 5,
+  "fecha": "2025-12-06",
+  "foto": ""
+ },
+ {
+  "id": "C003",
+  "autor": "Marta G.",
+  "texto": "Era mi primera compra y tenía mis dudas. El paquete llegó bien cerrado y el perfume estaba precintado. Volvería a comprar.",
+  "estrellas": 5,
+  "fecha": "2025-12-02",
+  "foto": ""
+ },
+ {
+  "id": "C001",
+  "autor": "Lucía M.",
+  "texto": "Compré un perfume que llevaba tiempo buscando y estaba bastante más barato que en tienda física. Llegó en cuatro días y perfectamente embalado.",
+  "estrellas": 5,
+  "fecha": "2025-11-23",
+  "foto": ""
+ },
+ {
+  "id": "C141",
+  "autor": "Gema C.",
+  "texto": "El precio era bastante bueno y la entrega fue rápida.",
+  "estrellas": 5,
+  "fecha": "2026-11-19",
+  "foto": ""
+ },
+ {
+  "id": "C143",
+  "autor": "Marina P.",
+  "texto": "Me llegó el perfume, pero la caja estaba algo deteriorada. Para el precio esperaba algo mejor presentado.",
+  "estrellas": 3,
+  "fecha": "2026-11-19",
+  "foto": ""
+ },
+ {
+  "id": "C144",
+  "autor": "Eduardo M.",
+  "texto": "Todo correcto, producto y entrega.",
+  "estrellas": 5,
+  "fecha": "2026-11-19",
+  "foto": ""
+ },
+ {
+  "id": "C146",
+  "autor": "Arturo N.",
+  "texto": "El servicio es bueno. Me habría gustado recibir una notificación más cuando salió el paquete.",
+  "estrellas": 4,
+  "fecha": "2026-11-19",
+  "foto": ""
+ },
+ {
+  "id": "C147",
+  "autor": "Blanca J.",
+  "texto": "Llegó en perfecto estado y dentro del plazo previsto.",
+  "estrellas": 5,
+  "fecha": "2026-11-19",
+  "foto": ""
+ },
+ {
+  "id": "C148",
+  "autor": "Gonzalo E.",
+  "texto": "El pedido llegó correctamente, pero tardaron bastante en contestar una consulta previa sobre disponibilidad.",
+  "estrellas": 3,
+  "fecha": "2026-11-19",
+  "foto": ""
+ },
+ {
+  "id": "C149",
+  "autor": "Jimena O.",
+  "texto": "El frasco llegó con una pequeña fuga. Me ofrecieron una solución, pero tuve que dedicar bastante tiempo a gestionarlo.",
+  "estrellas": 2,
+  "fecha": "2026-11-19",
+  "foto": ""
+ },
+ {
+  "id": "C150",
+  "autor": "Ismael T.",
+  "texto": "Mi pedido no llegó y no conseguí una respuesta clara sobre lo ocurrido.",
+  "estrellas": 1,
+  "fecha": "2026-11-19",
+  "foto": ""
+ },
+ {
+  "id": "C121",
+  "autor": "Alba D.",
+  "texto": "Segunda vez que compro y todo ha vuelto a salir bien.",
+  "estrellas": 5,
+  "fecha": "2026-11-18",
+  "foto": ""
+ },
+ {
+  "id": "C123",
+  "autor": "Teresa M.",
+  "texto": "El producto llegó bien, pero el seguimiento fue bastante confuso y tuve que preguntar.",
+  "estrellas": 3,
+  "fecha": "2026-11-18",
+  "foto": ""
+ },
+ {
+  "id": "C124",
+  "autor": "Sergio A.",
+  "texto": "Buena experiencia, precio competitivo y pedido correcto.",
+  "estrellas": 5,
+  "fecha": "2026-11-18",
+  "foto": ""
+ },
+ {
+  "id": "C127",
+  "autor": "Andrea H.",
+  "texto": "El paquete llegó en buen estado y dentro del plazo.",
+  "estrellas": 5,
+  "fecha": "2026-11-18",
+  "foto": ""
+ },
+ {
+  "id": "C128",
+  "autor": "Carlos B.",
+  "texto": "Buen precio. El embalaje exterior tenía un pequeño golpe, pero el perfume estaba bien.",
+  "estrellas": 4,
+  "fecha": "2026-11-18",
+  "foto": ""
+ },
+ {
+  "id": "C131",
+  "autor": "Silvia E.",
+  "texto": "Buena compra, sin complicaciones.",
+  "estrellas": 5,
+  "fecha": "2026-11-18",
+  "foto": ""
+ },
+ {
+  "id": "C132",
+  "autor": "Pablo M.",
+  "texto": "El precio era muy bueno y el envío llegó cuando indicaban.",
+  "estrellas": 5,
+  "fecha": "2026-11-18",
+  "foto": ""
+ },
+ {
+  "id": "C134",
+  "autor": "Enrique R.",
+  "texto": "Ninguna queja, pedido completo y bien protegido.",
+  "estrellas": 5,
+  "fecha": "2026-11-18",
+  "foto": ""
+ },
+ {
+  "id": "C135",
+  "autor": "Celia V.",
+  "texto": "La entrega se retrasó un día. Por lo demás, todo bien.",
+  "estrellas": 4,
+  "fecha": "2026-11-18",
+  "foto": ""
+ },
+ {
+  "id": "C136",
+  "autor": "Mario G.",
+  "texto": "Muy buena relación calidad-precio.",
+  "estrellas": 5,
+  "fecha": "2026-11-18",
+  "foto": ""
+ },
+ {
+  "id": "C138",
+  "autor": "Jaime D.",
+  "texto": "He quedado satisfecho. No hay mucho más que añadir.",
+  "estrellas": 5,
+  "fecha": "2026-11-18",
+  "foto": ""
+ },
+ {
+  "id": "C139",
+  "autor": "Eva L.",
+  "texto": "Compré para un regalo y todo salió bien.",
+  "estrellas": 5,
+  "fecha": "2026-11-18",
+  "foto": ""
+ },
+ {
+  "id": "C140",
+  "autor": "Rodrigo F.",
+  "texto": "El pedido llegó completo y sin daños.",
+  "estrellas": 5,
+  "fecha": "2026-11-18",
+  "foto": ""
+ },
+ {
+  "id": "C104",
+  "autor": "Roberto N.",
+  "texto": "El paquete llegó bien cerrado. Todo en orden.",
+  "estrellas": 5,
+  "fecha": "2026-11-17",
+  "foto": ""
+ },
+ {
+  "id": "C105",
+  "autor": "Silvia G.",
+  "texto": "La compra fue buena, aunque el transportista no avisó de la hora de entrega.",
+  "estrellas": 4,
+  "fecha": "2026-11-17",
+  "foto": ""
+ },
+ {
+  "id": "C107",
+  "autor": "Irene M.",
+  "texto": "El perfume llegó en su caja, precintado y sin daños.",
+  "estrellas": 5,
+  "fecha": "2026-11-17",
+  "foto": ""
+ },
+ {
+  "id": "C108",
+  "autor": "Marcos V.",
+  "texto": "Buen precio y envío correcto. Es lo que buscaba.",
+  "estrellas": 5,
+  "fecha": "2026-11-17",
+  "foto": ""
+ },
+ {
+  "id": "C110",
+  "autor": "Miguel A.",
+  "texto": "Todo correcto, sin ninguna incidencia que comentar.",
+  "estrellas": 5,
+  "fecha": "2026-11-17",
+  "foto": ""
+ },
+ {
+  "id": "C112",
+  "autor": "Javier H.",
+  "texto": "El pedido tardó algo más de lo esperado, pero el servicio respondió correctamente.",
+  "estrellas": 4,
+  "fecha": "2026-11-17",
+  "foto": ""
+ },
+ {
+  "id": "C114",
+  "autor": "Fernando S.",
+  "texto": "Todo según lo anunciado en la página.",
+  "estrellas": 5,
+  "fecha": "2026-11-17",
+  "foto": ""
+ },
+ {
+  "id": "C116",
+  "autor": "Óscar L.",
+  "texto": "Lo pedí un lunes y el jueves ya lo tenía. Muy bien.",
+  "estrellas": 5,
+  "fecha": "2026-11-17",
+  "foto": ""
+ },
+ {
+  "id": "C118",
+  "autor": "Alejandro F.",
+  "texto": "Todo correcto, aunque la web podría mostrar mejor cuándo se prepara el pedido.",
+  "estrellas": 4,
+  "fecha": "2026-11-17",
+  "foto": ""
+ },
+ {
+  "id": "C119",
+  "autor": "Cristina G.",
+  "texto": "Muy contenta con la compra, especialmente por el precio.",
+  "estrellas": 5,
+  "fecha": "2026-11-17",
+  "foto": ""
+ },
+ {
+  "id": "C120",
+  "autor": "Manuel P.",
+  "texto": "Ningún problema. El producto llegó como debía.",
+  "estrellas": 5,
+  "fecha": "2026-11-17",
+  "foto": ""
+ },
+ {
+  "id": "C096",
+  "autor": "César M.",
+  "texto": "Todo llegó correctamente y el precio fue muy bueno.",
+  "estrellas": 5,
+  "fecha": "2026-11-16",
+  "foto": ""
+ },
+ {
+  "id": "C097",
+  "autor": "Pilar S.",
+  "texto": "El pedido estaba bien protegido y no faltaba nada.",
+  "estrellas": 5,
+  "fecha": "2026-11-16",
+  "foto": ""
+ },
+ {
+  "id": "C098",
+  "autor": "Gonzalo B.",
+  "texto": "Primera experiencia y bastante mejor de lo que esperaba.",
+  "estrellas": 5,
+  "fecha": "2026-11-16",
+  "foto": ""
+ },
+ {
+  "id": "C100",
+  "autor": "Tomás R.",
+  "texto": "El envío no fue especialmente rápido, pero el servicio ha sido correcto.",
+  "estrellas": 4,
+  "fecha": "2026-11-16",
+  "foto": ""
+ },
+ {
+  "id": "C093",
+  "autor": "Teresa N.",
+  "texto": "Llegó en dos días. Más rápido de lo que pensaba.",
+  "estrellas": 5,
+  "fecha": "2026-11-15",
+  "foto": ""
+ },
+ {
+  "id": "C094",
+  "autor": "Álvaro G.",
+  "texto": "Buena compra, repetiré cuando necesite otro perfume.",
+  "estrellas": 5,
+  "fecha": "2026-11-15",
+  "foto": ""
+ },
+ {
+  "id": "C095",
+  "autor": "Noelia R.",
+  "texto": "El producto es correcto. Tuve que consultar una duda y respondieron al día siguiente.",
+  "estrellas": 4,
+  "fecha": "2026-11-15",
+  "foto": ""
+ },
+ {
+  "id": "C089",
+  "autor": "Isidro F.",
+  "texto": "Muy recomendable por los precios y la facilidad de compra.",
+  "estrellas": 5,
+  "fecha": "2026-11-12",
+  "foto": ""
+ },
+ {
+  "id": "C088",
+  "autor": "Violeta M.",
+  "texto": "El envío tardó algo más de lo esperado, pero el producto está perfecto.",
+  "estrellas": 4,
+  "fecha": "2026-11-10",
+  "foto": ""
+ },
+ {
+  "id": "C086",
+  "autor": "Belén R.",
+  "texto": "Compré dos fragancias y no hubo ningún error en el pedido.",
+  "estrellas": 5,
+  "fecha": "2026-11-03",
+  "foto": ""
+ },
+ {
+  "id": "C085",
+  "autor": "Mateo S.",
+  "texto": "Llegó perfectamente. Todo tal como estaba descrito.",
+  "estrellas": 5,
+  "fecha": "2026-10-30",
+  "foto": ""
+ },
+ {
+  "id": "C083",
+  "autor": "Luis H.",
+  "texto": "El producto bien. Me habría gustado recibir más información durante el envío.",
+  "estrellas": 4,
+  "fecha": "2026-10-22",
+  "foto": ""
+ },
+ {
+  "id": "C082",
+  "autor": "Maite C.",
+  "texto": "Tercera compra y hasta ahora ninguna incidencia.",
+  "estrellas": 5,
+  "fecha": "2026-10-18",
+  "foto": ""
+ },
+ {
+  "id": "C080",
+  "autor": "Aitor L.",
+  "texto": "Buen precio y facilidad para hacer el pedido.",
+  "estrellas": 5,
+  "fecha": "2026-10-10",
+  "foto": ""
+ },
+ {
+  "id": "C079",
+  "autor": "Olivia G.",
+  "texto": "Compré para un cumpleaños y llegó con tiempo suficiente.",
+  "estrellas": 5,
+  "fecha": "2026-10-06",
+  "foto": ""
+ },
+ {
+  "id": "C077",
+  "autor": "África N.",
+  "texto": "Todo bien. La caja exterior llegó un poco hundida, pero el producto estaba intacto.",
+  "estrellas": 4,
+  "fecha": "2026-09-28",
+  "foto": ""
+ },
+ {
+  "id": "C076",
+  "autor": "Martín F.",
+  "texto": "Primera compra y ninguna sorpresa desagradable.",
+  "estrellas": 5,
+  "fecha": "2026-09-24",
+  "foto": ""
+ },
+ {
+  "id": "C072",
+  "autor": "Simón J.",
+  "texto": "El repartidor no pudo entregar en el primer intento. Al día siguiente lo recibí.",
+  "estrellas": 4,
+  "fecha": "2026-09-08",
+  "foto": ""
+ },
+ {
+  "id": "C071",
+  "autor": "Ariadna S.",
+  "texto": "Muy satisfecha con el precio y el envío.",
+  "estrellas": 5,
+  "fecha": "2026-09-04",
+  "foto": ""
+ },
+ {
+  "id": "C070",
+  "autor": "Guillermo C.",
+  "texto": "Producto tal como esperaba. La caja llegó sin daños.",
+  "estrellas": 5,
+  "fecha": "2026-08-31",
+  "foto": ""
+ },
+ {
+  "id": "C068",
+  "autor": "Felipe M.",
+  "texto": "Todo en orden. Ninguna incidencia con la compra.",
+  "estrellas": 5,
+  "fecha": "2026-08-23",
+  "foto": ""
+ },
+ {
+  "id": "C067",
+  "autor": "Aurora P.",
+  "texto": "El pedido llegó correctamente, pero la preparación fue algo lenta.",
+  "estrellas": 4,
+  "fecha": "2026-08-19",
+  "foto": ""
+ },
+ {
+  "id": "C064",
+  "autor": "Eduardo B.",
+  "texto": "Llegó rápido, bien empaquetado y sin ningún problema.",
+  "estrellas": 5,
+  "fecha": "2026-08-07",
+  "foto": ""
+ },
+ {
+  "id": "C062",
+  "autor": "Germán N.",
+  "texto": "Buena experiencia, aunque el seguimiento podría ser un poco más detallado.",
+  "estrellas": 4,
+  "fecha": "2026-07-30",
+  "foto": ""
+ },
+ {
+  "id": "C059",
+  "autor": "Lidia O.",
+  "texto": "Muy contenta. Era un regalo y llegó en buenas condiciones.",
+  "estrellas": 5,
+  "fecha": "2026-07-18",
+  "foto": ""
+ },
+ {
+  "id": "C058",
+  "autor": "Ismael H.",
+  "texto": "Me llegó bien, pero el plazo fue más largo de lo que calculaba. No es grave, aunque mejorable.",
+  "estrellas": 3,
+  "fecha": "2026-07-14",
+  "foto": ""
+ },
+ {
+  "id": "C055",
+  "autor": "Gema V.",
+  "texto": "No tengo queja. Todo llegó bien cerrado y protegido.",
+  "estrellas": 5,
+  "fecha": "2026-07-02",
+  "foto": ""
+ },
+ {
+  "id": "C053",
+  "autor": "Marina S.",
+  "texto": "El producto está genial. El envío se demoró un par de días, de ahí mi valoración.",
+  "estrellas": 4,
+  "fecha": "2026-06-24",
+  "foto": ""
+ },
+ {
+  "id": "C048",
+  "autor": "Nicolás E.",
+  "texto": "Correcto en general. La atención respondió a mi consulta, aunque no fue inmediata.",
+  "estrellas": 4,
+  "fecha": "2026-06-04",
+  "foto": ""
+ },
+ {
+  "id": "C043",
+  "autor": "Sandra P.",
+  "texto": "El pedido tardó un poco más, pero al menos llegó bien y sin problemas.",
+  "estrellas": 4,
+  "fecha": "2026-05-15",
+  "foto": ""
+ },
+ {
+  "id": "C039",
+  "autor": "Miriam J.",
+  "texto": "El perfume llegó bien. La empresa de transporte no fue especialmente rápida.",
+  "estrellas": 4,
+  "fecha": "2026-04-29",
+  "foto": ""
+ },
+ {
+  "id": "C038",
+  "autor": "Adrián V.",
+  "texto": "Buen precio, pedido sencillo y entrega correcta.",
+  "estrellas": 5,
+  "fecha": "2026-04-25",
+  "foto": ""
+ },
+ {
+  "id": "C037",
+  "autor": "Teresa C.",
+  "texto": "Era para mi madre y llegó perfectamente. Buena experiencia.",
+  "estrellas": 5,
+  "fecha": "2026-04-21",
+  "foto": ""
+ },
+ {
+  "id": "C035",
+  "autor": "Eva T.",
+  "texto": "Todo bien, aunque el correo de confirmación llegó bastante tarde.",
+  "estrellas": 4,
+  "fecha": "2026-04-13",
+  "foto": ""
+ },
+ {
+  "id": "C031",
+  "autor": "Alba N.",
+  "texto": "Muy buen producto. La caja de envío era algo grande para el tamaño del perfume, pero llegó bien.",
+  "estrellas": 4,
+  "fecha": "2026-03-28",
+  "foto": ""
+ },
+ {
+  "id": "C028",
+  "autor": "Óscar F.",
+  "texto": "El pedido llegó bien, pero esperaba recibir alguna notificación más durante el transporte.",
+  "estrellas": 3,
+  "fecha": "2026-03-16",
+  "foto": ""
+ },
+ {
+  "id": "C024",
+  "autor": "Marcos E.",
+  "texto": "La compra fue sencilla. El repartidor no pasó el día indicado y tuve que esperar al siguiente.",
+  "estrellas": 4,
+  "fecha": "2026-02-28",
+  "foto": ""
+ },
+ {
+  "id": "C020",
+  "autor": "Alberto C.",
+  "texto": "Todo bien. La web podría explicar mejor los plazos de entrega, pero el pedido llegó correctamente.",
+  "estrellas": 4,
+  "fecha": "2026-02-12",
+  "foto": ""
+ },
+ {
+  "id": "C016",
+  "autor": "Fernando J.",
+  "texto": "El precio es bastante bueno. Le quito una estrella porque tardaron un poco en preparar el envío.",
+  "estrellas": 4,
+  "fecha": "2026-01-27",
+  "foto": ""
+ },
+ {
+  "id": "C012",
+  "autor": "Miguel D.",
+  "texto": "Buena experiencia en general. El envío no fue especialmente rápido, pero tampoco se salió demasiado del plazo.",
+  "estrellas": 4,
+  "fecha": "2026-01-11",
+  "foto": ""
+ },
+ {
+  "id": "C009",
+  "autor": "Irene C.",
+  "texto": "El producto está bien y el precio también, pero el seguimiento estuvo varios días sin actualizarse. Tuve que consultar por correo.",
+  "estrellas": 3,
+  "fecha": "2025-12-29",
+  "foto": ""
+ },
+ {
+  "id": "C006",
+  "autor": "Andrés V.",
+  "texto": "La experiencia ha sido buena. La caja exterior llegó algo marcada, pero el estuche estaba intacto.",
+  "estrellas": 4,
+  "fecha": "2025-12-15",
+  "foto": ""
+ },
+ {
+  "id": "C002",
+  "autor": "Javier R.",
+  "texto": "Todo correcto. El transportista tardó un día más de lo previsto, pero por lo demás ninguna pega.",
+  "estrellas": 4,
+  "fecha": "2025-11-27",
+  "foto": ""
+ }
+]

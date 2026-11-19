@@ -5,10 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Reseñas — Allpa Essence</title>
 
-  <!-- ===== DOMINIO SEO ===== -->
-  <!-- meta description, canonical, OG — agente SEO. -->
-  <!-- ===== FIN bloque SEO ===== -->
-
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -57,10 +53,6 @@
           <a href="contacto.html" class="nav-main__link">Contacto</a>
         </nav>
         <div class="site-header__icons">
-          <!-- CUENTA_PENDIENTE: el brief (§3) pide este ícono en el nav pero no define la página en
-               el mapa del sitio (§4) — sin login/cuenta.html todavía. Confirmar alcance con Paul
-               antes de cablear un destino real; por ahora apunta a contacto.html como fallback no
-               -roto en vez de un href="#" muerto. -->
           <a href="contacto.html" class="header-icon header-icon--account" aria-label="Mi cuenta" data-account-pendiente="true">
             <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.58-7 8-7s8 3 8 7"/></svg>
           </a>
@@ -76,12 +68,6 @@
     </div>
   </header>
 
-  <!-- ===== AE-R1 · BANNER DE CAMPANA CON CUENTA ATRAS (copiado de la mecánica de referencia, decision de Paul 2026-11-15).
-       Oferta: 3 por S/ 99 (antes S/ 135), presentacion 30 ml. Precio 30 ml = S/ 45 (3 x 45 = 135).
-       Fin: 2026-11-18 23:59:59 hora Peru (UTC-5), editable en data-countdown-end (UN solo lugar por pagina;
-       js debe leerlo y compartirlo con el drawer del carrito, ver inbox/js.md). Sin JS se ven los guiones y
-       el boton sigue funcionando. Al llegar a 0 js pone [hidden] en la seccion (css: .promo-banner[hidden]{display:none}).
-       Bloque IDENTICO en las paginas con utility-bar. No tocar a mano sin replicar. -->
   <section class="promo-banner" id="promo-banner" aria-label="Oferta por tiempo limitado">
     <div class="container">
       <div class="promo-banner__frame">
@@ -131,9 +117,6 @@
       <button class="cart-close" id="btn-cart-close" aria-label="Cerrar carrito">✕</button>
     </div>
 
-    <!-- AE-R3 · Oferta vigente + progreso (BRIEFING §5.1/§5.3). Misma fecha de fin que #promo-banner (js la lee del
-         primer [data-countdown-end]; aqui se repite el atributo solo para que el HTML sea autonomo, mantener sincronizado).
-         Oferta: 3 por S/ 99 (antes S/ 135), 30 ml. js oculta [data-offer-block] al terminar la cuenta atras. -->
     <div class="cart-drawer__offer" id="cart-offer" data-offer-block>
       <p class="cart-drawer__offer-title"><strong>3 por S/ 99</strong> <s>antes S/ 135</s> <span>· 30 ml</span></p>
       <p class="cart-drawer__offer-timer">
@@ -163,7 +146,6 @@
 
     <ul class="cart-drawer__items" id="cart-items"></ul>
 
-    <!-- Completar la oferta: js sugiere hasta 2 fragancias que no estan en el carrito (desde data/productos.json) -->
     <div class="cart-upsell" id="cart-upsell" data-offer-block hidden>
       <p class="cart-upsell__title">Completa tu oferta</p>
       <ul class="cart-upsell__list" id="cart-upsell-list"></ul>
@@ -215,8 +197,6 @@
 
   <main id="main">
 
-    <!-- ===== AE-R4 · PÁGINA DE TODAS LAS RESEÑAS ("Reseñas de la tienda" en la referencia). js pinta TODAS las de data/resenas.json en
-         #reviews-all; con el JSON vacío quedan los placeholders. Cifras = PLACEHOLDER (data-placeholder-cifra). ===== -->
     <section class="page-hero" aria-labelledby="resenas-titulo">
       <div class="container">
         <h1 id="resenas-titulo">Reseñas de nuestros clientes</h1>
@@ -226,7 +206,7 @@
           <p class="reviews__summary" data-rating-summary data-placeholder-cifra>Basado en +1.200 reseñas</p>
         </div>
         <p class="page-hero__sub">Lo que dicen quienes ya probaron Allpa Essence.</p>
-        <a href="RESENA_FORMULARIO_PENDIENTE" data-cta-pendiente="RESENA_FORMULARIO" class="btn btn--primary">Escribir una reseña</a>
+        <a href="#escribir-resena" class="btn btn--primary">Escribir una reseña</a>
       </div>
     </section>
 
@@ -283,6 +263,51 @@
           </li>
         </ul>
         <p class="section-more"><a href="catalogo.html" class="btn btn--outline">Ver fragancias</a></p>
+      </div>
+    </section>
+
+    <section class="resena-form-section" id="escribir-resena" aria-labelledby="resena-form-titulo">
+      <div class="container">
+        <h2 id="resena-form-titulo">Cuéntanos tu experiencia</h2>
+        <p class="resena-form__intro">Tu reseña se publica después de que la revisemos.</p>
+        <form class="resena-form" id="resena-form" novalidate>
+          <div class="resena-form__field">
+            <label for="resena-nombre">Tu nombre</label>
+            <input type="text" id="resena-nombre" name="autor" maxlength="60" autocomplete="name" required>
+          </div>
+          <div class="resena-form__field">
+            <label for="resena-producto">Fragancia</label>
+            <select id="resena-producto" name="producto" required>
+              <option value="">Elige la fragancia</option>
+            </select>
+          </div>
+          <fieldset class="resena-form__field resena-form__stars">
+            <legend>Tu puntuación</legend>
+            <input type="radio" id="resena-estrellas-5" name="estrellas" value="5" required><label for="resena-estrellas-5"><span aria-hidden="true">★</span><span class="sr-only">5 estrellas</span></label>
+            <input type="radio" id="resena-estrellas-4" name="estrellas" value="4"><label for="resena-estrellas-4"><span aria-hidden="true">★</span><span class="sr-only">4 estrellas</span></label>
+            <input type="radio" id="resena-estrellas-3" name="estrellas" value="3"><label for="resena-estrellas-3"><span aria-hidden="true">★</span><span class="sr-only">3 estrellas</span></label>
+            <input type="radio" id="resena-estrellas-2" name="estrellas" value="2"><label for="resena-estrellas-2"><span aria-hidden="true">★</span><span class="sr-only">2 estrellas</span></label>
+            <input type="radio" id="resena-estrellas-1" name="estrellas" value="1"><label for="resena-estrellas-1"><span aria-hidden="true">★</span><span class="sr-only">1 estrella</span></label>
+          </fieldset>
+          <div class="resena-form__field">
+            <label for="resena-texto">Tu reseña</label>
+            <textarea id="resena-texto" name="texto" rows="5" minlength="10" maxlength="800" required></textarea>
+          </div>
+          <div class="resena-form__field">
+            <label for="resena-email">Correo (opcional, no se publica; solo para verificar tu compra)</label>
+            <input type="email" id="resena-email" name="email" maxlength="120" autocomplete="email">
+          </div>
+          <div class="resena-form__trap" aria-hidden="true">
+            <label for="resena-web">No rellenes este campo</label>
+            <input type="text" id="resena-web" name="web" tabindex="-1" autocomplete="off">
+          </div>
+          <label class="resena-form__consent">
+            <input type="checkbox" name="consentimiento" required>
+            <span>Acepto que Allpa Essence publique mi nombre y mi reseña en esta web.</span>
+          </label>
+          <button type="submit" class="btn btn--primary">Enviar reseña</button>
+          <p class="resena-form__estado" id="resena-estado" role="status" aria-live="polite" hidden></p>
+        </form>
       </div>
     </section>
 
@@ -356,10 +381,15 @@
 
       <nav class="site-footer__col" aria-label="Ayuda">
         <p class="site-footer__policies-title">Ayuda</p>
-        <a href="POLITICA_ENVIO_PENDIENTE" data-cta-pendiente="POLITICA_ENVIO">Envíos</a>
+        <a href="politicas.html#envios">Envíos</a>
         <a href="muestras.html">Muestras</a>
         <a href="PAGINA_FAQ_PENDIENTE" data-cta-pendiente="PAGINA_FAQ">Preguntas frecuentes</a>
-        <a href="POLITICA_CAMBIOS_PENDIENTE" data-cta-pendiente="POLITICA_CAMBIOS">Cambios y devoluciones</a>
+        <a href="politicas.html#devoluciones">Cambios y devoluciones</a>
+        <a href="politicas.html#terminos">Términos y condiciones</a>
+        <a href="politicas.html#privacidad">Privacidad</a>
+        <a href="politicas.html#cookies">Cookies</a>
+        <a href="#" data-ae-privacy>Configurar cookies</a>
+        <a href="RECLAMACIONES_PENDIENTE" data-cta-pendiente="LIBRO_RECLAMACIONES">Libro de Reclamaciones</a>
         <details class="footer-faq">
           <summary>¿Por qué mi perfume tiene alcohol?</summary>
           <p>Todo perfume lo lleva — es lo que libera y transporta el aroma, no un relleno. Lo que sí evitamos es bajar la concentración de esencia para ahorrar costo: la tuya es la que corresponde, no menos.</p>
@@ -389,7 +419,6 @@
     </div>
   </footer>
 
-  <!-- AE-R4 · Botón flotante de WhatsApp (la referencia lo tiene en todas las páginas). Destino PENDIENTE (número real de Paul). -->
   <a class="whatsapp-float" href="https://wa.me/51929033871" target="_blank" rel="noopener noreferrer" aria-label="Escríbenos por WhatsApp">
     <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.2-4.6-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.8 0-1.3.7-2 1-2.3.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.3 0 .5l-.3.4-.4.4c-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.3 2.4 1.5.3.1.5.1.6-.1l.9-1.1c.2-.3.4-.2.6-.1l1.9.9c.3.1.5.2.5.3.1.1.1.6-.1 1.2z"/></svg>
   </a>

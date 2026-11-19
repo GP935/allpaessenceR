@@ -156,7 +156,7 @@ Estado actual: sección `.product-detail` con foto única, familia, h1, descripc
 - **Plazo real a confirmar** con Paul (Lima vs provincias).
 
 ### 4.5 Selector de tamaño
-- Mantener Muestra / Tamaño completo. Convertir los radios en **botones tipo "pill"** (mismo patrón que `.lash-size` de AP Beauty). Mantener el `disclaimer` de muestra.
+- Mantener Muestra / Tamaño completo. Convertir los radios en **botones tipo "pill"** (mismo patrón que `.lash-size` de otro proyecto). Mantener el `disclaimer` de muestra.
 - Añadir selector de cantidad (+/−).
 
 ### 4.6 Acordeón de datos de perfumería
@@ -173,7 +173,7 @@ Los textos siguen siendo placeholders hasta que Paul entregue los datos reales (
   - `<p class="product-detail__viewers" data-viewers-slot hidden>` → "N personas viendo este producto".
   - `<p class="product-detail__stock" data-stock-slot hidden>` → "Quedan N unidades".
 - Etiqueta de oferta junto al precio (`<span class="product-detail__badge" data-offer-badge hidden>`) con la oferta vigente y su fecha de fin.
-- **Quién pone el número es js/backend, no el HTML.** Recomendación de front (§0): origen real. Para stock, contrato AB-B10 (`/api/stock`, por diseño y no por talla). Si el dato falla → se oculta el slot, nunca se muestra un número por defecto.
+- **Quién pone el número es js/backend, no el HTML.** Recomendación de front (§0): origen real. Para stock, contrato ref. interna (`/api/stock`, por diseño y no por talla). Si el dato falla → se oculta el slot, nunca se muestra un número por defecto.
 - Los tres slots aceptan texto con `aria-live="polite"` para no spamear a lectores de pantalla.
 
 ### 4.8 Barra sticky de compra (nuevo)
@@ -194,7 +194,7 @@ Los textos siguen siendo placeholders hasta que Paul entregue los datos reales (
 
 ## 5. CARRITO
 
-El drawer **ya existe** (`#cart-drawer`, contrato compartido con AP Beauty). Se enriquece; no se rehace.
+El drawer **ya existe** (`#cart-drawer`, contrato compartido con otro proyecto). Se enriquece; no se rehace.
 
 ### 5.1 Drawer (`#cart-drawer`)
 - Título: texto de marca (p. ej. "Tu esencia te espera").
@@ -207,8 +207,8 @@ El drawer **ya existe** (`#cart-drawer`, contrato compartido con AP Beauty). Se 
 - Botón principal: "Ir a pagar" (hoy "Ver carrito y pagar").
 
 ### 5.2 Página `carrito.html`
-- Mantiene resumen + pasarela Mercado Pago (patrón AP-J2). Se alinea el copy y la barra de progreso con el drawer.
-- `<p class="stock-msg" role="status" aria-live="polite" hidden>` para avisos de stock (contrato AB-B10).
+- Mantiene resumen + pasarela Mercado Pago (patrón ref. interna). Se alinea el copy y la barra de progreso con el drawer.
+- `<p class="stock-msg" role="status" aria-live="polite" hidden>` para avisos de stock (contrato ref. interna).
 
 ### 5.3 Ofertas y urgencia en el carrito
 - Cabecera del drawer con la oferta vigente (misma fuente que el banner de §3.1b): `<p class="cart-drawer__offer" data-offer-slot hidden>`.
@@ -264,7 +264,7 @@ Problema actual: header, utility-bar, menú móvil, drawer del carrito y footer 
 | **css** | Estilos de: utility-bar con controles, barra de reseñas, buscador, marquee, pestañas, galería, pills de tamaño, acordeón, barra sticky, barra de progreso, drawer, footer 4 cols. Patrón `.clase[hidden]{display:none}` en todo slot con `display` propio |
 | **js** | Rotación/pausa de la utility-bar, fecha de entrega calculada, tabs de trending, buscador, galería, selector de cantidad, barra sticky (IntersectionObserver), barra de progreso del carrito, inyección de componentes, stock real (si hay backend) |
 | **seo** | JSON-LD Product+Offer, `title`/`meta`/OG por página, copy del aviso legal, redacción de FAQ/políticas |
-| **backend / devops** | Solo cuando haya checkout real o `/api/stock` (patrón AB-B10); deploy |
+| **backend / devops** | Solo cuando haya checkout real o `/api/stock` (patrón ref. interna); deploy |
 
 Orden de trabajo sugerido: **front → css → js → seo**. Front entrega marcado + handoffs por `inbox/`, sin tocar CSS/JS/`<meta>`/`style=""`.
 

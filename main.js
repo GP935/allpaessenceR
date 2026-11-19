@@ -1,11 +1,12 @@
 // main.js — Allpa Essence (AE-J1). Contrato completo: header/menú móvil, dropdown de
 // catálogo, carrito (drawer + página), carrusel genérico ×3, filtro de catálogo por
 // familia, plantilla de producto por ?id=, estado de confirmación por ?estado=.
-// Checkout: Mercado Pago Card Payment Brick (mismo patrón que AP-J2 de AP Beauty), activado
+// Checkout: Mercado Pago Card Payment Brick (mismo patrón que ref. interna de otro proyecto), activado
 // por el interruptor del backend (GET /api/market).
 
 import { cartStore } from './scripts/cart.js';
 import { OFFER, getOfferEnd, computeCartTotals } from './scripts/offer.js';
+import { initPoliciesAccordion, initCookieConsent } from './scripts/consent.js';
 import { loadStock, availableFor, stockLabel, isLowEnoughToShow, baseId } from './scripts/stock.js';
 
 const priceFormatter = new Intl.NumberFormat('es-PE', { style: 'currency', currency: 'PEN' });
@@ -24,7 +25,7 @@ function setText(id, value) {
 
 /* --------------------------------------------------------------------------
    Paneles off-canvas (menú móvil + carrito) — mismo patrón .is-open +
-   transitionend que Powervein/AP Beauty (ver PV-C1 en pipeline.md).
+   transitionend que otros proyectos (ver PV-C1 en pipeline.md).
    -------------------------------------------------------------------------- */
 function openPanel(panel, backdrop, toggleBtn, focusTarget) {
   if (backdrop) {
@@ -685,15 +686,19 @@ async function initProductPage() {
   const addBtn = document.getElementById('btn-add-to-cart');
 
   const tamanos = producto.tamanos || [{ ml: 30, precio: producto.precio }];
+  // Muestras (decisión de Paul 2026-11-19): 5 ml = S/ 15 y 10 ml = S/ 25 para todo perfume.
+  const MUESTRAS = [{ ml: 5, precio: 15 }, { ml: 10, precio: 25 }];
   const renderTamano = (size) => {
-    const isMuestra = size === 'muestra';
+    const muestra = size.startsWith('muestra-') ? MUESTRAS.find((m) => `muestra-${m.ml}` === size) : null;
     const t = tamanos.find((x) => String(x.ml) === size) || tamanos.find((x) => x.ml === 30) || tamanos[0];
-    // 30 ml conserva el id base (es el único formato de la oferta 3 por S/ 99); 50 y 100 ml llevan sufijo y no entran.
-    const id = isMuestra ? `${producto.id}-muestra` : (t.ml === 30 ? producto.id : `${producto.id}-${t.ml}ml`);
-    const label = isMuestra ? 'Muestra' : `${t.ml} ml`;
-    const price = isMuestra ? producto.precioMuestra : t.precio;
-    setText('product-titulo', isMuestra ? `${producto.nombre} — Muestra` : producto.nombre);
-    setText('product-precio', isMuestra ? producto.precioMuestraDisplay : `S/ ${t.precio} · ${label}`);
+    // 30 ml conserva el id base (es el único formato de la oferta 3 por S/ 99); 50/100 ml y muestras llevan sufijo y no entran.
+    const id = muestra ? `${producto.id}-muestra-${muestra.ml}ml` : (t.ml === 30 ? producto.id : `${producto.id}-${t.ml}ml`);
+    const label = muestra ? `Muestra ${muestra.ml} ml` : `${t.ml} ml`;
+    const price = muestra ? muestra.precio : t.precio;
+    setText('product-titulo', muestra ? `${producto.nombre} — ${label}` : producto.nombre);
+    setText('product-precio', `S/ ${price} · ${label}`);
+    const disclaimer = document.getElementById('muestra-disclaimer');
+    if (disclaimer) disclaimer.hidden = !muestra;
     if (addBtn) {
       addBtn.dataset.id = id;
       addBtn.dataset.name = `${producto.nombre} · ${label}`;
@@ -706,14 +711,37 @@ async function initProductPage() {
     refreshProductStock();
   };
 
-  renderTamano(initialIsMuestra ? 'muestra' : '30');
+  // Las dos opciones de muestra se generan aquí (precio único en MUESTRAS) bajo el label "Muestras".
+  const sizeFieldset = document.getElementById('product-size');
+  if (sizeFieldset) {
+    sizeFieldset.querySelector('[value="muestra"]')?.closest('label')?.remove();
+    const group = document.createElement('div');
+    group.className = 'product-detail__size-group';
+    const gl = document.createElement('span');
+    gl.className = 'product-detail__size-group-label';
+    gl.textContent = 'Muestras';
+    group.appendChild(gl);
+    MUESTRAS.forEach((m) => {
+      const lab = document.createElement('label');
+      const inp = document.createElement('input');
+      inp.type = 'radio';
+      inp.name = 'tamano';
+      inp.value = `muestra-${m.ml}`;
+      inp.setAttribute('data-size-option', '');
+      lab.append(inp, ` ${m.ml} ml · S/ ${m.precio}`);
+      group.appendChild(lab);
+    });
+    sizeFieldset.appendChild(group);
+  }
+
+  renderTamano(initialIsMuestra ? 'muestra-5' : '30');
   initProductExtras(producto, productos);
 
   // Copy deck AE-F7: el radio "Elige tu tamaño" reemplaza el link "Probar en muestra
   // antes" (#link-muestra) que ya no existe en el DOM — recalcula precio/id/nombre sin
   // recargar, mismo dato que antes leía de ?variant=muestra en la URL.
   const sizeOptions = document.querySelectorAll('[data-size-option]');
-  const initialSize = initialIsMuestra ? 'muestra' : '30';
+  const initialSize = initialIsMuestra ? 'muestra-5' : '30';
   sizeOptions.forEach((input) => {
     input.checked = input.value === initialSize;
     input.addEventListener('change', () => {
@@ -825,7 +853,34 @@ function fillReviewList(list, tpl, source) {
     if (r.fecha) { time.dateTime = r.fecha; time.textContent = new Date(r.fecha).toLocaleDateString('es-PE', { day: 'numeric', month: 'long', year: 'numeric' }); } else time.remove();
     if (r.verificado) node.querySelector('.review-card__verified').hidden = false;
     const photo = node.querySelector('[data-review-photo]');
-    if (r.foto) { const im = document.createElement('img'); im.src = r.foto; im.alt = `Foto de ${r.autor || 'cliente'}`; im.width = 600; im.height = 600; im.loading = 'lazy'; photo.appendChild(im); }
+    if (r.foto) { const im = document.createElement('img'); im.src = r.foto; im.alt = `Foto de ${r.autor || 'cliente'}`; im.width = 600; im.height = 600; im.loading = 'lazy'; photo.appendChild(im); } else photo.remove();
+    if (!r.producto) node.querySelector('.review-card__product').remove();
+    const meta = node.querySelector('.review-card__meta');
+    if (r.promo === true) {
+      const tag = document.createElement('span');
+      tag.className = 'review-card__promo';
+      tag.textContent = 'Cliente que participó en nuestra promoción';
+      meta.after(tag);
+    }
+    if (r.respuesta && r.respuesta.texto) {
+      const reply = document.createElement('div');
+      reply.className = 'review-card__reply';
+      const head = document.createElement('p');
+      head.className = 'review-card__reply-title';
+      head.textContent = 'Respuesta de Allpa Essence';
+      const body = document.createElement('p');
+      body.className = 'review-card__reply-text';
+      body.textContent = r.respuesta.texto;
+      reply.append(head, body);
+      if (r.respuesta.fecha) {
+        const t = document.createElement('time');
+        t.className = 'review-card__reply-date';
+        t.dateTime = r.respuesta.fecha;
+        t.textContent = new Date(r.respuesta.fecha).toLocaleDateString('es-PE', { day: 'numeric', month: 'long', year: 'numeric' });
+        reply.appendChild(t);
+      }
+      node.querySelector('.review-card').appendChild(reply);
+    }
     list.appendChild(node);
   });
 }
@@ -939,9 +994,71 @@ function setUpReviewsAll(list, tpl, items) {
   render();
 }
 
+// Formulario de reseña (resenas.html #resena-form). POST /api/resenas → queda pendiente de moderación.
+async function initReviewForm() {
+  const form = document.getElementById('resena-form');
+  if (!form) return;
+  const select = document.getElementById('resena-producto');
+  const estado = document.getElementById('resena-estado');
+  const submit = form.querySelector('[type="submit"]');
+  const productos = await loadProductosOnce();
+  productos.slice().sort((a, b) => String(a.nombre).localeCompare(String(b.nombre), 'es')).forEach((p) => {
+    const o = document.createElement('option');
+    o.value = p.id;
+    o.textContent = p.nombre;
+    select.appendChild(o);
+  });
+  const pre = new URLSearchParams(location.search).get('producto');
+  if (pre && productos.some((p) => p.id === pre)) select.value = pre;
+
+  const show = (msg, ok) => {
+    estado.textContent = msg;
+    estado.classList.toggle('is-ok', ok);
+    estado.classList.toggle('is-error', !ok);
+    estado.hidden = false;
+  };
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const fd = new FormData(form);
+    const autor = String(fd.get('autor') || '').trim();
+    const producto = String(fd.get('producto') || '');
+    const estrellas = Number(fd.get('estrellas'));
+    const texto = String(fd.get('texto') || '').trim();
+    const email = String(fd.get('email') || '').trim();
+    if (!autor) return show('Escribe tu nombre.', false);
+    if (!producto) return show('Elige la fragancia.', false);
+    if (!(estrellas >= 1 && estrellas <= 5)) return show('Elige tu puntuación.', false);
+    if (texto.length < 10) return show('La reseña debe tener al menos 10 caracteres.', false);
+    if (email && !form.elements.email.checkValidity()) return show('El correo no parece válido.', false);
+    if (!fd.get('consentimiento')) return show('Debes aceptar la publicación de tu reseña.', false);
+
+    submit.disabled = true;
+    try {
+      const res = await fetch('/api/resenas', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ autor, producto, estrellas, texto, email: email || undefined, web: String(fd.get('web') || '') }),
+      });
+      if (res.ok) {
+        form.reset();
+        if (pre) select.value = pre;
+        show('Gracias, la revisaremos antes de publicarla.', true);
+      } else if (res.status === 400) show('Revisa los datos del formulario e inténtalo de nuevo.', false);
+      else if (res.status === 429) show('Has enviado varias reseñas seguidas. Espera unos minutos e inténtalo otra vez.', false);
+      else show('No pudimos recibir tu reseña ahora mismo. Inténtalo más tarde o escríbenos por WhatsApp.', false);
+    } catch {
+      show('No hay conexión con el servidor. Inténtalo de nuevo en un momento.', false);
+    } finally {
+      submit.disabled = false;
+    }
+  });
+}
+
 async function initProductReviews(producto) {
   const lists = [...document.querySelectorAll('#reviews-list, [data-reviews-list], [data-reviews-all]')];
   const tpl = document.getElementById('review-card-tpl');
+  if (producto) document.querySelectorAll('[data-review-write]').forEach((a) => { a.href = `resenas.html?producto=${encodeURIComponent(producto.id)}#escribir-resena`; });
   if (!lists.length || !tpl) return;
   const items = await loadReviewsOnce();
   if (!items.length) return;
@@ -1164,7 +1281,7 @@ function intercalar(ella, el, n) {
   return out;
 }
 async function initHomePage() {
-  if (document.body.dataset.page === 'resenas') { initProductReviews(null); return; }
+  if (document.body.dataset.page === 'resenas') { initProductReviews(null); initReviewForm(); return; }
   if (document.body.dataset.page !== 'home' && document.body.dataset.page !== 'index' && !document.getElementById('trending-track')) return;
   const productos = await loadProductosOnce();
   if (productos.length) {
@@ -1270,7 +1387,7 @@ const normalizeText = (s) => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g
 
 /* --------------------------------------------------------------------------
    Checkout (carrito.html) — Mercado Pago Card Payment Brick, mismo patrón que
-   AP Beauty (AP-J2 / AB-J15..J21). GET /api/market decide: con `mercadopago` se
+   otro proyecto (ref. interna). GET /api/market decide: con `mercadopago` se
    monta [dirección de envío] → [Brick] → [aviso de error]; con `none` (o si el
    backend no responde) el botón mantiene el aviso "pago en configuración".
    El importe SIEMPRE lo fija el servidor (create-order): el Brick solo lo muestra.
@@ -1788,7 +1905,7 @@ async function initCheckout() {
 
 /* --------------------------------------------------------------------------
    Confirmación de pedido (confirmacion.html) — ?estado=pendiente para el
-   flujo "en revisión" de Mercado Pago, mismo patrón que AP-J2.
+   flujo "en revisión" de Mercado Pago, mismo patrón que ref. interna.
    -------------------------------------------------------------------------- */
 function initConfirmacionEstado() {
   const pendiente = document.getElementById('estado-pendiente');
@@ -1804,16 +1921,16 @@ function initFooterYear() {
 }
 
 /* --------------------------------------------------------------------------
-   Reveals al scroll — mismo efecto/técnica que `.why-stat` de AP Beauty
+   Reveals al scroll — mismo efecto/técnica que `.why-stat` de otro proyecto
    (IntersectionObserver, disparo único, respeta prefers-reduced-motion).
-   A diferencia de Makeup Andrea (JS agrega `.reveal` a selectores fijos),
+   A diferencia de otros proyectos (JS agrega `.reveal` a selectores fijos),
    acá el hook ya vive en el HTML de estas 4 páginas (`.reveal` +
    `[data-animate="stagger"]` en el contenedor padre) — este bloque solo
    observa lo que ya está marcado y togglea `.is-visible`.
    NO visible todavía: el CSS de `.reveal` sigue sin estado oculto ni
    transición ("FASE MOCKUP", style.css ~L44-48) — handoff dejado en
    inbox/css.md con el bloque exacto que necesita, mismo patrón que
-   `.why-stat`/`.revealed` de AP Beauty.
+   `.why-stat`/`.revealed` de otro proyecto.
    -------------------------------------------------------------------------- */
 function initScrollReveals() {
   if (!('IntersectionObserver' in window)) return;
@@ -1977,4 +2094,6 @@ document.addEventListener('DOMContentLoaded', () => {
   initPromoCountdown();
   initNewsletterForm();
   initScrollReveals();
+  initPoliciesAccordion();
+  initCookieConsent();
 });

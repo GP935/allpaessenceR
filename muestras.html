@@ -5,10 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Muestras — Allpa Essence</title>
 
-  <!-- ===== DOMINIO SEO ===== -->
-  <!-- meta description, canonical, OG — agente SEO. -->
-  <!-- ===== FIN bloque SEO ===== -->
-
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -57,10 +53,6 @@
           <a href="contacto.html" class="nav-main__link">Contacto</a>
         </nav>
         <div class="site-header__icons">
-          <!-- CUENTA_PENDIENTE: el brief (§3) pide este ícono en el nav pero no define la página en
-               el mapa del sitio (§4) — sin login/cuenta.html todavía. Confirmar alcance con Paul
-               antes de cablear un destino real; por ahora apunta a contacto.html como fallback no
-               -roto en vez de un href="#" muerto. -->
           <a href="contacto.html" class="header-icon header-icon--account" aria-label="Mi cuenta" data-account-pendiente="true">
             <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.58-7 8-7s8 3 8 7"/></svg>
           </a>
@@ -76,12 +68,6 @@
     </div>
   </header>
 
-  <!-- ===== AE-R1 · BANNER DE CAMPANA CON CUENTA ATRAS (copiado de la mecánica de referencia, decision de Paul 2026-11-15).
-       Oferta: 3 por S/ 99 (antes S/ 135), presentacion 30 ml. Precio 30 ml = S/ 45 (3 x 45 = 135).
-       Fin: 2026-11-18 23:59:59 hora Peru (UTC-5), editable en data-countdown-end (UN solo lugar por pagina;
-       js debe leerlo y compartirlo con el drawer del carrito, ver inbox/js.md). Sin JS se ven los guiones y
-       el boton sigue funcionando. Al llegar a 0 js pone [hidden] en la seccion (css: .promo-banner[hidden]{display:none}).
-       Bloque IDENTICO en las paginas con utility-bar. No tocar a mano sin replicar. -->
   <section class="promo-banner" id="promo-banner" aria-label="Oferta por tiempo limitado">
     <div class="container">
       <div class="promo-banner__frame">
@@ -131,9 +117,6 @@
       <button class="cart-close" id="btn-cart-close" aria-label="Cerrar carrito">✕</button>
     </div>
 
-    <!-- AE-R3 · Oferta vigente + progreso (BRIEFING §5.1/§5.3). Misma fecha de fin que #promo-banner (js la lee del
-         primer [data-countdown-end]; aqui se repite el atributo solo para que el HTML sea autonomo, mantener sincronizado).
-         Oferta: 3 por S/ 99 (antes S/ 135), 30 ml. js oculta [data-offer-block] al terminar la cuenta atras. -->
     <div class="cart-drawer__offer" id="cart-offer" data-offer-block>
       <p class="cart-drawer__offer-title"><strong>3 por S/ 99</strong> <s>antes S/ 135</s> <span>· 30 ml</span></p>
       <p class="cart-drawer__offer-timer">
@@ -163,7 +146,6 @@
 
     <ul class="cart-drawer__items" id="cart-items"></ul>
 
-    <!-- Completar la oferta: js sugiere hasta 2 fragancias que no estan en el carrito (desde data/productos.json) -->
     <div class="cart-upsell" id="cart-upsell" data-offer-block hidden>
       <p class="cart-upsell__title">Completa tu oferta</p>
       <ul class="cart-upsell__list" id="cart-upsell-list"></ul>
@@ -215,87 +197,65 @@
 
   <main id="main">
 
-    <!-- ===== 1 · HERO — el mecanismo de confianza sin distribución personal (principio rector) ===== -->
     <section class="page-hero" aria-labelledby="muestras-titulo">
       <div class="container">
-        <p class="eyebrow">SAMPLE-FIRST</p>
+        <p class="eyebrow">MUESTRAS</p>
         <h1 id="muestras-titulo">Pruébala antes de decidir</h1>
-        <p class="page-hero__sub">Una muestra real, al precio de una muestra real. Así de simple.</p>
-        <a href="#muestras-catalogo-titulo" class="btn btn--primary">Pedir muestra</a>
+        <p class="page-hero__sub">Cada perfume tiene dos tamaños de muestra: 5 ml por S/ 15 y 10 ml por S/ 25. Así encuentras tu esencia sin pagar el frasco completo.</p>
+        <a href="#como-pedir" class="btn btn--primary">Ver cómo pedir mi muestra</a>
       </div>
     </section>
 
-    <!-- ===== 2 · CÓMO FUNCIONA ===== -->
-    <section class="how-it-works" aria-labelledby="how-titulo">
+    <section class="how-it-works" id="como-pedir" aria-labelledby="how-titulo">
       <div class="container">
-        <h2 id="how-titulo" class="sr-only">Cómo funciona</h2>
+        <h2 id="how-titulo">Cómo pedir tu muestra, paso a paso</h2>
         <ol class="how-it-works__steps" data-animate="stagger">
           <li class="how-step reveal">
             <span class="how-step__num">01</span>
-            <h3>Elegís tu muestra</h3>
-            <p>Cualquier fragancia del catálogo tiene su versión en muestra, sin excepción.</p>
+            <h3>Elige tu fragancia</h3>
+            <p>Entra al catálogo y escoge el perfume que quieres probar. Puedes filtrar por familia olfativa o por «Para él» y «Para ella». Todas las fragancias tienen versión en muestra, sin excepción.</p>
           </li>
           <li class="how-step reveal">
             <span class="how-step__num">02</span>
-            <h3>Te escribimos por WhatsApp</h3>
-            <p>Nurture automatizado — te acompañamos mientras la probás, sin apuro.</p>
+            <h3>Abre la ficha del producto</h3>
+            <p>Haz clic en la fragancia para ver sus notas, su descripción y sus opciones de tamaño.</p>
           </li>
           <li class="how-step reveal">
             <span class="how-step__num">03</span>
-            <h3>Pasás a tamaño completo cuando quieras</h3>
-            <p>Sin presión de tiempo límite — el upsell llega cuando ya estás convencida/o.</p>
+            <h3>En «Tamaño», elige la muestra</h3>
+            <p>Dentro de la ficha, en la sección <strong>Tamaño</strong>, verás las opciones de muestra. Para empezar te recomendamos la de 5 ml.</p>
+            <ul class="muestra-tamanos">
+              <li class="muestra-tamano muestra-tamano--destacado">
+                <span class="muestra-tamano__ml">5 ml</span>
+                <span class="muestra-tamano__precio">S/ 15</span>
+                <span class="muestra-tamano__desc">Ideal para probarla unos días y decidir.</span>
+              </li>
+              <li class="muestra-tamano">
+                <span class="muestra-tamano__ml">10 ml</span>
+                <span class="muestra-tamano__precio">S/ 25</span>
+                <span class="muestra-tamano__desc">Para usarla más tiempo antes de pasar al frasco.</span>
+              </li>
+            </ul>
+          </li>
+          <li class="how-step reveal">
+            <span class="how-step__num">04</span>
+            <h3>Añade al carrito y confirma</h3>
+            <p>Pulsa «Añadir», revisa tu carrito y completa el pedido. Puedes mezclar varias muestras en un mismo pedido.</p>
+          </li>
+          <li class="how-step reveal">
+            <span class="how-step__num">05</span>
+            <h3>Pruébala y pasa al frasco cuando quieras</h3>
+            <p>Cuando ya estés convencida/o, pide el tamaño completo. Sin apuro y sin plazo límite.</p>
           </li>
         </ol>
       </div>
     </section>
 
-    <!-- ===== 3 · MUESTRAS DISPONIBLES — mismo grid que catálogo, variante "muestra" del mismo SKU ===== -->
-    <!-- Contrato JS: mismo add-to-cart, pero data-variant="muestra" (id/precio/imagen distintos al
-         tamaño completo) — pendiente de que Paul confirme si la muestra es un SKU propio en el
-         catálogo real o un flag de variante sobre el mismo producto. -->
-    <section class="muestras-catalogo" aria-labelledby="muestras-catalogo-titulo">
+    <section class="muestras-cta" aria-labelledby="muestras-cta-titulo">
       <div class="container">
-        <h2 id="muestras-catalogo-titulo">Todas las fragancias, en muestra</h2>
-        <ul class="catalog-grid" data-animate="stagger">
-
-          <li class="product-item reveal" data-familia="amaderado">
-            <a href="producto.html?id=ae-001&variant=muestra" class="product-item__link">
-              <div class="product-item__media">
-                <img src="assets/muestras/1.webp" alt="Vial de muestra Allpa Essence, formato tubo delgado con tapa plateada, fondo gris" width="600" height="750" loading="lazy">
-              </div>
-              <p class="product-item__familia">Amaderada</p>
-              <h3 class="product-item__name">Esencia a tu elección</h3>
-              <p class="product-item__price">S/. 35</p>
-            </a>
-            <button class="add-to-cart btn btn--outline" data-id="ae-001-muestra" data-name="Esencia a tu elección" data-price="35" data-image="assets/muestras/1.webp">Añadir</button>
-          </li>
-
-          <li class="product-item reveal" data-familia="citrico">
-            <a href="producto.html?id=ae-002&variant=muestra" class="product-item__link">
-              <div class="product-item__media">
-                <img src="assets/muestras/2.webp" alt="Vial de muestra Allpa Essence, frasco redondeado con tapa plateada, fondo cálido texturizado" width="600" height="750" loading="lazy">
-              </div>
-              <p class="product-item__familia">Cítrica</p>
-              <h3 class="product-item__name">Esencia a tu elección</h3>
-              <p class="product-item__price">S/. 35</p>
-            </a>
-            <button class="add-to-cart btn btn--outline" data-id="ae-002-muestra" data-name="Esencia a tu elección" data-price="35" data-image="assets/muestras/2.webp">Añadir</button>
-          </li>
-
-          <li class="product-item reveal" data-familia="floral">
-            <a href="producto.html?id=ae-003&variant=muestra" class="product-item__link">
-              <div class="product-item__media">
-                <img src="assets/muestras/3.webp" alt="Vial de muestra Allpa Essence, frasco rectangular con tapa plateada, fondo blanco de estudio" width="600" height="750" loading="lazy">
-              </div>
-              <p class="product-item__familia">Floral</p>
-              <h3 class="product-item__name">Esencia a tu elección</h3>
-              <p class="product-item__price">S/. 35</p>
-            </a>
-            <button class="add-to-cart btn btn--outline" data-id="ae-003-muestra" data-name="Esencia a tu elección" data-price="35" data-image="assets/muestras/3.webp">Añadir</button>
-          </li>
-
-        </ul>
-        <p class="muestras-catalogo__note">Mostrando 3 de 9 — <a href="catalogo.html">ver catálogo completo</a> para el resto de familias.</p>
+        <h2 id="muestras-cta-titulo">¿Lista/o para elegir?</h2>
+        <p>Ya sabes cómo funciona. Ve al catálogo, escoge tu fragancia y selecciona el tamaño de muestra.</p>
+        <a href="catalogo.html" class="btn btn--primary">Ir al catálogo</a>
       </div>
     </section>
 
@@ -353,10 +313,15 @@
 
       <nav class="site-footer__col" aria-label="Ayuda">
         <p class="site-footer__policies-title">Ayuda</p>
-        <a href="POLITICA_ENVIO_PENDIENTE" data-cta-pendiente="POLITICA_ENVIO">Envíos</a>
+        <a href="politicas.html#envios">Envíos</a>
         <a href="muestras.html">Muestras</a>
         <a href="PAGINA_FAQ_PENDIENTE" data-cta-pendiente="PAGINA_FAQ">Preguntas frecuentes</a>
-        <a href="POLITICA_CAMBIOS_PENDIENTE" data-cta-pendiente="POLITICA_CAMBIOS">Cambios y devoluciones</a>
+        <a href="politicas.html#devoluciones">Cambios y devoluciones</a>
+        <a href="politicas.html#terminos">Términos y condiciones</a>
+        <a href="politicas.html#privacidad">Privacidad</a>
+        <a href="politicas.html#cookies">Cookies</a>
+        <a href="#" data-ae-privacy>Configurar cookies</a>
+        <a href="RECLAMACIONES_PENDIENTE" data-cta-pendiente="LIBRO_RECLAMACIONES">Libro de Reclamaciones</a>
         <details class="footer-faq">
           <summary>¿Por qué mi perfume tiene alcohol?</summary>
           <p>Todo perfume lo lleva — es lo que libera y transporta el aroma, no un relleno. Lo que sí evitamos es bajar la concentración de esencia para ahorrar costo: la tuya es la que corresponde, no menos.</p>
@@ -386,7 +351,6 @@
     </div>
   </footer>
 
-  <!-- AE-R4 · Botón flotante de WhatsApp (la referencia lo tiene en todas las páginas). Destino PENDIENTE (número real de Paul). -->
   <a class="whatsapp-float" href="https://wa.me/51929033871" target="_blank" rel="noopener noreferrer" aria-label="Escríbenos por WhatsApp">
     <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.2-4.6-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.8 0-1.3.7-2 1-2.3.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.3 0 .5l-.3.4-.4.4c-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.3 2.4 1.5.3.1.5.1.6-.1l.9-1.1c.2-.3.4-.2.6-.1l1.9.9c.3.1.5.2.5.3.1.1.1.6-.1 1.2z"/></svg>
   </a>

@@ -1,7 +1,7 @@
 // stock.js — Stock por SKU/tamaño (AE-J5). Única fuente de disponibilidad para tarjetas, ficha y carrito.
 //
 // Fuentes (en orden):
-//  1. GET /api/stock (mismo origen, no-store) — contrato de AP Beauty (AB-B10):
+//  1. GET /api/stock (mismo origen, no-store) — contrato de otro proyecto (ref. interna):
 //       { "<sku>": { "disponible": N, "agotado": bool } }
 //     Un SKU ausente = no controlado (sin contador ni bloqueo). 503/fallo -> se pasa a la fuente 2.
 //  2. data/urgencia.json — CIFRAS DE MUESTRA mientras "placeholder" sea true (no publicar así).
@@ -16,7 +16,7 @@ let state = null; // { map, placeholder, meta, source }
 let inflight = null;
 
 export function baseId(id) {
-  return String(id || '').replace(/-(\d+ml|muestra)$/i, '');
+  return String(id || '').replace(/-(muestra-\d+ml|muestra|\d+ml)$/i, '');
 }
 
 function normalizeApi(json) {
@@ -64,7 +64,7 @@ export function loadStock(force = false) {
 
 // undefined = no controlado. Síncrono: devuelve undefined hasta que loadStock() haya resuelto.
 export function availableFor(id) {
-  if (!state || /-muestra$/i.test(id)) return undefined;
+  if (!state || /-muestra(-\d+ml)?$/i.test(id)) return undefined;
   const m = state.map;
   const v = Object.prototype.hasOwnProperty.call(m, id) ? m[id] : m[baseId(id)];
   return typeof v === 'number' && Number.isFinite(v) ? Math.max(0, v) : undefined;

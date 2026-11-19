@@ -5,10 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Pedido confirmado — Allpa Essence</title>
 
-  <!-- ===== DOMINIO SEO ===== -->
-  <!-- meta description, noindex (página transaccional) — agente SEO. -->
-  <!-- ===== FIN bloque SEO ===== -->
-
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -35,9 +31,6 @@
 
   <main id="main">
 
-    <!-- ===== CONFIRMACIÓN — mismo patrón que AP Beauty (?estado=pendiente para Mercado Pago
-         "en revisión", ver AP-J2 en pipeline.md). Contrato JS: leer ?estado= de la URL y alternar
-         entre los 2 bloques por [hidden] — nunca asumir siempre "aprobado". ===== -->
     <section class="confirmation" aria-labelledby="confirmation-titulo">
       <div class="container confirmation__inner">
         <h1 id="confirmation-titulo">Estado de tu pedido</h1>
@@ -110,10 +103,15 @@
 
       <nav class="site-footer__col" aria-label="Ayuda">
         <p class="site-footer__policies-title">Ayuda</p>
-        <a href="POLITICA_ENVIO_PENDIENTE" data-cta-pendiente="POLITICA_ENVIO">Envíos</a>
+        <a href="politicas.html#envios">Envíos</a>
         <a href="muestras.html">Muestras</a>
         <a href="PAGINA_FAQ_PENDIENTE" data-cta-pendiente="PAGINA_FAQ">Preguntas frecuentes</a>
-        <a href="POLITICA_CAMBIOS_PENDIENTE" data-cta-pendiente="POLITICA_CAMBIOS">Cambios y devoluciones</a>
+        <a href="politicas.html#devoluciones">Cambios y devoluciones</a>
+        <a href="politicas.html#terminos">Términos y condiciones</a>
+        <a href="politicas.html#privacidad">Privacidad</a>
+        <a href="politicas.html#cookies">Cookies</a>
+        <a href="#" data-ae-privacy>Configurar cookies</a>
+        <a href="RECLAMACIONES_PENDIENTE" data-cta-pendiente="LIBRO_RECLAMACIONES">Libro de Reclamaciones</a>
         <details class="footer-faq">
           <summary>¿Por qué mi perfume tiene alcohol?</summary>
           <p>Todo perfume lo lleva — es lo que libera y transporta el aroma, no un relleno. Lo que sí evitamos es bajar la concentración de esencia para ahorrar costo: la tuya es la que corresponde, no menos.</p>
@@ -143,7 +141,6 @@
     </div>
   </footer>
 
-  <!-- AE-R4 · Botón flotante de WhatsApp (la referencia lo tiene en todas las páginas). Destino PENDIENTE (número real de Paul). -->
   <a class="whatsapp-float" href="https://wa.me/51929033871" target="_blank" rel="noopener noreferrer" aria-label="Escríbenos por WhatsApp">
     <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.2-4.6-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.8 0-1.3.7-2 1-2.3.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.3 0 .5l-.3.4-.4.4c-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.3 2.4 1.5.3.1.5.1.6-.1l.9-1.1c.2-.3.4-.2.6-.1l1.9.9c.3.1.5.2.5.3.1.1.1.6-.1 1.2z"/></svg>
   </a>
