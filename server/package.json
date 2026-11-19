@@ -1,0 +1,18 @@
+{
+  "name": "allpaessence-backend",
+  "version": "1.0.0",
+  "description": "Backend de pagos Allpa Essence — Mercado Pago Card Payment Brick, moneda PEN",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node --env-file-if-exists=.env server.js",
+    "dev": "node --env-file-if-exists=.env --watch server.js",
+    "test": "node _test_checkout.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}
