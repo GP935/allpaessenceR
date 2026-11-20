@@ -2068,15 +2068,11 @@ function initUtilityBarRotation() {
   if (messages.length < 2) return;
   const box = document.getElementById('utility-message');
   const bar = box ? box.closest('.utility-bar') : null;
-  const btnPrev = document.querySelector('[data-utility-prev]');
-  const btnNext = document.querySelector('[data-utility-next]');
-  const btnPause = document.querySelector('[data-utility-pause]');
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   if (box) box.setAttribute('aria-live', 'polite');
 
   let index = Math.max(0, messages.findIndex((el) => el.classList.contains('is-active')));
-  let paused = reduced;
   let hovering = false;
 
   function show(i) {
@@ -2084,16 +2080,6 @@ function initUtilityBarRotation() {
     index = (i + messages.length) % messages.length;
     messages[index].classList.add('is-active');
   }
-
-  if (btnPause) {
-    btnPause.setAttribute('aria-pressed', String(paused));
-    btnPause.addEventListener('click', () => {
-      paused = !paused;
-      btnPause.setAttribute('aria-pressed', String(paused));
-    });
-  }
-  if (btnPrev) btnPrev.addEventListener('click', () => show(index - 1));
-  if (btnNext) btnNext.addEventListener('click', () => show(index + 1));
 
   if (bar) {
     bar.addEventListener('mouseenter', () => { hovering = true; });
@@ -2104,7 +2090,7 @@ function initUtilityBarRotation() {
 
   if (reduced) return;
   setInterval(() => {
-    if (paused || hovering || document.hidden) return;
+    if (hovering || document.hidden) return;
     show(index + 1);
   }, 4500);
 }
