@@ -14,6 +14,8 @@ const realFetch = globalThis.fetch.bind(globalThis);
 
 let lastMP = null;
 const mpCalls = [];
+const correos = [];
+let resendOk = true;
 let mpStatus = 'approved';
 let mpRechazaExtra = false;
 let paymentGet = null; // respuesta de GET /v1/payments/:id (webhook)
@@ -38,6 +40,10 @@ globalThis.fetch = async (url, opts = {}) => {
       payer: { email: 'x@example.com' },
     }), { status: 201 });
   }
+  if (u.includes('api.resend.com')) {
+    correos.push({ auth: opts.headers?.Authorization, ...JSON.parse(opts.body) });
+    return resendOk ? new Response(JSON.stringify({ id: 'em_fake' }), { status: 200 }) : new Response('{}', { status: 500 });
+  }
   if (u.includes('/v1/payments/')) return new Response(JSON.stringify(paymentGet), { status: 200 });
   throw new Error(`fetch no mockeado: ${u}`);
 };
@@ -49,6 +55,13 @@ process.env.MP_WEBHOOK_SECRET = SECRET;
 process.env.PORT = String(PORT);
 process.env.LOGS_DIR = tmp;
 process.env.MP_RATE_LIMIT = '1000';
+process.env.RESENAS_RATE_LIMIT = '8';
+process.env.RECLAMOS_RATE_LIMIT = '8';
+process.env.RESEND_API_KEY = 're_clave_falsa_no_loguear';
+process.env.RESEND_FROM = 'Allpa Essence <pedidos@allpaessence.test>';
+process.env.VENTAS_EMAIL_INTERNO = 'ventas@allpaessence.test';
+process.env.RECLAMOS_EMAIL = 'reclamos@allpaessence.test';
+process.env.SOPORTE_WHATSAPP = '+51 999 111 222';
 
 const srv = await import(new URL('./server.js', import.meta.url).href);
 const offer = await import(pathToFileURL(path.resolve(import.meta.dirname, '..', 'scripts', 'offer.js')).href);
@@ -131,6 +144,27 @@ const ofertaVigente = Date.now() < Date.parse('2026-11-30T23:59:59-05:00');
     }
   }
   check(comparados >= 300, `servidor == scripts/offer.js en ${comparados} carritos aleatorios (antes y después del fin)`);
+}
+{ // 5 — POST /api/resenas: pendiente de moderación, validación, honeypot, límite
+  const ok = { autor: 'María P.', producto: 'ae-001', estrellas: 5, texto: 'Me encantó, dura todo el día y huele increíble.' };
+  const r1 = await post('/api/resenas', ok);
+  check(r1.http === 200 && r1.data.ok === true, 'reseña válida → 200');
+  const hp = await post('/api/resenas', { ...ok, autor: 'Bot', web: 'http://spam.example' });
+  check(hp.http === 200, 'honeypot lleno → 200 (el bot no se entera)');
+  check((await post('/api/resenas', { ...ok, estrellas: 6 })).http === 400, 'estrellas 6 → 400');
+  check((await post('/api/resenas', { ...ok, texto: 'corto' })).http === 400, 'texto de menos de 10 caracteres → 400');
+  check((await post('/api/resenas', { ...ok, producto: 'ae-9999' })).http === 400, 'fragancia inexistente → 400');
+  check((await post('/api/resenas', { ...ok, autor: '   ' })).http === 400, 'autor vacío → 400');
+  check((await post('/api/resenas', { ...ok, email: 'no-es-correo' })).http === 400, 'correo inválido → 400');
+  const r2 = await post('/api/resenas', { ...ok, autor: 'Ana <b>R.</b>', texto: 'Muy buena fragancia' + String.fromCharCode(7) + ' para el día a día.', email: 'ana@example.com' });
+  check(r2.http === 200, 'reseña con email opcional → 200');
+  check((await post('/api/resenas', ok)).http === 429, 'límite por IP → 429');
+  const lineas = fs.readFileSync(path.join(tmp, 'resenas_pendientes.jsonl'), 'utf8').trim().split(String.fromCharCode(10)).map((l) => JSON.parse(l));
+  check(lineas.length === 2, 'solo se guardaron las 2 reseñas válidas (honeypot e inválidas descartadas)');
+  check(lineas.every((l) => l.estado === 'pendiente' && /^W-/.test(l.id)), 'quedan pendientes de moderación con id W-…');
+  check(!JSON.stringify(lineas).includes('spam.example') && !('ip' in lineas[0]), 'no se guarda el honeypot ni la IP');
+  check(lineas[1].autor === 'Ana b R. /b' || !/[<>]/.test(lineas[1].autor), 'se sanean < > del autor');
+  check(![...lineas[1].texto].some((c) => c.charCodeAt(0) < 32) && lineas[1].email === 'ana@example.com', 'se limpian caracteres de control y se guarda el email opcional');
 }
 let ordenOk;
 { // 5 — payload completo a MP
@@ -227,6 +261,48 @@ let ordenOk;
 }
 
 function hdr(h, n) { return Object.entries(h).find(([k]) => k.toLowerCase() === n.toLowerCase())?.[1]; }
+
+{ // 6 - Resend: comprobante, aviso interno y reclamos
+  await new Promise((r) => setTimeout(r, 400)); // el correo sale justo despues de escribir la venta
+  const porAsunto = (re) => correos.filter((c) => re.test(c.subject));
+  const cliente = correos.find((c) => c.to[0] === 'clienta@example.com' && /Tu compra en Allpa Essence/.test(c.subject));
+  check(Boolean(cliente) && /Total pagado: S\/ /.test(cliente.text) && /Gracias por tu compra/.test(cliente.text), 'venta aprobada -> comprobante al cliente');
+  check(cliente && cliente.text.includes('+51 999 111 222') && cliente.from.includes('allpaessence.test'), 'comprobante lleva WhatsApp de soporte y remitente de marca');
+  const interno = correos.find((c) => c.to[0] === 'ventas@allpaessence.test' && /Nueva venta/.test(c.subject));
+  check(Boolean(interno) && /Pago MP: /.test(interno.text), 'venta aprobada -> aviso interno al buzon de ventas');
+  const ventasConCorreo = correos.filter((c) => /Tu compra en Allpa Essence/.test(c.subject)).length;
+  const ventas = fs.readFileSync(path.join(tmp, 'ventas.jsonl'), 'utf8').trim().split(String.fromCharCode(10)).map((l) => JSON.parse(l));
+  const ventasRegistradas = ventas.filter((v) => v.email).length;
+  check(correos.filter((c) => /Nueva venta/.test(c.subject)).length === ventas.length, 'un aviso interno por cada venta registrada (con o sin correo de cliente)');
+  check(ventasConCorreo === ventasRegistradas, `un comprobante por venta con correo de cliente (${ventasRegistradas}), nunca duplicado por webhook repetido`);
+  check(correos.every((c) => c.auth === 'Bearer re_clave_falsa_no_loguear'), 'la API key viaja solo en el header Authorization');
+
+  const rec = { nombre: 'Lucia Torres', documento: '12345678', domicilio: 'Av. Pardo 123, Miraflores', telefono: '987654321', email: 'lucia@example.com', pedido: 'ORD-1', producto: 'ae-001', monto: '45', tipo: 'Reclamo', detalle: 'El frasco llego con la tapa rota.', solucion_esperada: 'Cambio del producto', consentimiento: true };
+  const antes = correos.length;
+  const r1 = await post('/api/reclamos', rec);
+  check(r1.http === 200 && /^LR-\d{4}-0001$/.test(r1.data.correlativo) && r1.data.correoEnviado === true, 'reclamo valido -> 200 con correlativo LR-AAAA-0001');
+  const nuevos = correos.slice(antes);
+  const aviso = nuevos.find((c) => c.to[0] === 'reclamos@allpaessence.test');
+  check(Boolean(aviso) && aviso.reply_to === 'lucia@example.com' && /El frasco llego con la tapa rota/.test(aviso.text), 'aviso al buzon del Libro con reply_to al cliente');
+  check(nuevos.some((c) => c.to[0] === 'lucia@example.com' && /Constancia/.test(c.subject) && c.text.includes(r1.data.correlativo)), 'constancia al cliente con su correlativo');
+  const r2 = await post('/api/reclamos', { ...rec, tipo: 'Queja', nombre: 'Ana <script>x</script>' });
+  check(r2.http === 200 && /-0002$/.test(r2.data.correlativo), 'segundo reclamo -> correlativo 0002');
+  check((await post('/api/reclamos', { ...rec, web: 'spam' })).http === 200, 'honeypot -> 200 sin registrar');
+  check((await post('/api/reclamos', { ...rec, tipo: 'Otro' })).http === 400, 'tipo invalido -> 400');
+  check((await post('/api/reclamos', { ...rec, consentimiento: false })).http === 400, 'sin consentimiento -> 400');
+  check((await post('/api/reclamos', { ...rec, email: 'no-es-correo' })).http === 400, 'correo invalido -> 400');
+  check((await post('/api/reclamos', { ...rec, detalle: 'corto' })).http === 400, 'detalle corto -> 400');
+  resendOk = false;
+  const r3 = await post('/api/reclamos', rec);
+  check(r3.http === 200 && r3.data.correoEnviado === false, 'Resend caido -> el reclamo se registra igual (200, correoEnviado:false)');
+  check((await post('/api/reclamos', rec)).http === 429, 'limite por IP -> 429');
+  resendOk = true;
+  const lineas = fs.readFileSync(path.join(tmp, 'reclamos.jsonl'), 'utf8').trim().split(String.fromCharCode(10)).map((l) => JSON.parse(l));
+  check(lineas.length === 3 && lineas.every((l) => /^LR-/.test(l.correlativo)) && !lineas[1].nombre.includes('<'), 'reclamos.jsonl: 3 registros, saneados, sin duplicar correlativo');
+  const fallidos = fs.readFileSync(path.join(tmp, 'correos_fallidos.jsonl'), 'utf8');
+  check(/reclamo-cliente/.test(fallidos) && /reclamo-interno/.test(fallidos), 'correos caidos quedan anotados en correos_fallidos.jsonl para reenviar');
+  check(!logs.join(String.fromCharCode(10)).includes('re_clave_falsa_no_loguear'), 'la API key de Resend no aparece en los logs');
+}
 console.log(`\n${pass}/${pass} PASS`);
 process.stdout.write(`\n${pass} PASS\n`);
 fs.rmSync(tmp, { recursive: true, force: true });

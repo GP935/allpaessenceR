@@ -22,6 +22,12 @@ const {
   THREEDS_ENABLED = '0', // '1' → 3DS 2.0 (three_d_secure_mode optional) en process-payment
   LOGS_DIR,
   CATALOGO_FILE,
+  // Correo transaccional (Resend). Vacio RESEND_API_KEY o RESEND_FROM -> no se envia nada (aviso al arrancar).
+  RESEND_API_KEY,
+  RESEND_FROM, // `Allpa Essence <pedidos@allpaessence.com>` - el dominio debe estar verificado en Resend
+  VENTAS_EMAIL_INTERNO, // buzon interno: aviso de cada venta
+  RECLAMOS_EMAIL, // buzon del Libro de Reclamaciones (por defecto, VENTAS_EMAIL_INTERNO)
+  SOPORTE_WHATSAPP, // opcional: se muestra en el comprobante
 } = process.env;
 
 const AQUI = dirname(fileURLToPath(import.meta.url));
@@ -29,6 +35,36 @@ const GATEWAY = ['none', 'mercadopago'].includes(CHECKOUT_GATEWAY) ? CHECKOUT_GA
 const MONEDA = 'PEN';
 
 console.log(`Pasarela activa (CHECKOUT_GATEWAY): ${GATEWAY}`);
+const RESEND_LISTO = Boolean(RESEND_API_KEY && RESEND_FROM);
+if (!RESEND_LISTO) console.warn('AVISO: Resend sin configurar (falta RESEND_API_KEY o RESEND_FROM) - no se enviaran comprobantes ni correos de reclamos.');
+else if (!VENTAS_EMAIL_INTERNO) console.warn('AVISO: VENTAS_EMAIL_INTERNO vacio - no se enviara el aviso interno de cada venta.');
+const BUZON_RECLAMOS = RECLAMOS_EMAIL || VENTAS_EMAIL_INTERNO || '';
+
+// Envio por la API de Resend (sin dependencias). Nunca lanza: devuelve true/false. La API key no se loguea.
+async function enviarCorreo({ to, subject, text, replyTo }) {
+  if (!RESEND_LISTO || !to) return false;
+  try {
+    const r = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ from: RESEND_FROM, to: [to], subject, text, ...(replyTo ? { reply_to: replyTo } : {}) }),
+      signal: AbortSignal.timeout(8000),
+    });
+    if (!r.ok) console.error(`Resend "${String(subject).slice(0, 40)}": HTTP ${r.status}`);
+    return r.ok;
+  } catch (err) {
+    console.error(`Resend "${String(subject).slice(0, 40)}": ${err.message}`);
+    return false;
+  }
+}
+const fmtPEN = (n) => `S/ ${Number(n).toFixed(2)}`;
+async function anotarCorreoFallido(tipo, ref, destino) {
+  try {
+    const dir = LOGS_DIR || resolve(AQUI, 'logs');
+    await mkdir(dir, { recursive: true });
+    await appendFile(resolve(dir, 'correos_fallidos.jsonl'), `${JSON.stringify({ fecha: new Date().toISOString(), tipo, ref, destino })}\n`);
+  } catch { /* el error ya se logueo en enviarCorreo */ }
+}
 if (GATEWAY === 'mercadopago' && !MP_ACCESS_TOKEN) {
   console.error('CHECKOUT_GATEWAY=mercadopago pero falta MP_ACCESS_TOKEN. Abortando.');
   process.exit(1);
@@ -144,6 +180,47 @@ const mpLimiter = rateLimit({ windowMs: 60_000, max: Number(process.env.MP_RATE_
 
 // GET /api/market — el frontend decide con esto si monta el Brick o mantiene el modo mockup.
 app.get('/api/market', (_req, res) => res.json({ gateway: GATEWAY, currency: MONEDA }));
+
+// ─────────────────────────────────────────────────────────────
+// POST /api/resenas — reseña enviada desde resenas.html. NUNCA se publica sola: se guarda
+// como pendiente en logs/resenas_pendientes.jsonl (una línea por reseña) y Paul la modera
+// (al aprobarla pasa a data/resenas.json sin email ni IP). No guardamos la IP.
+// Body: { autor(1-60), producto(ae-NN), estrellas(1-5), texto(10-800), email?, web } — `web` = honeypot.
+// 200 guardada (o descartada por honeypot, sin avisar al bot) · 400 inválida · 429 límite · 503 sin guardar.
+// ─────────────────────────────────────────────────────────────
+const resenasLimiter = rateLimit({ windowMs: 3_600_000, max: Number(process.env.RESENAS_RATE_LIMIT) || 5 });
+const limpiar = (v) => String(v ?? '').replace(/[\u0000-\u001f\u007f<>]/g, ' ').replace(/\s+/g, ' ').trim();
+app.post('/api/resenas', resenasLimiter, async (req, res) => {
+  const b = req.body || {};
+  if (typeof b.web === 'string' && b.web.trim() !== '') return res.json({ ok: true });
+  const autor = limpiar(typeof b.autor === 'string' ? b.autor : '');
+  const texto = limpiar(typeof b.texto === 'string' ? b.texto : '');
+  const producto = typeof b.producto === 'string' ? b.producto.trim() : '';
+  const estrellas = typeof b.estrellas === 'number' ? b.estrellas : Number(b.estrellas);
+  const emailRaw = typeof b.email === 'string' ? b.email.trim() : '';
+  if (autor.length < 1 || autor.length > 60) return res.status(400).json({ error: 'nombre inválido (1 a 60 caracteres)' });
+  if (!/^ae-\d{1,4}$/.test(producto) || !CATALOGO.has(producto)) return res.status(400).json({ error: 'fragancia no válida' });
+  if (!Number.isInteger(estrellas) || estrellas < 1 || estrellas > 5) return res.status(400).json({ error: 'puntuación inválida (1 a 5)' });
+  if (texto.length < 10 || texto.length > 800) return res.status(400).json({ error: 'la reseña debe tener entre 10 y 800 caracteres' });
+  if (emailRaw && (emailRaw.length > 254 || !EMAIL_RE.test(emailRaw))) return res.status(400).json({ error: 'correo no válido' });
+  try {
+    const dir = LOGS_DIR || resolve(AQUI, 'logs');
+    await mkdir(dir, { recursive: true });
+    const registro = {
+      id: `W-${Date.now().toString(36)}-${crypto.randomBytes(3).toString('hex')}`,
+      fecha: new Date().toISOString(),
+      estado: 'pendiente',
+      autor, producto, estrellas, texto,
+      email: emailRaw || null,
+    };
+    await appendFile(resolve(dir, 'resenas_pendientes.jsonl'), `${JSON.stringify(registro)}\n`);
+    console.info(`RESEÑA ${registro.id} ${producto} ${estrellas}★ → pendiente de moderación`);
+    return res.json({ ok: true });
+  } catch (err) {
+    console.error('No se pudo guardar la reseña:', err.message);
+    return res.status(503).json({ error: 'no disponible' });
+  }
+});
 
 // ─────────────────────────────────────────────────────────────
 // POST /api/mp/create-order   Body: { items: [{ id, quantity }] }
@@ -306,6 +383,58 @@ function payloadMinimoMP(full) {
 // con el panel de MP) que guarda a dónde enviar cada pedido. Una línea por pago
 // aprobado, idempotente por payment_id.
 // ─────────────────────────────────────────────────────────────
+// Comprobante al cliente + aviso interno. Se llama UNA vez por payment_id (registrarVenta es idempotente).
+// Si un correo falla, la venta ya esta en ventas.jsonl y el fallo queda en correos_fallidos.jsonl para reenviarlo a mano.
+async function enviarComprobantes(orderId, pedido, venta) {
+  if (!RESEND_LISTO) return;
+  const filas = pedido.items.map((i) => `  · ${i.cantidad}× ${i.title || i.id} — ${fmtPEN((i.price / 100) * i.cantidad)}`).join('\n');
+  const e = pedido.shipping;
+  const dir = e
+    ? [e.name, e.line + (e.reference ? ` (${e.reference})` : ''), [e.district, e.province, e.department].filter(Boolean).join(', '), e.phone ? `Tel. ${e.phone}` : ''].filter(Boolean).join('\n')
+    : '(no facilitada)';
+  const nombre = e?.name ? e.name.split(/\s+/)[0] : '';
+  if (venta.email) {
+    const lineas = [
+      `Hola${nombre ? ` ${nombre}` : ''},`,
+      '',
+      'Gracias por tu compra en Allpa Essence. Recibimos tu pago y ya estamos preparando tu pedido.',
+      '',
+      `Pedido: ${orderId}`,
+      `Fecha: ${venta.fecha.slice(0, 10)}`,
+      '',
+      'Detalle:',
+      filas,
+      '',
+      `Total pagado: ${fmtPEN(venta.total)}`,
+      '',
+      'Envío a:',
+      dir,
+    ];
+    if (SOPORTE_WHATSAPP) lineas.push('', `Cualquier duda escríbenos por WhatsApp: ${SOPORTE_WHATSAPP}`);
+    if (!(await enviarCorreo({ to: venta.email, subject: `Tu compra en Allpa Essence — pedido ${orderId}`, text: lineas.join('\n') }))) {
+      await anotarCorreoFallido('comprobante', orderId, 'cliente');
+    }
+  }
+  if (VENTAS_EMAIL_INTERNO) {
+    const texto = [
+      `Pedido: ${orderId}`,
+      `Pago MP: ${venta.paymentId}`,
+      `Fecha: ${venta.fecha}`,
+      `Cliente: ${e?.name || '(sin nombre)'} <${venta.email || 'sin-email'}>`,
+      '',
+      'Detalle:',
+      filas,
+      `Total: ${fmtPEN(venta.total)}`,
+      '',
+      'Envío a:',
+      dir,
+    ].join('\n');
+    if (!(await enviarCorreo({ to: VENTAS_EMAIL_INTERNO, subject: `Nueva venta ${fmtPEN(venta.total)} — pedido ${orderId}`, text: texto }))) {
+      await anotarCorreoFallido('venta-interna', orderId, 'interno');
+    }
+  }
+}
+
 async function registrarVenta(orderId, pedido, payment) {
   if (pagosRegistrados.has(payment.id)) return;
   pagosRegistrados.add(payment.id);
@@ -323,6 +452,7 @@ async function registrarVenta(orderId, pedido, payment) {
     };
     await appendFile(resolve(dir, 'ventas.jsonl'), `${JSON.stringify(linea)}\n`);
     console.info(`VENTA ${orderId} payment=${payment.id} total=${pedido.amountExpected} ${MONEDA} → registrada`);
+    await enviarComprobantes(orderId, pedido, linea);
   } catch (err) {
     pagosRegistrados.delete(payment.id);
     console.error(`No se pudo registrar la venta ${orderId}:`, err.message);
@@ -514,6 +644,83 @@ app.post('/api/mp/webhook', async (req, res) => {
     console.error('Error consultando pago en webhook MP:', err.message);
   }
   return res.status(200).json({ received: true });
+});
+
+// ─────────────────────────────────────────────────────────────
+// POST /api/reclamos - Libro de Reclamaciones virtual (reclamaciones.html). Guarda el registro con
+// correlativo LR-AAAA-NNNN en logs/reclamos.jsonl y envia: aviso al buzon del Libro (con reply_to al
+// cliente) y constancia al cliente. Si Resend falla el registro NO se pierde (200 con correoEnviado:false).
+// Body: { nombre, documento, domicilio, telefono, email, pedido?, producto, monto?, tipo: Reclamo|Queja,
+//         detalle(10-1500), solucion_esperada?, consentimiento, web }   - `web` = honeypot.
+// ─────────────────────────────────────────────────────────────
+const reclamosLimiter = rateLimit({ windowMs: 3_600_000, max: Number(process.env.RECLAMOS_RATE_LIMIT) || 5 });
+let colaReclamos = Promise.resolve();
+async function guardarReclamo(datos) {
+  const dir = LOGS_DIR || resolve(AQUI, 'logs');
+  await mkdir(dir, { recursive: true });
+  const archivo = resolve(dir, 'reclamos.jsonl');
+  let previos = 0;
+  try { previos = readFileSync(archivo, 'utf8').split('\n').filter(Boolean).length; } catch { /* aun no existe */ }
+  const ahora = new Date();
+  const registro = { correlativo: `LR-${ahora.getUTCFullYear()}-${String(previos + 1).padStart(4, '0')}`, fecha: ahora.toISOString(), ...datos };
+  await appendFile(archivo, `${JSON.stringify(registro)}\n`);
+  return registro;
+}
+app.post('/api/reclamos', reclamosLimiter, async (req, res) => {
+  const b = req.body || {};
+  if (typeof b.web === 'string' && b.web.trim() !== '') return res.json({ ok: true });
+  const t = (k, max) => (typeof b[k] === 'string' ? limpiar(b[k]).slice(0, max + 1) : '');
+  const d = {
+    nombre: t('nombre', 120), documento: t('documento', 20), domicilio: t('domicilio', 200), telefono: t('telefono', 20),
+    email: typeof b.email === 'string' ? b.email.trim() : '', pedido: t('pedido', 60), producto: t('producto', 120),
+    monto: t('monto', 20), tipo: typeof b.tipo === 'string' ? b.tipo.trim() : '', detalle: t('detalle', 1500),
+    solucion_esperada: t('solucion_esperada', 600),
+  };
+  const err = (m) => res.status(400).json({ error: m });
+  if (d.nombre.length < 2 || d.nombre.length > 120) return err('nombre inválido');
+  if (!/^[A-Za-z0-9-]{5,20}$/.test(d.documento)) return err('documento inválido');
+  if (d.domicilio.length < 5 || d.domicilio.length > 200) return err('domicilio inválido');
+  if (!/^[0-9+()\s-]{6,20}$/.test(d.telefono)) return err('teléfono inválido');
+  if (d.email.length > 254 || !EMAIL_RE.test(d.email)) return err('correo no válido');
+  if (d.pedido.length > 60) return err('pedido inválido');
+  if (d.producto.length < 2 || d.producto.length > 120) return err('producto inválido');
+  if (d.monto.length > 20 || !/^[0-9.,\sSs/]*$/.test(d.monto)) return err('monto inválido');
+  if (!['Reclamo', 'Queja'].includes(d.tipo)) return err('tipo inválido');
+  if (d.detalle.length < 10 || d.detalle.length > 1500) return err('el detalle debe tener entre 10 y 1500 caracteres');
+  if (d.solucion_esperada.length > 600) return err('texto demasiado largo');
+  if (!(b.consentimiento === true || b.consentimiento === 'on' || b.consentimiento === 'true')) return err('falta el consentimiento');
+  let registro;
+  try {
+    registro = await (colaReclamos = colaReclamos.then(() => guardarReclamo(d), () => guardarReclamo(d)));
+  } catch (e) {
+    console.error('No se pudo guardar el reclamo:', e.message);
+    return res.status(503).json({ error: 'no disponible' });
+  }
+  console.info(`RECLAMO ${registro.correlativo} ${d.tipo} → registrado`);
+  const cuerpo = [
+    `Libro de Reclamaciones — ${registro.correlativo}`,
+    `Fecha: ${registro.fecha}`,
+    `Tipo: ${d.tipo}`,
+    '',
+    `Nombre: ${d.nombre}`, `Documento: ${d.documento}`, `Domicilio: ${d.domicilio}`, `Teléfono: ${d.telefono}`, `Correo: ${d.email}`,
+    '',
+    `Pedido: ${d.pedido || '(no indicado)'}`, `Producto: ${d.producto}`, `Monto: ${d.monto || '(no indicado)'}`,
+    '',
+    'Detalle:', d.detalle,
+    '',
+    'Solución esperada:', d.solucion_esperada || '(no indicada)',
+  ].join('\n');
+  if (BUZON_RECLAMOS) {
+    const okInterno = await enviarCorreo({ to: BUZON_RECLAMOS, subject: `[${d.tipo}] ${registro.correlativo} — ${d.nombre}`, text: cuerpo, replyTo: d.email });
+    if (!okInterno) await anotarCorreoFallido('reclamo-interno', registro.correlativo, 'interno');
+  }
+  const okCliente = await enviarCorreo({
+    to: d.email,
+    subject: `Constancia de tu ${d.tipo.toLowerCase()} ${registro.correlativo} — Allpa Essence`,
+    text: [`Hola ${d.nombre.split(/\s+/)[0]},`, '', `Recibimos tu ${d.tipo.toLowerCase()} y quedó registrado con el código ${registro.correlativo}. Te responderemos dentro del plazo legal.`, '', 'Copia de lo que registraste:', '', cuerpo].join('\n'),
+  });
+  if (!okCliente) await anotarCorreoFallido('reclamo-cliente', registro.correlativo, 'cliente');
+  return res.json({ ok: true, correlativo: registro.correlativo, correoEnviado: okCliente });
 });
 
 app.get('/health', (_req, res) => res.json({ ok: true }));
