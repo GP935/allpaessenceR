@@ -1,7 +1,7 @@
 User-agent: *
 Allow: /
-Disallow: /checkout.html
-Disallow: /confirmacion.html
+Disallow: /checkout
+Disallow: /confirmacion
 Disallow: /api/
 
 Sitemap: https://allpaessence.com/sitemap.xml
