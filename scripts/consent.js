@@ -5,7 +5,6 @@
 // Elección en localStorage `ae_cookie_consent` = { v:1, analytics:bool, marketing:bool, ts:ISO } (no es una cookie).
 // El aviso solo se pinta cuando css publica el centinela `:root { --ae-privacy-ui: ready }`.
 
-const PANEL_MS = 250;
 const timers = new WeakMap();
 
 function openAccPanel(panel) {
@@ -18,9 +17,9 @@ function openAccPanel(panel) {
 
 function closeAccPanel(panel) {
   if (!panel) return;
-  panel.classList.remove('is-open');
   clearTimeout(timers.get(panel));
-  timers.set(panel, setTimeout(() => { panel.hidden = true; }, PANEL_MS));
+  panel.classList.remove('is-open');
+  panel.hidden = true;
 }
 
 export function initPoliciesAccordion() {

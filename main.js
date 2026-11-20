@@ -735,6 +735,7 @@ async function initProductPage() {
   }
 
   renderTamano(initialIsMuestra ? 'muestra-5' : '30');
+  setProductHead(producto);
   initProductExtras(producto, productos);
 
   // Copy deck AE-F7: el radio "Elige tu tamaño" reemplaza el link "Probar en muestra
@@ -748,6 +749,54 @@ async function initProductPage() {
       if (input.checked) renderTamano(input.value);
     });
   });
+}
+
+// Head dinámico de la ficha (title, description, canonical, Open Graph, JSON-LD Product). No cita la marca de referencia.
+// Sin aggregateRating: las reseñas actuales no son por producto.
+const SITE_ORIGIN = 'https://allpaessence.com';
+function setProductHead(producto) {
+  const title = `${producto.nombre} — Allpa Essence`;
+  const desc = `${producto.desc || `Fragancia ${producto.nombre}`} Desde S/ ${producto.precio}. Envíos a todo el Perú.`;
+  const url = `${SITE_ORIGIN}/producto.html?id=${encodeURIComponent(producto.id)}`;
+  const image = new URL(producto.imagen, `${SITE_ORIGIN}/`).href;
+  document.title = title;
+  const setMeta = (attr, key, value) => {
+    let el = document.head.querySelector(`meta[${attr}="${key}"]`);
+    if (!el) { el = document.createElement('meta'); el.setAttribute(attr, key); document.head.appendChild(el); }
+    el.setAttribute('content', value);
+  };
+  setMeta('name', 'description', desc);
+  setMeta('property', 'og:type', 'product');
+  setMeta('property', 'og:title', title);
+  setMeta('property', 'og:description', desc);
+  setMeta('property', 'og:image', image);
+  setMeta('property', 'og:url', url);
+  setMeta('name', 'twitter:title', title);
+  setMeta('name', 'twitter:description', desc);
+  setMeta('name', 'twitter:image', image);
+  let canon = document.head.querySelector('link[rel="canonical"]');
+  if (!canon) { canon = document.createElement('link'); canon.rel = 'canonical'; document.head.appendChild(canon); }
+  canon.href = url;
+  const ld = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: producto.nombre,
+    description: producto.desc || undefined,
+    image,
+    sku: producto.id,
+    brand: { '@type': 'Brand', name: 'Allpa Essence' },
+    offers: {
+      '@type': 'Offer',
+      url,
+      priceCurrency: 'PEN',
+      price: String(producto.precio),
+      availability: 'https://schema.org/InStock',
+      itemCondition: 'https://schema.org/NewCondition',
+    },
+  };
+  let script = document.getElementById('product-jsonld');
+  if (!script) { script = document.createElement('script'); script.type = 'application/ld+json'; script.id = 'product-jsonld'; document.head.appendChild(script); }
+  script.textContent = JSON.stringify(ld);
 }
 
 /* --------------------------------------------------------------------------
@@ -779,17 +828,24 @@ function initProductExtras(producto, productos) {
     qty.addEventListener('change', clampQty);
   }
 
-  // Fecha de entrega calculada (plazo en data-delivery-min/max, PENDIENTE de confirmar con Paul)
+  // Fecha de entrega (plazo vigente de Paul, 2026-11-20): Lima 2 días hábiles habitual, máximo 3, contados desde
+  // el pago, lunes a viernes. No se descuentan feriados (sin calendario fiable): el máximo cubre el margen.
   const deliveryEl = document.getElementById('product-delivery');
   const deliveryText = deliveryEl?.querySelector('[data-delivery-text]');
   if (deliveryEl && deliveryText) {
-    const min = parseInt(deliveryEl.dataset.deliveryMin, 10);
-    const max = parseInt(deliveryEl.dataset.deliveryMax, 10);
-    if (Number.isFinite(min) && Number.isFinite(max)) {
-      const fmt = new Intl.DateTimeFormat('es-PE', { weekday: 'long', day: 'numeric', month: 'long' });
-      const day = (n) => { const d = new Date(); d.setDate(d.getDate() + n); return fmt.format(d); };
-      deliveryText.textContent = `Pídelo hoy y recíbelo entre el ${day(min)} y el ${day(max)}`;
-    }
+    const LIMA_MIN = 2;
+    const LIMA_MAX = 3;
+    const fmt = new Intl.DateTimeFormat('es-PE', { weekday: 'long', day: 'numeric', month: 'long' });
+    const businessDay = (n) => {
+      const d = new Date();
+      let left = n;
+      while (left > 0) {
+        d.setDate(d.getDate() + 1);
+        if (d.getDay() !== 0 && d.getDay() !== 6) left -= 1;
+      }
+      return fmt.format(d);
+    };
+    deliveryText.textContent = `Pídelo hoy y recíbelo en Lima entre el ${businessDay(LIMA_MIN)} y el ${businessDay(LIMA_MAX)}`;
   }
 
   // Barra sticky: aparece cuando el botón principal ya salió por arriba. Usa scroll + rect
@@ -1049,6 +1105,50 @@ async function initReviewForm() {
       else show('No pudimos recibir tu reseña ahora mismo. Inténtalo más tarde o escríbenos por WhatsApp.', false);
     } catch {
       show('No hay conexión con el servidor. Inténtalo de nuevo en un momento.', false);
+    } finally {
+      submit.disabled = false;
+    }
+  });
+}
+
+// Libro de Reclamaciones (reclamaciones.html): POST /api/reclamos; mailto del HTML como fallback si no hay servidor.
+function initReclamoForm() {
+  const form = document.querySelector('[data-reclamo-form]');
+  if (!form) return;
+  const estado = document.getElementById('reclamo-estado');
+  const submit = form.querySelector('[type="submit"]');
+  const show = (msg, ok) => {
+    estado.textContent = msg;
+    estado.classList.toggle('is-ok', ok);
+    estado.classList.toggle('is-error', !ok);
+    estado.hidden = false;
+  };
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!form.checkValidity()) { form.classList.add('was-validated'); form.reportValidity(); return; }
+    const fd = new FormData(form);
+    const v = (k) => String(fd.get(k) || '').trim();
+    const body = {
+      nombre: v('nombre'), documento: v('documento'), domicilio: v('domicilio'), telefono: v('telefono'), email: v('email'),
+      pedido: v('pedido') || undefined, producto: v('producto'), monto: v('monto') || undefined,
+      tipo: v('tipo'), detalle: v('detalle'), solucion_esperada: v('solucion_esperada') || undefined,
+      consentimiento: fd.get('consentimiento') === 'on', web: v('web'),
+    };
+    submit.disabled = true;
+    try {
+      const res = await fetch('/api/reclamos', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      if (res.ok) {
+        const data = await res.json().catch(() => ({}));
+        form.reset();
+        show(`Recibimos tu ${body.tipo.toLowerCase()}.${data.correlativo ? ` Tu número de registro es ${data.correlativo}.` : ''} Te responderemos por correo.`, true);
+      } else if (res.status === 400) {
+        const data = await res.json().catch(() => ({}));
+        show(data.error || 'Revisa los datos del formulario e inténtalo de nuevo.', false);
+      } else if (res.status === 429) show('Has enviado varios registros seguidos. Espera un rato e inténtalo otra vez.', false);
+      else throw new Error('servidor');
+    } catch {
+      show('No pudimos enviarlo desde la web. Se abrirá tu correo para que lo envíes directamente.', false);
+      form.submit();
     } finally {
       submit.disabled = false;
     }
@@ -1545,7 +1645,7 @@ function readShippingForm(form) {
     name: val('nombre'),
     phone: val('telefono'),
     address: {
-      // "Amazonas 836" + "836" → "Amazonas 836", no "Amazonas 836 836"
+      // evita duplicar el número si ya viene en la calle
       line: number && street.split(/\s+/).pop().toLowerCase() === number.toLowerCase()
         ? street
         : [street, number].filter(Boolean).join(' '),
@@ -2096,4 +2196,5 @@ document.addEventListener('DOMContentLoaded', () => {
   initScrollReveals();
   initPoliciesAccordion();
   initCookieConsent();
+  initReclamoForm();
 });
