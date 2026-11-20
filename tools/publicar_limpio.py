@@ -32,7 +32,7 @@ n = {'html': 0, 'js': 0, 'css': 0, 'otros': 0}
 for raiz, dirs, archivos in os.walk(RAIZ):
     dirs[:] = [d for d in dirs if d not in EXCLUIR_DIRS]
     for nombre in archivos:
-        if nombre.lower().endswith(EXCLUIR_EXT) or nombre.startswith('_test'):
+        if (nombre.lower().endswith(EXCLUIR_EXT) and nombre != 'robots.txt') or nombre.startswith('_test'):
             continue
         origen = os.path.join(raiz, nombre)
         destino = os.path.join(DIST, os.path.relpath(origen, RAIZ))
